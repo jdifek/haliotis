@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
 type Props = {
@@ -57,7 +57,36 @@ export const Header: React.FC<Props> = ({
     },
     { id: "tec-diving", label: "Tec Diving", image: "/Rectangle 8.png" },
   ];
-
+  const dropdownRef = useRef<HTMLDivElement>(null); // для centers
+  const coursesRef = useRef<HTMLDivElement>(null);
+  const langRef = useRef<HTMLDivElement>(null);
+  
+  const centersButtonRef = useRef<HTMLButtonElement>(null);
+  const coursesButtonRef = useRef<HTMLButtonElement>(null);
+  const langButtonRef = useRef<HTMLButtonElement>(null);
+  
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
+      
+      const isInside =
+        (dropdownRef.current && dropdownRef.current.contains(target)) ||
+        (coursesRef.current && coursesRef.current.contains(target)) ||
+        (langRef.current && langRef.current.contains(target)) ||
+        (centersButtonRef.current && centersButtonRef.current.contains(target)) ||
+        (coursesButtonRef.current && coursesButtonRef.current.contains(target)) ||
+        (langButtonRef.current && langButtonRef.current.contains(target));
+  
+      if (!isInside) {
+        setOpenDropdown(null);
+        setMobileOpenDropdown(null);
+        setIsLangMenuOpen(false);
+      }
+    };
+  
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
   return (
     <>
       <header className="mx-auto p-5">
@@ -259,14 +288,22 @@ export const Header: React.FC<Props> = ({
               {navItems.slice(0, -1).map((item) => (
                 <div key={item.id} className="relative">
                   <button
-                    onClick={() => {
-                      setActiveNav(item.id);
-                      if (item.hasDropdown) {
-                        setOpenDropdown(
-                          openDropdown === item.id ? null : item.id
-                        );
-                      }
-                    }}
+                        ref={item.id === "centers" ? centersButtonRef : item.id === "courses" ? coursesButtonRef : undefined}
+
+                  onClick={(e) => {
+                    console.log("[CENTERS BTN] клик по кнопке центров");
+                    setActiveNav(item.id);
+                    if (item.hasDropdown) {
+                      const willOpen = openDropdown !== item.id;
+                      console.log(
+                        "[CENTERS BTN] меняем openDropdown →",
+                        willOpen ? "открываем" : "закрываем",
+                        "текущее значение:",
+                        openDropdown
+                      );
+                      setOpenDropdown(willOpen ? item.id : null);
+                    }
+                  }}
                     className={`relative flex cursor-pointer items-center whitespace-nowrap uppercase transition-all ${
                       activeNav === item.id
                         ? "text-[15px] font-normal uppercase leading-[120%] text-white "
@@ -304,6 +341,8 @@ export const Header: React.FC<Props> = ({
                     openDropdown === item.id &&
                     item.id === "centers" && (
                       <div
+                      ref={dropdownRef}
+                        data-dropdown
                         className="absolute left-0 top-full z-50 mt-2 flex flex-col gap-0 rounded-[10px] border-2 border-white p-0"
                         style={{
                           width: "238px",
@@ -316,7 +355,7 @@ export const Header: React.FC<Props> = ({
                           <button
                             key={center.id}
                             onClick={() => setSelectedCenter(center.id)}
-                            className={`flex h-[44px] items-center justify-between px-[14px] transition-all hover:bg-[#111d9e] ${
+                            className={`flex h-[44px]  cursor-pointer  items-center justify-between px-[14px] transition-all hover:bg-[#111d9e] ${
                               selectedCenter === center.id ? "bg-[#111d9e]" : ""
                             } ${index === 0 ? "rounded-t-[8px]" : ""} ${
                               index === centersData.length - 1
@@ -395,6 +434,8 @@ export const Header: React.FC<Props> = ({
             {/* Courses Dropdown - вынесен за map, позиционируется относительно nav */}
             {openDropdown === "courses" && (
               <div
+              ref={coursesRef}
+                data-dropdown
                 className="absolute left-1/2 top-full z-50 mt-2 -translate-x-1/2 rounded-[10px] border-2 border-white p-[20px]"
                 style={{
                   width: "100%",
@@ -408,7 +449,7 @@ export const Header: React.FC<Props> = ({
                   {coursesData.map((course) => (
                     <button
                       key={course.id}
-                      className="flex flex-col items-center gap-[5px] rounded-[20px] border-2 border-transparent px-0 pb-[5px] pt-[10px] transition-all hover:border-white hover:bg-[#111d9e]"
+                      className="flex flex-col items-center gap-[5px] cursor-pointer rounded-[20px] border-2 border-transparent px-0 pb-[5px] pt-[10px] transition-all hover:border-white hover:bg-[#111d9e]"
                       style={{
                         width: "120px",
                         height: "124px",
@@ -443,8 +484,13 @@ export const Header: React.FC<Props> = ({
               {/* Language Selector */}
               <div className="relative">
                 <button
-                  onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
-                  className="flex items-center justify-center gap-1.5 rounded-lg border border-black/12 bg-white px-2.5 py-2.5 text-[14px] font-bold text-black xl:gap-2 xl:px-3.5 xl:text-[15px]"
+                  ref={langButtonRef}
+
+                  onClick={(e) => {
+                    
+                    setIsLangMenuOpen(!isLangMenuOpen);
+                  }}
+                  className="flex items-center justify-center gap-1.5 rounded-lg border border-black/12 bg-white cursor-pointer hover:bg-gray-100 px-2.5 py-2.5 text-[14px] font-bold text-black xl:gap-2 xl:px-3.5 xl:text-[15px]"
                   style={{ lineHeight: "120%" }}
                 >
                   {selectedLang}
@@ -467,6 +513,7 @@ export const Header: React.FC<Props> = ({
                 {/* Language Dropdown */}
                 {isLangMenuOpen && (
                   <div
+                    data-dropdown
                     className="absolute right-0 top-full mt-2 flex flex-col rounded-[10px] border-2 border-white shadow-lg"
                     style={{
                       width: "75px",
@@ -482,7 +529,7 @@ export const Header: React.FC<Props> = ({
                           setSelectedLang(lang.code);
                           setIsLangMenuOpen(false);
                         }}
-                        className={`flex h-[40px] w-[71px] items-center justify-center text-center text-[15px] font-semibold leading-[160%] transition-colors ${
+                        className={`flex h-[40px] w-[71px] cursor-pointer items-center justify-center text-center text-[15px] font-semibold leading-[160%] transition-colors ${
                           selectedLang === lang.code
                             ? "text-[#e84814]"
                             : "text-white hover:text-[#e84814]"
@@ -556,13 +603,34 @@ export const Header: React.FC<Props> = ({
             className="flex items-center justify-center rounded-lg bg-white p-2 lg:hidden"
           >
             {isMenuOpen ? (
-             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-             <path d="M7 7L17 17M7 17L17 7" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-           </svg>
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M7 7L17 17M7 17L17 7"
+                  stroke="black"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
             ) : (
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M4 18C3.71667 18 3.47934 17.904 3.288 17.712C3.09667 17.52 3.00067 17.2827 3 17C2.99934 16.7173 3.09534 16.48 3.288 16.288C3.48067 16.096 3.718 16 4 16H20C20.2833 16 20.521 16.096 20.713 16.288C20.905 16.48 21.0007 16.7173 21 17C20.9993 17.2827 20.9033 17.5203 20.712 17.713C20.5207 17.9057 20.2833 18.0013 20 18H4ZM4 13C3.71667 13 3.47934 12.904 3.288 12.712C3.09667 12.52 3.00067 12.2827 3 12C2.99934 11.7173 3.09534 11.48 3.288 11.288C3.48067 11.096 3.718 11 4 11H20C20.2833 11 20.521 11.096 20.713 11.288C20.905 11.48 21.0007 11.7173 21 12C20.9993 12.2827 20.9033 12.5203 20.712 12.713C20.5207 12.9057 20.2833 13.0013 20 13H4ZM4 8C3.71667 8 3.47934 7.904 3.288 7.712C3.09667 7.52 3.00067 7.28267 3 7C2.99934 6.71733 3.09534 6.48 3.288 6.288C3.48067 6.096 3.718 6 4 6H20C20.2833 6 20.521 6.096 20.713 6.288C20.905 6.48 21.0007 6.71733 21 7C20.9993 7.28267 20.9033 7.52033 20.712 7.713C20.5207 7.90567 20.2833 8.00133 20 8H4Z" fill="black" />
-            </svg>
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M4 18C3.71667 18 3.47934 17.904 3.288 17.712C3.09667 17.52 3.00067 17.2827 3 17C2.99934 16.7173 3.09534 16.48 3.288 16.288C3.48067 16.096 3.718 16 4 16H20C20.2833 16 20.521 16.096 20.713 16.288C20.905 16.48 21.0007 16.7173 21 17C20.9993 17.2827 20.9033 17.5203 20.712 17.713C20.5207 17.9057 20.2833 18.0013 20 18H4ZM4 13C3.71667 13 3.47934 12.904 3.288 12.712C3.09667 12.52 3.00067 12.2827 3 12C2.99934 11.7173 3.09534 11.48 3.288 11.288C3.48067 11.096 3.718 11 4 11H20C20.2833 11 20.521 11.096 20.713 11.288C20.905 11.48 21.0007 11.7173 21 12C20.9993 12.2827 20.9033 12.5203 20.712 12.713C20.5207 12.9057 20.2833 13.0013 20 13H4ZM4 8C3.71667 8 3.47934 7.904 3.288 7.712C3.09667 7.52 3.00067 7.28267 3 7C2.99934 6.71733 3.09534 6.48 3.288 6.288C3.48067 6.096 3.718 6 4 6H20C20.2833 6 20.521 6.096 20.713 6.288C20.905 6.48 21.0007 6.71733 21 7C20.9993 7.28267 20.9033 7.52033 20.712 7.713C20.5207 7.90567 20.2833 8.00133 20 8H4Z"
+                  fill="black"
+                />
+              </svg>
             )}
           </button>
         </div>
@@ -809,9 +877,21 @@ export const Header: React.FC<Props> = ({
                 onClick={() => setIsMenuOpen(false)}
                 className="flex items-center justify-center rounded-lg bg-white p-2"
               >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <path d="M7 7L17 17M7 17L17 7" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-</svg>
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M7 7L17 17M7 17L17 7"
+                    stroke="black"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
               </button>
             </div>
 
@@ -819,21 +899,22 @@ export const Header: React.FC<Props> = ({
             <nav className="flex flex-col gap-4 p-6">
               {navItems.map((item) => (
                 <div key={item.id} className="relative">
-                  <button
-                    onClick={() => {
-                      if (item.hasDropdown) {
-                        setMobileOpenDropdown(
-                          mobileOpenDropdown === item.id ? null : item.id
-                        );
-                      } else {
-                        setActiveNav(item.id);
-                        setIsMenuOpen(false);
-                      }
-                    }}
-                    className={`flex w-full items-center justify-between uppercase text-[15px] font-normal uppercase leading-[120%] ${
-                      activeNav === item.id ? "text-[#e84814]" : "text-white"
-                    }`}
-                  >
+                 <button
+  onClick={(e) => {
+    e.stopPropagation();
+    if (item.hasDropdown) {
+      setMobileOpenDropdown(
+        mobileOpenDropdown === item.id ? null : item.id
+      );
+    } else {
+      setActiveNav(item.id);
+      setIsMenuOpen(false);
+    }
+  }}
+  className={`flex w-full items-center justify-between uppercase text-[15px] font-normal uppercase leading-[120%] ${
+    activeNav === item.id ? "text-[#e84814]" : "text-white"
+  }`}
+>
                     {item.label}
                     {item.hasDropdown && (
                       <svg
@@ -857,6 +938,8 @@ export const Header: React.FC<Props> = ({
                   {item.id === "centers" &&
                     mobileOpenDropdown === "centers" && (
                       <div
+                      ref={coursesRef}
+                        data-dropdown
                         className="absolute  rounded-lg -left-3.5 -top-2 z-10 w-[calc(100%_+_28px)] overflow-hidden rounded-t-lg"
                         style={{
                           background: "#fff",
@@ -893,7 +976,7 @@ export const Header: React.FC<Props> = ({
                                 setSelectedCenter(center.id);
                                 setMobileOpenDropdown(null);
                               }}
-                              className={`flex h-[44px] items-center justify-between px-[14px] transition-all hover:bg-[#111d9e] ${
+                              className={`flex h-[44px] items-center  cursor-pointer justify-between px-[14px] transition-all hover:bg-[#111d9e] ${
                                 selectedCenter === center.id
                                   ? "bg-[#111d9e]"
                                   : ""
@@ -935,6 +1018,8 @@ export const Header: React.FC<Props> = ({
                   {item.id === "courses" &&
                     mobileOpenDropdown === "courses" && (
                       <div
+                      ref={coursesRef}
+                        data-dropdown
                         className="absolute -left-3.5 -top-2 z-10 w-[calc(100%_+_28px)] z-10  overflow-hidden rounded-lg"
                         style={{
                           background: "#fff",
@@ -1006,8 +1091,11 @@ export const Header: React.FC<Props> = ({
                 {/* Language Selector */}
                 <div className="relative">
                   <button
-                    onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
-                    className="flex items-center justify-center gap-2 rounded-lg bg-white px-4 py-2 text-black"
+                    ref={langButtonRef}
+
+ onClick={(e) => {
+  setIsLangMenuOpen(!isLangMenuOpen);
+}}                    className="flex items-center justify-center gap-2 rounded-lg bg-white px-4 py-2 text-black"
                   >
                     {selectedLang}
                     <svg
@@ -1029,6 +1117,7 @@ export const Header: React.FC<Props> = ({
                   {/* Language Dropdown */}
                   {isLangMenuOpen && (
                     <div
+                      data-dropdown
                       className="absolute bottom-full left-0 mb-2 flex flex-col rounded-[10px] border-2 border-white"
                       style={{
                         width: "75px",

@@ -21,16 +21,26 @@ type Props = {
     duration: string;
     requestBased: boolean;
     badge: string;
-  }[];
+    location: string;
+}[]
 };
-export const CoursesSection:React.FC<Props> = ({locations, courseCards}) => {
-  const [selectedLocation, setSelectedLocation] = useState("santa-maria");
+export const CoursesSection: React.FC<Props> = ({ locations, courseCards }) => {
+  const [selectedLocation, setSelectedLocation] = useState("all");
   const coursesSwiperRef = useRef<SwiperType | null>(null);
 
   const [coursesCurrentSlide, setCoursesCurrentSlide] = useState(0);
- 
+  const filteredCourses = selectedLocation === "all" 
+  ? courseCards 
+  : courseCards.filter(card => card.location === selectedLocation);
+
+  // Функцию для получения названия локации
+  const getLocationLabel = () => {
+    const location = locations.find((loc) => loc.id === selectedLocation);
+    return location ? location.label : "ALL";
+  };
+
   return (
-    <section className="bg-[#f1f1f1] px-4 py-12 md:px-8 md:py-18.25">
+    <section className="bg-[#FFFF] px-4 py-12 md:px-8 md:py-18.25">
       <div className="flex flex-col lg:flex-row">
         {/* Sidebar - скрыт на мобильных */}
         <div className="mb-8 lg:mr-[34px] lg:mb-0 lg:w-[282px] lg:flex-shrink-0">
@@ -72,10 +82,10 @@ export const CoursesSection:React.FC<Props> = ({locations, courseCards}) => {
         <div className="flex flex-1 flex-col gap-[30px] overflow-hidden">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div className="flex flex-col gap-[10px]">
-              <h1 className="text-[28px] font-medium leading-[130%] text-black sm:text-[36px] lg:text-[42px]">
+              <h2 className="text-[28px] font-medium leading-[130%] text-black sm:text-[36px] lg:text-[42px]">
                 Upcoming Courses:{" "}
-                <span className="text-[#e84814]">Sesimbra</span>
-              </h1>
+                <span className="text-[#e84814]">{getLocationLabel()}</span>
+                </h2>
               <p className="text-[15px] font-normal leading-[160%] text-[#101010] opacity-80">
                 The perfect course for you
               </p>
@@ -83,7 +93,7 @@ export const CoursesSection:React.FC<Props> = ({locations, courseCards}) => {
             <div className="hidden sm:block">
               <CarouselControls
                 currentSlide={coursesCurrentSlide}
-                totalSlides={courseCards.length}
+                totalSlides={filteredCourses.length}
                 onPrev={() => coursesSwiperRef.current?.slidePrev()}
                 onNext={() => coursesSwiperRef.current?.slideNext()}
                 theme="dark"
@@ -131,7 +141,7 @@ export const CoursesSection:React.FC<Props> = ({locations, courseCards}) => {
                 },
               }}
             >
-              {courseCards.map((card, index) => (
+              {filteredCourses.map((card, index) => (
                 <SwiperSlide key={index}>
                   <CourseCard
                     image={card.image}
