@@ -9,6 +9,7 @@ import { useState, useRef, useEffect } from "react";
 import type { Swiper as SwiperType } from "swiper";
 import { FilterList } from "../FilterList";
 import { ButtonWithIcon } from "../buttons/ButtonWithIcon";
+
 type Props = {
   locations: {
     id: string;
@@ -25,23 +26,32 @@ type Props = {
     equipmentPrice: string;
   }[];
 };
+
 export const TripsSection: React.FC<Props> = ({ locations, tripCards }) => {
   const tripsSwiperRef = useRef<SwiperType | null>(null);
   const [selectedLocation, setSelectedLocation] = useState("all");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [tripsCurrentSlide, setTripsCurrentSlide] = useState(0);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [triangleX, setTriangleX] = useState<number | null>(null);
-
   const [expandedCardId, setExpandedCardId] = useState<number | null>(null);
+
   const filteredTrips =
     selectedLocation === "all"
       ? tripCards
       : tripCards.filter((card) => card.location === selectedLocation);
-  // Функцию для получения названия локации
+
+  // Функция для получения названия локации
   const getLocationLabel = () => {
     const location = locations.find((loc) => loc.id === selectedLocation);
     return location ? location.label : "ALL";
   };
+
+  const handleLocationSelect = (id: string) => {
+    setSelectedLocation(id);
+    setIsDropdownOpen(false);
+  };
+
   useEffect(() => {
     if (expandedCardId === null) return;
 
@@ -89,11 +99,73 @@ export const TripsSection: React.FC<Props> = ({ locations, tripCards }) => {
               TRIPS
             </h2>
           </div>
+
+          {/* Mobile Dropdown */}
+          <div className="mb-6 lg:hidden">
+            <div className="relative">
+              {/* Dropdown Button */}
+              <button
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className="flex w-full items-center justify-between rounded-lg bg-[#FFE500] px-4 py-3.5 transition-colors hover:bg-[#fadc00]"
+              >
+                <span className="text-[15px] font-bold uppercase leading-[160%] text-[#0C0C0C]">
+                  {getLocationLabel()}
+                </span>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className={`transition-transform ${
+                    isDropdownOpen ? "rotate-180" : ""
+                  }`}
+                >
+                  <path
+                    d="M4 6L8 10L12 6"
+                    stroke="#0C0C0C"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+
+              {/* Dropdown Content */}
+              {isDropdownOpen && (
+                <div className="absolute left-0 right-0 top-full z-10 mt-2 rounded-lg bg-white shadow-lg">
+                  <FilterList
+                    options={locations}
+                    selected={selectedLocation}
+                    onSelect={handleLocationSelect}
+                    bgActive="bg-[#FFE500]"
+                    bgNoactive="bg-white"
+                    textActive="text-black"
+                    arrow="#0C0C0C"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Backdrop */}
+            {isDropdownOpen && (
+              <div
+                className="fixed inset-0 z-[5]"
+                onClick={() => setIsDropdownOpen(false)}
+              />
+            )}
+          </div>
+
+          {/* Desktop FilterList */}
           <div className="hidden lg:block">
             <FilterList
               options={locations}
               selected={selectedLocation}
               onSelect={setSelectedLocation}
+              bgActive="bg-[#fadc00]"
+              bgNoactive="bg-white"
+              textActive="text-black"
+              arrow="black"
             />
           </div>
         </div>
@@ -196,10 +268,10 @@ export const TripsSection: React.FC<Props> = ({ locations, tripCards }) => {
               ))}
             </Swiper>
             {expandedCardId !== null && filteredTrips[expandedCardId] && (
-            <div
-            id="trip-details"
-            className="hidden lg:block mt-[50px] border-[3px] border-[#f49519] rounded-2xl bg-white relative w-full p-6 lg:p-10"
-          >
+              <div
+                id="trip-details"
+                className="hidden lg:block mt-[50px] border-[3px] border-[#f49519] rounded-2xl bg-white relative w-full p-6 lg:p-10"
+              >
                 {/* SVG треугольник */}
                 <div
                   className="absolute -top-6 transition-all duration-300"
@@ -232,20 +304,11 @@ export const TripsSection: React.FC<Props> = ({ locations, tripCards }) => {
 
                   {/* Правая колонка */}
                   <div className="w-full lg:w-[469px] bg-[#f1f1f1] rounded-3xl p-4 flex flex-col items-center justify-center gap-4">
-                    <h3
-                      className="
-    text-[28px]
-    lg:text-[42px]
-    font-medium
-    leading-[1.3]
-    text-center
-    text-black
-  "
-                    >
+                    <h3 className="text-[28px] lg:text-[42px] font-medium leading-[1.3] text-center text-black">
                       {filteredTrips[expandedCardId].title}
                     </h3>
                     <div className="flex gap-4">
-                      <div className="  flex items-center gap-2 rounded-lg bg-[#f49519] px-3 py-2">
+                      <div className="flex items-center gap-2 rounded-lg bg-[#f49519] px-3 py-2">
                         <svg
                           width="20"
                           height="20"
@@ -286,23 +349,9 @@ export const TripsSection: React.FC<Props> = ({ locations, tripCards }) => {
                       />
                     </div>
                     {filteredTrips[expandedCardId].equipmentPrice && (
-                      <p
-                        className=" underline
-                         font-medium
-                         text-[18px]
-                         leading-[1.4]
-                         text-black text-center"
-                      >
+                      <p className="underline font-medium text-[18px] leading-[1.4] text-black text-center">
                         Equipment/Extra Price:{" "}
-                        <span
-                          className="
-                         underline
-                         font-medium
-                         text-[18px]
-                         leading-[1.4]
-                         text-black
-                       "
-                        >
+                        <span className="underline font-medium text-[18px] leading-[1.4] text-black">
                           {filteredTrips[expandedCardId].equipmentPrice}
                         </span>
                       </p>

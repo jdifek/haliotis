@@ -22,27 +22,35 @@ type Props = {
     requestBased: boolean;
     badge: string;
     location: string;
-}[]
+  }[];
 };
+
 export const CoursesSection: React.FC<Props> = ({ locations, courseCards }) => {
   const [selectedLocation, setSelectedLocation] = useState("all");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const coursesSwiperRef = useRef<SwiperType | null>(null);
-
   const [coursesCurrentSlide, setCoursesCurrentSlide] = useState(0);
-  const filteredCourses = selectedLocation === "all" 
-  ? courseCards 
-  : courseCards.filter(card => card.location === selectedLocation);
+  
+  const filteredCourses =
+    selectedLocation === "all"
+      ? courseCards
+      : courseCards.filter((card) => card.location === selectedLocation);
 
-  // Функцию для получения названия локации
+  // Функция для получения названия локации
   const getLocationLabel = () => {
     const location = locations.find((loc) => loc.id === selectedLocation);
     return location ? location.label : "ALL";
   };
 
+  const handleLocationSelect = (id: string) => {
+    setSelectedLocation(id);
+    setIsDropdownOpen(false);
+  };
+
   return (
     <section className="bg-[#FFFF] px-4 py-12 md:px-8 md:py-18.25">
       <div className="flex flex-col lg:flex-row">
-        {/* Sidebar - скрыт на мобильных */}
+        {/* Sidebar */}
         <div className="mb-8 lg:mr-[34px] lg:mb-0 lg:w-[282px] lg:flex-shrink-0">
           <div className="mb-6 flex items-center gap-4 lg:mb-[85px]">
             <div
@@ -70,11 +78,73 @@ export const CoursesSection: React.FC<Props> = ({ locations, courseCards }) => {
               COURSES
             </h2>
           </div>
+
+          {/* Mobile Dropdown */}
+          <div className="mb-6 lg:hidden">
+            <div className="relative">
+              {/* Dropdown Button */}
+              <button
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className="flex w-full items-center justify-between rounded-lg bg-[#FFE500] px-4 py-3.5 transition-colors hover:bg-[#fadc00]"
+              >
+                <span className="text-[15px] font-bold uppercase leading-[160%] text-[#0C0C0C]">
+                  {getLocationLabel()}
+                </span>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className={`transition-transform ${
+                    isDropdownOpen ? "rotate-180" : ""
+                  }`}
+                >
+                  <path
+                    d="M4 6L8 10L12 6"
+                    stroke="#0C0C0C"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+
+              {/* Dropdown Content */}
+              {isDropdownOpen && (
+                <div className="absolute left-0 right-0 top-full z-10 mt-2 rounded-lg bg-white shadow-lg">
+                  <FilterList
+                    options={locations}
+                    selected={selectedLocation}
+                    onSelect={handleLocationSelect}
+                    bgActive="bg-[#FFE500]"
+                    bgNoactive="bg-white"
+                    textActive="text-black"
+                    arrow="#0C0C0C"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Backdrop */}
+            {isDropdownOpen && (
+              <div
+                className="fixed inset-0 z-[5]"
+                onClick={() => setIsDropdownOpen(false)}
+              />
+            )}
+          </div>
+
+          {/* Desktop FilterList */}
           <div className="hidden lg:block">
             <FilterList
               options={locations}
               selected={selectedLocation}
               onSelect={setSelectedLocation}
+              bgActive="bg-[#fadc00]"
+              bgNoactive="bg-white"
+              textActive="text-black"
+              arrow="black"
             />
           </div>
         </div>
@@ -85,7 +155,7 @@ export const CoursesSection: React.FC<Props> = ({ locations, courseCards }) => {
               <h2 className="text-[28px] font-medium leading-[130%] text-black sm:text-[36px] lg:text-[42px]">
                 Upcoming Courses:{" "}
                 <span className="text-[#e84814]">{getLocationLabel()}</span>
-                </h2>
+              </h2>
               <p className="text-[15px] font-normal leading-[160%] text-[#101010] opacity-80">
                 The perfect course for you
               </p>

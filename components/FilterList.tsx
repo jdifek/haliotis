@@ -23,8 +23,7 @@ export const FilterList: React.FC<FilterListProps> = ({
   arrow
 }) => {
   return (
-    <div className="flex w-full max-w-[282px] flex-col gap-2">
-      {options.map((option) => (
+<div className="flex w-full flex-col gap-2 lg:max-w-[282px]">      {options.map((option) => (
         <button
           key={option.id}
           onClick={() => onSelect(option.id)}
