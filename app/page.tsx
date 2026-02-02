@@ -499,131 +499,129 @@ export default function Home() {
   ];
   // Mock data for Centers Section
 
+  const SAME_DESCRIPTION =
+  "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+
 const centerCardsData = [
-  // PENICHE
   {
     image: "/CTABackgroundImage.png",
     title: "Peniche",
-    description: "Unique location due to the diversity of life and dive sites including reefs, caverns and wrecks.",
+    description: SAME_DESCRIPTION,
     buttonColor: "#f49519",
-    location: "peniche"
+    location: "peniche",
   },
   {
     image: "/CTABackgroundImage.png",
     title: "Peniche Marine Reserve",
-    description: "Protected marine area with exceptional biodiversity. Perfect for wall diving and deep dives.",
+    description: SAME_DESCRIPTION,
     buttonColor: "#f49519",
-    location: "peniche"
+    location: "peniche",
   },
-  
-  // MADEIRA
+
   {
     image: "/CTABackgroundImage.png",
     title: "Madeira",
-    description: "Pearl of the Atlantic! Best island destination in Europe. An island blessed by the sun and the sea.",
+    description: SAME_DESCRIPTION,
     buttonColor: "#e52924",
-    location: "madeira"
+    location: "madeira",
   },
   {
     image: "/CTABackgroundImage.png",
     title: "Madeira South Coast",
-    description: "Warm subtropical waters with year-round diving. Excellent visibility and diverse marine life.",
+    description: SAME_DESCRIPTION,
     buttonColor: "#e52924",
-    location: "madeira"
+    location: "madeira",
   },
   {
     image: "/CTABackgroundImage.png",
     title: "Madeira North Coast",
-    description: "Dramatic underwater landscapes with volcanic formations and exciting drift dives.",
+    description: SAME_DESCRIPTION,
     buttonColor: "#e52924",
-    location: "madeira"
+    location: "madeira",
   },
-  
-  // SESIMBRA
+
   {
     image: "/CTABackgroundImage.png",
     title: "Sesimbra",
-    description: "From Arrábida to Cabo Espichel, the green combines perfectly with the blue of the sea.",
+    description: SAME_DESCRIPTION,
     buttonColor: "#a0c52e",
-    location: "sesimbra"
+    location: "sesimbra",
   },
   {
     image: "/CTABackgroundImage.png",
     title: "Sesimbra Arrábida Park",
-    description: "Natural park with crystal clear waters and abundant marine biodiversity.",
+    description: SAME_DESCRIPTION,
     buttonColor: "#a0c52e",
-    location: "sesimbra"
+    location: "sesimbra",
   },
-  
-  // SANTA MARIA
+
   {
     image: "/CTABackgroundImage.png",
     title: "Santa Maria",
-    description: "The sunniest island in the Azores. Famous for encounters with mobula rays and blue sharks.",
+    description: SAME_DESCRIPTION,
     buttonColor: "#fed402",
-    location: "santa-maria"
+    location: "santa-maria",
   },
   {
     image: "/CTABackgroundImage.png",
     title: "Santa Maria Blue Zone",
-    description: "Open ocean diving with pelagic species. One of Europe's best blue water diving destinations.",
+    description: SAME_DESCRIPTION,
     buttonColor: "#fed402",
-    location: "santa-maria"
+    location: "santa-maria",
   },
   {
     image: "/CTABackgroundImage.png",
     title: "Santa Maria Coastal Sites",
-    description: "Beautiful volcanic reefs with endemic Atlantic species and excellent underwater photography opportunities.",
+    description: SAME_DESCRIPTION,
     buttonColor: "#fed402",
-    location: "santa-maria"
+    location: "santa-maria",
   },
-  
-  // FAIAL
+
   {
     image: "/CTABackgroundImage.png",
     title: "Faial",
-    description: "Blue island in the middle of the Atlantic. Volcanic underwater landscapes and unique dive sites.",
+    description: SAME_DESCRIPTION,
     buttonColor: "#1b5ba7",
-    location: "faial"
+    location: "faial",
   },
   {
     image: "/CTABackgroundImage.png",
     title: "Faial Harbor",
-    description: "Historic marina with easy shore dives and fascinating underwater topography.",
+    description: SAME_DESCRIPTION,
     buttonColor: "#1b5ba7",
-    location: "faial"
+    location: "faial",
   },
   {
     image: "/CTABackgroundImage.png",
     title: "Faial Caldeira",
-    description: "Altitude diving in volcanic crater lake. Unique freshwater diving experience.",
+    description: SAME_DESCRIPTION,
     buttonColor: "#1b5ba7",
-    location: "faial"
+    location: "faial",
   },
-  
-  // SAO VICENTE
+
   {
     image: "/CTABackgroundImage.png",
     title: "São Vicente",
-    description: "Cape Verde's diving paradise with tropical waters, colorful reefs and exotic marine species.",
+    description: SAME_DESCRIPTION,
     buttonColor: "#f49519",
-    location: "sao-vicente"
+    location: "sao-vicente",
   },
   {
     image: "/CTABackgroundImage.png",
     title: "São Vicente North",
-    description: "Advanced diving with strong currents and big fish. Nurse sharks and large pelagics.",
+    description: SAME_DESCRIPTION,
     buttonColor: "#f49519",
-    location: "sao-vicente"
+    location: "sao-vicente",
   },
   {
     image: "/CTABackgroundImage.png",
     title: "São Vicente Bay",
-    description: "Protected bay area perfect for training and easy dives. Beautiful coral formations.",
+    description: SAME_DESCRIPTION,
     buttonColor: "#f49519",
-    location: "sao-vicente"
+    location: "sao-vicente",
   },
 ];
+
   const diveTripsCards = [
     {
       image: "/CTABackgroundImage.png",
