@@ -888,7 +888,7 @@ const centerCardsData = [
         
 
           {/* Hero Section */}
-          <section className="container mx-auto px-4 py-12 lg:px-8 lg:py-24">
+          <section className="container mx-auto px-5 py-6 ">
             <div className="max-w-3xl">
               {/* Показываем только текущий слайд БЕЗ Swiper */}
               <div className="mb-12">

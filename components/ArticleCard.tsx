@@ -63,7 +63,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
 >
           <ButtonWithIcon
             className="absolute lg:hidden -top-5 right-4"
-            label="Book"
+            label="Book now"
             onClick={onBookClick}
             icon={
               <svg
@@ -195,7 +195,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
           <div></div>
           <ButtonWithIcon
             className="absolute hidden lg:flex lg:bottom-20 lg:right-4 rounded-2xl"
-            label="Book"
+           label="Book now"
             onClick={onBookClick}
             icon={
               <svg

@@ -283,7 +283,7 @@ export const Header: React.FC<Props> = ({
 
           {/* Desktop Navigation */}
           {/* Desktop Navigation */}
-          <nav className="relative hidden rounded-xl bg-black/10 px-4 py-7 lg:flex">
+          <nav className="relative hidden rounded-xl bg-black/10 px-4 py-[16.5px] lg:flex">
             <div className="flex w-full items-center justify-center gap-2 xl:gap-7">
               {navItems.slice(0, -1).map((item) => (
                 <div key={item.id} className="relative">

@@ -138,9 +138,9 @@ export const TripsSection: React.FC<Props> = ({ locations, tripCards }) => {
                     options={locations}
                     selected={selectedLocation}
                     onSelect={handleLocationSelect}
-                    bgActive="bg-[#FFE500]"
+                    bgActive="!bg-[#281D4D]"
                     bgNoactive="bg-white"
-                    textActive="text-black"
+                    textActive="!text-white"
                     arrow="#0C0C0C"
                   />
                 </div>
@@ -162,10 +162,10 @@ export const TripsSection: React.FC<Props> = ({ locations, tripCards }) => {
               options={locations}
               selected={selectedLocation}
               onSelect={setSelectedLocation}
-              bgActive="bg-[#fadc00]"
-              bgNoactive="bg-white"
-              textActive="text-black"
-              arrow="black"
+              bgActive="!bg-[#281d4d]"
+              bgNoactive="!bg-white"
+              textActive="!text-white"
+              arrow="white"
             />
           </div>
         </div>
@@ -330,7 +330,7 @@ export const TripsSection: React.FC<Props> = ({ locations, tripCards }) => {
 
                       <ButtonWithIcon
                         className="w-full"
-                        label="Book"
+                       label="Book now"
                         icon={
                           <svg
                             width="44"
