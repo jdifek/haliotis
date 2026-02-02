@@ -17,6 +17,22 @@ type Props = {
 export const DiveTrips: React.FC<Props> = ({ diveTripsCards }) => {
   const [diveTripsCurrentSlide, setDiveTripsCurrentSlide] = useState(0);
   const diveTripswiperRef = useRef<SwiperType | null>(null);
+  const partners = [
+    "cressi-71",
+    "dan-79",
+    "lightmotion-66",
+    "mares-15",
+    "oms-28",
+    "padi-44",
+    "x",
+    "poseidon-08",
+    "razor-logo-22",
+    "retra-98",
+    "scubapro-06",
+    "shearwater-59",
+    "sitech-34",
+    "tusa-86",
+  ];
   return (
     <section className="bg-[#ffff] px-4 pt-6 pb-12 md:px-[30px] md:pb-[77px]">
       <div className="flex flex-col gap-[20px] lg:flex-row lg:gap-[30px]">
@@ -289,21 +305,22 @@ export const DiveTrips: React.FC<Props> = ({ diveTripsCards }) => {
 
               {/* Brand Logos Grid */}
               <div className="mb-[30px] rounded-2xl bg-white p-4 md:mb-[40px] md:p-8">
-                <div className="grid grid-cols-3 gap-x-4 gap-y-4 md:grid-cols-4 md:gap-x-8 md:gap-y-6">
-                  {[...Array(15)].map((_, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-center"
-                    >
-                      <img
-                        src="/cressi-71.png"
-                        alt="Partner"
-                        className="h-6 object-contain md:h-8"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
+  <div className="grid grid-cols-3 gap-x-4 gap-y-4 md:grid-cols-4 md:gap-x-8 md:gap-y-6">
+    {partners.map((name) => (
+      <div
+        key={name}
+        className="flex items-center justify-center"
+      >
+        <img
+          src={`/${name}.png`}
+          alt={name.replace(/-/g, " ")}
+          className="h-6 object-contain md:h-8"
+          loading="lazy"           // полезно, когда много картинок
+        />
+      </div>
+    ))}
+  </div>
+</div>
 
               {/* Button */}
               <div className="flex justify-center  mt-auto">
