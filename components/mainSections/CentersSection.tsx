@@ -229,7 +229,7 @@ export const CentersSection: React.FC<Props> = ({ locations, centerCards }) => {
               totalSlides={filteredCenters.length}
               onPrev={() => centersSwiperRef.current?.slidePrev()}
               onNext={() => centersSwiperRef.current?.slideNext()}
-              theme="light"
+              theme="dark"
               progressClass="centers-progress"
             />
           </div>

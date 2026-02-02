@@ -16,8 +16,8 @@ export const CenterCard: React.FC<CenterCardProps> = ({
   onMoreInfoClick,
 }) => {
   return (
-    <div className="relative w-full max-w-[363px] overflow-hidden rounded-[20px] p-5 lg:h-[550px] lg:pt-10">
-      {/* Background Image */}
+<div className="relative w-full max-w-[363px] h-[468px] overflow-hidden rounded-[20px] p-5 lg:h-[550px] lg:pt-10">
+{/* Background Image */}
       <div className="absolute inset-0 z-0">
         <img
           src={image}
@@ -38,12 +38,10 @@ export const CenterCard: React.FC<CenterCardProps> = ({
           <h3 className="mb-4 text-[24px] font-medium leading-[140%] text-white">
             {title}
           </h3>
-          <p className="text-[15px] font-normal leading-[160%] text-white opacity-80">
+          <p className="text-[15px] mb-4 font-normal leading-[160%] text-white opacity-80">
             {description}
           </p>
-        </div>
-
-        {/* Bottom Button */}
+            {/* Bottom Button */}
         <div className="flex justify-start">
           <ButtonWithIcon
             label="More Info"
@@ -71,6 +69,9 @@ export const CenterCard: React.FC<CenterCardProps> = ({
             }
           />
         </div>
+        </div>
+
+      
       </div>
     </div>
   );
