@@ -141,8 +141,8 @@ export const CoursesSection: React.FC<Props> = ({ locations, courseCards }) => {
               options={locations}
               selected={selectedLocation}
               onSelect={setSelectedLocation}
-              bgActive="bg-[#fadc00]"
-              bgNoactive="bg-white"
+              bgActive="!bg-[#fadc00]"
+              bgNoactive="!bg-[#f1f1f1]"
               textActive="text-black"
               arrow="black"
             />

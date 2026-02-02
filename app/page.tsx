@@ -14,6 +14,7 @@ import type { Swiper as SwiperType } from "swiper";
 import { CoursesSection } from "@/components/mainSections/CoursesSection";
 import { TripsSection } from "@/components/mainSections/TripsSection";
 import { DiveTrips } from "@/components/mainSections/DiveTrips";
+import { CentersSection } from "@/components/mainSections/CentersSection";
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeNav, setActiveNav] = useState("snorkeling");
@@ -496,6 +497,133 @@ export default function Home() {
       equipmentPrice: "€ 40.00"
     },
   ];
+  // Mock data for Centers Section
+
+const centerCardsData = [
+  // PENICHE
+  {
+    image: "/CTABackgroundImage.png",
+    title: "Peniche",
+    description: "Unique location due to the diversity of life and dive sites including reefs, caverns and wrecks.",
+    buttonColor: "#f49519",
+    location: "peniche"
+  },
+  {
+    image: "/CTABackgroundImage.png",
+    title: "Peniche Marine Reserve",
+    description: "Protected marine area with exceptional biodiversity. Perfect for wall diving and deep dives.",
+    buttonColor: "#f49519",
+    location: "peniche"
+  },
+  
+  // MADEIRA
+  {
+    image: "/CTABackgroundImage.png",
+    title: "Madeira",
+    description: "Pearl of the Atlantic! Best island destination in Europe. An island blessed by the sun and the sea.",
+    buttonColor: "#e52924",
+    location: "madeira"
+  },
+  {
+    image: "/CTABackgroundImage.png",
+    title: "Madeira South Coast",
+    description: "Warm subtropical waters with year-round diving. Excellent visibility and diverse marine life.",
+    buttonColor: "#e52924",
+    location: "madeira"
+  },
+  {
+    image: "/CTABackgroundImage.png",
+    title: "Madeira North Coast",
+    description: "Dramatic underwater landscapes with volcanic formations and exciting drift dives.",
+    buttonColor: "#e52924",
+    location: "madeira"
+  },
+  
+  // SESIMBRA
+  {
+    image: "/CTABackgroundImage.png",
+    title: "Sesimbra",
+    description: "From Arrábida to Cabo Espichel, the green combines perfectly with the blue of the sea.",
+    buttonColor: "#a0c52e",
+    location: "sesimbra"
+  },
+  {
+    image: "/CTABackgroundImage.png",
+    title: "Sesimbra Arrábida Park",
+    description: "Natural park with crystal clear waters and abundant marine biodiversity.",
+    buttonColor: "#a0c52e",
+    location: "sesimbra"
+  },
+  
+  // SANTA MARIA
+  {
+    image: "/CTABackgroundImage.png",
+    title: "Santa Maria",
+    description: "The sunniest island in the Azores. Famous for encounters with mobula rays and blue sharks.",
+    buttonColor: "#fed402",
+    location: "santa-maria"
+  },
+  {
+    image: "/CTABackgroundImage.png",
+    title: "Santa Maria Blue Zone",
+    description: "Open ocean diving with pelagic species. One of Europe's best blue water diving destinations.",
+    buttonColor: "#fed402",
+    location: "santa-maria"
+  },
+  {
+    image: "/CTABackgroundImage.png",
+    title: "Santa Maria Coastal Sites",
+    description: "Beautiful volcanic reefs with endemic Atlantic species and excellent underwater photography opportunities.",
+    buttonColor: "#fed402",
+    location: "santa-maria"
+  },
+  
+  // FAIAL
+  {
+    image: "/CTABackgroundImage.png",
+    title: "Faial",
+    description: "Blue island in the middle of the Atlantic. Volcanic underwater landscapes and unique dive sites.",
+    buttonColor: "#1b5ba7",
+    location: "faial"
+  },
+  {
+    image: "/CTABackgroundImage.png",
+    title: "Faial Harbor",
+    description: "Historic marina with easy shore dives and fascinating underwater topography.",
+    buttonColor: "#1b5ba7",
+    location: "faial"
+  },
+  {
+    image: "/CTABackgroundImage.png",
+    title: "Faial Caldeira",
+    description: "Altitude diving in volcanic crater lake. Unique freshwater diving experience.",
+    buttonColor: "#1b5ba7",
+    location: "faial"
+  },
+  
+  // SAO VICENTE
+  {
+    image: "/CTABackgroundImage.png",
+    title: "São Vicente",
+    description: "Cape Verde's diving paradise with tropical waters, colorful reefs and exotic marine species.",
+    buttonColor: "#f49519",
+    location: "sao-vicente"
+  },
+  {
+    image: "/CTABackgroundImage.png",
+    title: "São Vicente North",
+    description: "Advanced diving with strong currents and big fish. Nurse sharks and large pelagics.",
+    buttonColor: "#f49519",
+    location: "sao-vicente"
+  },
+  {
+    image: "/CTABackgroundImage.png",
+    title: "São Vicente Bay",
+    description: "Protected bay area perfect for training and easy dives. Beautiful coral formations.",
+    buttonColor: "#f49519",
+    location: "sao-vicente"
+  },
+];
   const diveTripsCards = [
     {
       image: "/CTABackgroundImage.png",
@@ -808,6 +936,8 @@ export default function Home() {
           </section>
         </div>
       </section>
+      <CentersSection locations={locations} centerCards={centerCardsData} />
+
       <CoursesSection locations={locations} courseCards={courseCards} />
       <TripsSection locations={locations} tripCards={tripCards} />
       <DiveTrips diveTripsCards={diveTripsCards} />
