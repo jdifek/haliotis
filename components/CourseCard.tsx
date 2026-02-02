@@ -37,11 +37,13 @@ export const CourseCard: React.FC<CourseCardProps> = ({
         )}
         
         {/* Bottom Info Bar */}
-        <div className="absolute bottom-3 left-3 flex items-center gap-1 rounded-xl bg-black/50 p-1">
-          {/* Duration */}
-          <div className="flex items-center gap-2 rounded-lg bg-black/50 px-3 py-2">
+{/* Bottom Info Bar */}
+<div className="absolute bottom-3 left-3 flex flex-col md:flex-row items-start md:items-center gap-0.5 md:gap-1 rounded-lg bg-black/50 p-0.5">          {/* Duration */}
+          <div className="flex items-center gap-1 md:gap-2 rounded-lg bg-black/50 md:px-3 p-1 md:py-2">
             <svg
               width="20"
+              className="w-[10px] h-[10px] md:w-[20px] md:h-[20px]"
+
               height="20"
               viewBox="0 0 20 20"
               fill="none"
@@ -54,14 +56,16 @@ export const CourseCard: React.FC<CourseCardProps> = ({
                 fill="white"
               />
             </svg>
-            <span className="whitespace-nowrap text-[15px] leading-[160%] text-[#f1f1f1]">
+            <span className="whitespace-nowrap text-[10px] md:text-[15px] leading-[160%] text-[#f1f1f1]">
               {duration}
             </span>
           </div>
           
           {/* Request Based */}
-          <div className="flex items-center gap-2 rounded-lg bg-black/50 px-3 py-2">
+          <div className="flex items-center gap-1 md:gap-2 rounded-lg bg-black/50 md:px-3 p-1 md:py-2">
             <svg
+              className="w-[10px] h-[10px] md:w-[20px] md:h-[20px]"
+
               width="19"
               height="20"
               viewBox="0 0 19 20"
@@ -73,7 +77,7 @@ export const CourseCard: React.FC<CourseCardProps> = ({
                 fill="white"
               />
             </svg>
-            <span className="whitespace-nowrap text-[15px] leading-[160%] text-[#f1f1f1]">
+            <span className="whitespace-nowrap text-[10px] md:text-[15px] leading-[160%] text-[#f1f1f1]">
               {requestBased ? 'Request based' : 'Fixed schedule'}
             </span>
           </div>
@@ -88,9 +92,8 @@ export const CourseCard: React.FC<CourseCardProps> = ({
         </h3>
 
         {/* Bottom Bar */}
-        <div className="flex items-center flex-col md:flex-row justify-between gap-3">
-          {/* Price */}
-          <div className="flex items-center  gap-2 rounded-lg bg-white px-3 py-2">
+        <div className="flex items-center flex-col md:flex-row justify-between gap-3 items-start md:items-center">          {/* Price */}
+          <div className="flex items-center  gap-2 rounded-lg bg-white px-2 md:px-3 py-1 md:py-2">
             <svg
               width="20"
               height="20"

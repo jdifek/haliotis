@@ -322,28 +322,46 @@ export const Header: React.FC = ({}) => {
                     }}
                     className={`relative flex cursor-pointer items-center whitespace-nowrap uppercase transition-all ${
                       activeNav === item.id
-                        ? "text-[16px] font-bold uppercase leading-[120%] text-white "
-                        : "text-[15px] font-medium uppercase leading-[120%] text-white "
+                        ? "text-[16px] font-bold uppercase leading-[120%]  "
+                        : "text-[15px] font-medium uppercase leading-[120%]  "
                     }`}
                     style={{ lineHeight: "120%" }}
                   >
-                    {item.label}
-                    {item.hasDropdown && (
-                      <svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        className={`transition-transform xl:h-6 xl:w-6 ${
-                          openDropdown === item.id ? "rotate-180" : ""
-                        }`}
-                      >
-                        <path
-                          d="M17.8534 9.85369L12.8537 14.8534C12.8073 14.8999 12.7522 14.9367 12.6915 14.9619C12.6308 14.9871 12.5657 15 12.5 15C12.4343 15 12.3692 14.9871 12.3085 14.9619C12.2478 14.9367 12.1927 14.8999 12.1463 14.8534L7.14663 9.85369C7.07663 9.78377 7.02895 9.69465 7.00963 9.59761C6.9903 9.50058 7.00021 9.39999 7.03808 9.30858C7.07595 9.21718 7.1401 9.13907 7.22239 9.08413C7.30468 9.0292 7.40142 8.99992 7.50036 9H17.4996C17.5986 8.99992 17.6953 9.0292 17.7776 9.08413C17.8599 9.13907 17.924 9.21718 17.9619 9.30858C17.9998 9.39999 18.0097 9.50058 17.9904 9.59761C17.971 9.69465 17.9234 9.78377 17.8534 9.85369Z"
-                          fill="white"
+                    <span className="relative inline-flex items-center gap-[6px] ">
+                      {/* Фон лежит под текстом, не влияет на размеры кнопки */}
+                      {openDropdown === item.id && (
+                        <span
+                          className="absolute  inset-x-[-8px] inset-y-[-8px] rounded-[8px] bg-white pointer-events-none"
+                          aria-hidden="true"
                         />
-                      </svg>
-                    )}
+                      )}
+
+                      {/* Текст и стрелка поверх фона */}
+                      <p
+  className={`
+    relative z-10
+    ${openDropdown === item.id ? "text-black" : "text-white"}
+  `}
+>
+  {item.label}
+</p>
+                      {item.hasDropdown && (
+                        <svg
+                          width="20"
+                          height="20"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          className={`transition-transform xl:h-6 xl:w-6 relative z-10 ${
+                            openDropdown === item.id ? "rotate-180" : ""
+                          }`}
+                        >
+                          <path
+                            d="M17.8534 9.85369L12.8537 14.8534C12.8073 14.8999 12.7522 14.9367 12.6915 14.9619C12.6308 14.9871 12.5657 15 12.5 15C12.4343 15 12.3692 14.9871 12.3085 14.9619C12.2478 14.9367 12.1927 14.8999 12.1463 14.8534L7.14663 9.85369C7.07663 9.78377 7.02895 9.69465 7.00963 9.59761C6.9903 9.50058 7.00021 9.39999 7.03808 9.30858C7.07595 9.21718 7.1401 9.13907 7.22239 9.08413C7.30468 9.0292 7.40142 8.99992 7.50036 9H17.4996C17.5986 8.99992 17.6953 9.0292 17.7776 9.08413C17.8599 9.13907 17.924 9.21718 17.9619 9.30858C17.9998 9.39999 18.0097 9.50058 17.9904 9.59761C17.971 9.69465 17.9234 9.78377 17.8534 9.85369Z"
+                            fill={openDropdown === item.id ? "black" : "white"}
+                          />
+                        </svg>
+                      )}
+                    </span>
                     {activeNav === item.id && !openDropdown && (
                       <div
                         className="absolute -bottom-[16.5px] left-0 right-0 mx-auto h-0.5 bg-[#e84814]"
@@ -359,7 +377,7 @@ export const Header: React.FC = ({}) => {
                       <div
                         ref={dropdownRef}
                         data-dropdown
-                        className="absolute left-0 top-full z-50 mt-2 flex flex-col gap-0 rounded-[10px] border-2 border-white p-0"
+                        className="absolute left-0 top-5 z-50 mt-2 flex flex-col gap-0 rounded-[10px] border-2 border-white p-0"
                         style={{
                           width: "238px",
                           background: "rgba(0, 3, 38, 0.5)",
@@ -452,7 +470,7 @@ export const Header: React.FC = ({}) => {
               <div
                 ref={coursesRef}
                 data-dropdown
-                className="absolute left-1/2 top-full z-50 mt-2 -translate-x-1/2 rounded-[10px] border-2 border-white p-[20px]"
+                className="absolute left-1/2 top-9 z-50 mt-2 -translate-x-1/2 rounded-[10px] border-2 border-white p-[20px]"
                 style={{
                   width: "100%",
                   maxWidth: "100%",
@@ -589,9 +607,7 @@ export const Header: React.FC = ({}) => {
                   />
                 </svg>
               </button>
-              <button
-                className="flex items-center gap-1 rounded-lg p-2"
-              >
+              <button className="flex items-center gap-1 rounded-lg p-2">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                   <path
                     d="M19.582 5.186C19.352 4.322 18.674 3.644 17.81 3.414C16.254 3 10 3 10 3C10 3 3.746 3 2.19 3.414C1.326 3.644 0.648 4.322 0.418 5.186C0 6.742 0 10 0 10C0 10 0 13.258 0.418 14.814C0.648 15.678 1.326 16.356 2.19 16.586C3.746 17 10 17 10 17C10 17 16.254 17 17.81 16.586C18.674 16.356 19.352 15.678 19.582 14.814C20 13.258 20 10 20 10C20 10 20 6.742 19.582 5.186ZM8 13V7L13 10L8 13Z"
@@ -613,9 +629,7 @@ export const Header: React.FC = ({}) => {
               </button>
 
               {/* Instagram */}
-              <button
-                className="rounded-lg p-2 flex items-center gap-1"
-              >
+              <button className="rounded-lg p-2 flex items-center gap-1">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                   <path
                     d="M10 1.802C12.67 1.802 12.987 1.812 14.041 1.86C16.751 1.986 18.013 3.27 18.139 5.959C18.188 7.013 18.197 7.33 18.197 10C18.197 12.671 18.187 12.987 18.139 14.041C18.012 16.728 16.754 18.014 14.041 18.14C12.987 18.188 12.671 18.198 10 18.198C7.33 18.198 7.013 18.188 5.96 18.14C3.241 18.013 1.988 16.725 1.862 14.04C1.813 12.987 1.803 12.67 1.803 10C1.803 7.33 1.814 7.013 1.862 5.96C1.989 3.27 3.247 1.986 5.96 1.86C7.014 1.812 7.33 1.802 10 1.802ZM10 0C7.284 0 6.944 0.012 5.878 0.06C2.246 0.227 0.228 2.242 0.061 5.877C0.012 6.944 0 7.284 0 10C0 12.716 0.012 13.056 0.06 14.122C0.227 17.754 2.242 19.772 5.877 19.939C6.944 19.988 7.284 20 10 20C12.716 20 13.056 19.988 14.122 19.94C17.751 19.773 19.775 17.757 19.938 14.123C19.988 13.056 20 12.716 20 10C20 7.284 19.988 6.944 19.94 5.878C19.777 2.249 17.758 0.228 14.123 0.061C13.056 0.012 12.716 0 10 0ZM10 4.865C7.164 4.865 4.865 7.164 4.865 10C4.865 12.836 7.164 15.136 10 15.136C12.836 15.136 15.135 12.837 15.135 10C15.135 7.164 12.836 4.865 10 4.865ZM10 13.333C8.159 13.333 6.667 11.842 6.667 10C6.667 8.159 8.159 6.667 10 6.667C11.841 6.667 13.333 8.159 13.333 10C13.333 11.842 11.841 13.333 10 13.333ZM15.338 3.462C14.675 3.462 14.139 3.998 14.139 4.661C14.139 5.324 14.675 5.86 15.338 5.86C16.001 5.86 16.537 5.324 16.537 4.661C16.537 3.998 16.001 3.462 15.338 3.462Z"
