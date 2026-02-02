@@ -30,7 +30,7 @@ export const CoursesSection: React.FC<Props> = ({ locations, courseCards }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const coursesSwiperRef = useRef<SwiperType | null>(null);
   const [coursesCurrentSlide, setCoursesCurrentSlide] = useState(0);
-  
+
   const filteredCourses =
     selectedLocation === "all"
       ? courseCards
@@ -51,7 +51,7 @@ export const CoursesSection: React.FC<Props> = ({ locations, courseCards }) => {
     <section className="bg-[#FFFF] px-4 py-12 md:px-8 md:py-18.25">
       <div className="flex flex-col lg:flex-row">
         {/* Sidebar */}
-        <div className="mb-8 lg:mr-[34px] lg:mb-0 lg:w-[282px] lg:flex-shrink-0">
+        <div className="lg:mr-[34px] lg:mb-0 lg:w-[282px] lg:flex-shrink-0">
           <div className="mb-6 flex items-center gap-4 lg:mb-[85px]">
             <div
               className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full p-1.5"
@@ -85,9 +85,9 @@ export const CoursesSection: React.FC<Props> = ({ locations, courseCards }) => {
               {/* Dropdown Button */}
               <button
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="flex w-full items-center justify-between rounded-lg bg-[#FFE500] px-4 py-3.5 transition-colors hover:bg-[#fadc00]"
+                className="flex w-full items-center justify-between rounded-lg bg-[#FFE500] px-4 py-3 transition-colors hover:bg-[#fadc00]"
               >
-                <span className="text-[15px] font-bold uppercase leading-[160%] text-[#0C0C0C]">
+                <span className="text-[16px] font-bold uppercase leading-[160%] text-[#0C0C0C]">
                   {getLocationLabel()}
                 </span>
                 <svg
@@ -149,7 +149,7 @@ export const CoursesSection: React.FC<Props> = ({ locations, courseCards }) => {
           </div>
         </div>
 
-        <div className="flex flex-1 flex-col gap-[30px] overflow-hidden">
+        <div className="flex flex-1 flex-col gap-[10px] md:gap-[30px] overflow-hidden">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div className="flex flex-col gap-[10px]">
               <h2 className="text-[28px] font-medium leading-[130%] text-black sm:text-[36px] lg:text-[42px]">
@@ -175,9 +175,10 @@ export const CoursesSection: React.FC<Props> = ({ locations, courseCards }) => {
           <div className="w-full">
             <Swiper
               modules={[Navigation, Pagination]}
-              spaceBetween={20}
-              slidesPerView={1}
-              loop={true}
+              spaceBetween={16}
+              slidesPerView={2}
+              slidesPerGroup={2}
+              loop={false}
               onSwiper={(swiper) => {
                 coursesSwiperRef.current = swiper;
               }}
@@ -189,24 +190,31 @@ export const CoursesSection: React.FC<Props> = ({ locations, courseCards }) => {
                 el: ".courses-progress",
               }}
               breakpoints={{
-                393: {
-                  slidesPerView: 1,
-                  spaceBetween: 20,
+                0: {
+                  slidesPerView: 2, // Две карточки на мобильных
+                  spaceBetween: 0,
+                
                 },
                 640: {
                   slidesPerView: 2,
-                  spaceBetween: 20,
+                  spaceBetween: 0,
                 },
+                // Medium tablet
                 768: {
                   slidesPerView: 2,
+                  slidesPerGroup: 1,
                   spaceBetween: 25,
                 },
+                // Desktop: 3 cards
                 1024: {
                   slidesPerView: 3,
+                  slidesPerGroup: 1,
                   spaceBetween: 30,
                 },
+                // Large desktop: 4 cards
                 1780: {
                   slidesPerView: 4,
+                  slidesPerGroup: 1,
                   spaceBetween: 30,
                 },
               }}
@@ -228,10 +236,10 @@ export const CoursesSection: React.FC<Props> = ({ locations, courseCards }) => {
           </div>
 
           {/* Mobile controls */}
-          <div className="block sm:hidden">
+          <div className="block sm:hidden ">
             <CarouselControls
               currentSlide={coursesCurrentSlide}
-              totalSlides={courseCards.length}
+              totalSlides={filteredCourses.length}
               onPrev={() => coursesSwiperRef.current?.slidePrev()}
               onNext={() => coursesSwiperRef.current?.slideNext()}
               theme="dark"

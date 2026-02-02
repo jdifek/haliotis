@@ -72,7 +72,7 @@ export const TripsSection: React.FC<Props> = ({ locations, tripCards }) => {
     <section className="bg-[#f1f1f1] px-4 py-12 md:px-8 md:py-18.25">
       <div className="flex flex-col lg:flex-row">
         {/* Sidebar */}
-        <div className="mb-8 lg:mr-[34px] lg:mb-0 lg:w-[282px] lg:flex-shrink-0">
+        <div className=" lg:mr-[34px] lg:mb-0 lg:w-[282px] lg:flex-shrink-0">
           <div className="mb-6 flex items-center gap-4 lg:mb-[85px]">
             <div
               className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full p-1.5"
@@ -106,9 +106,9 @@ export const TripsSection: React.FC<Props> = ({ locations, tripCards }) => {
               {/* Dropdown Button */}
               <button
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="flex w-full items-center justify-between rounded-lg bg-[#FFE500] px-4 py-3.5 transition-colors hover:bg-[#fadc00]"
+                className="flex w-full items-center justify-between rounded-lg bg-[#281D4D] px-4 py-3 transition-colors hover:bg-[#fadc00]"
               >
-                <span className="text-[15px] font-bold uppercase leading-[160%] text-[#0C0C0C]">
+                <span className="text-[16px] font-bold uppercase leading-[160%] text-[#ffff]">
                   {getLocationLabel()}
                 </span>
                 <svg
@@ -123,7 +123,7 @@ export const TripsSection: React.FC<Props> = ({ locations, tripCards }) => {
                 >
                   <path
                     d="M4 6L8 10L12 6"
-                    stroke="#0C0C0C"
+                    stroke="#ffff"
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -141,7 +141,7 @@ export const TripsSection: React.FC<Props> = ({ locations, tripCards }) => {
                     bgActive="!bg-[#281D4D]"
                     bgNoactive="bg-white"
                     textActive="!text-white"
-                    arrow="#0C0C0C"
+                    arrow="#ffff"
                   />
                 </div>
               )}
@@ -330,7 +330,7 @@ export const TripsSection: React.FC<Props> = ({ locations, tripCards }) => {
 
                       <ButtonWithIcon
                         className="w-full"
-                       label="Book now"
+                        label="Book now"
                         icon={
                           <svg
                             width="44"

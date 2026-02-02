@@ -18,14 +18,13 @@ export const DiveTrips: React.FC<Props> = ({ diveTripsCards }) => {
   const [diveTripsCurrentSlide, setDiveTripsCurrentSlide] = useState(0);
   const diveTripswiperRef = useRef<SwiperType | null>(null);
   return (
-    <section className="bg-[#ffff] px-4 pb-12 md:px-[30px] md:pb-[77px]">
+    <section className="bg-[#ffff] px-4 pt-6 pb-12 md:px-[30px] md:pb-[77px]">
       <div className="flex flex-col gap-[20px] lg:flex-row lg:gap-[30px]">
         {/* Upcoming Dive Trips Card - 2/3 width on desktop */}
         <div
-          className="relative overflow-hidden lg:flex-[2]"
+          className="relative h-[558px] md:h-[720px] overflow-hidden lg:flex-[2]"
           style={{
             borderRadius: "20px",
-            height: "720px",
           }}
         >
           {/* Background Swiper - absolute positioned */}
@@ -64,9 +63,9 @@ export const DiveTrips: React.FC<Props> = ({ diveTripsCards }) => {
           {/* Content - relative positioned */}
           <div className="relative z-10 flex h-full flex-col p-6 md:p-[40px]">
             {/* Header */}
-            <div className="mb-auto text-center">
+            <div className="md:mb-[54.5px] mb-[19px] text-center">
               <p
-                className="text-lg font-medium text-white md:text-2xl"
+                className="text-[20px] font-medium text-white md:text-2xl"
                 style={{
                   lineHeight: "140%",
                 }}
@@ -76,11 +75,11 @@ export const DiveTrips: React.FC<Props> = ({ diveTripsCards }) => {
             </div>
 
             {/* Main Content */}
-            <div className="mb-[40px] md:mb-[60px]">
+            <div className="mb-[20px] md:mb-[60px]">
               {/* Counter */}
-              <div className="mb-[20px] flex items-baseline gap-1 md:mb-[30px]">
+              <div className="mb-[20px] flex items-baseline gap-1 md:mb-[54.5px]">
                 <span
-                  className="text-[32px] font-medium text-white md:text-[42px]"
+                  className="text-[24px] font-medium text-white"
                   style={{
                     lineHeight: "130%",
                   }}
@@ -88,7 +87,7 @@ export const DiveTrips: React.FC<Props> = ({ diveTripsCards }) => {
                   {String(diveTripsCurrentSlide + 1).padStart(2, "0")}
                 </span>
                 <span
-                  className="text-[32px] font-medium md:text-[42px]"
+                  className="text-[24px] font-medium "
                   style={{
                     lineHeight: "130%",
                     color: "rgba(255, 255, 255, 0.3)",
@@ -100,18 +99,9 @@ export const DiveTrips: React.FC<Props> = ({ diveTripsCards }) => {
 
               {/* Location Badge */}
               <div className="mb-[16px] inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 md:mb-[20px] md:px-4 md:py-2">
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 14 14"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M7 0C4.24 0 2 2.24 2 5C2 8.5 7 14 7 14C7 14 12 8.5 12 5C12 2.24 9.76 0 7 0ZM7 6.75C6.03 6.75 5.25 5.97 5.25 5C5.25 4.03 6.03 3.25 7 3.25C7.97 3.25 8.75 4.03 8.75 5C8.75 5.97 7.97 6.75 7 6.75Z"
-                    fill="#111111"
-                  />
-                </svg>
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path fill-rule="evenodd" clip-rule="evenodd" d="M0 10C0 4.47715 4.47715 0 10 0C15.5228 0 20 4.47715 20 10C20 15.5228 15.5228 20 10 20C4.47715 20 0 15.5228 0 10ZM8.6158 7.5C9.0535 6.71823 9.8025 6 10.7498 6C11.284 6 11.819 6.23239 12.2923 6.70646C12.6824 7.09734 13.3156 7.09792 13.7065 6.70775C14.0973 6.31758 14.0979 5.68442 13.7077 5.29354C12.9274 4.51179 11.9042 4 10.7498 4C9.3289 4 8.1189 4.77025 7.29826 5.86449C6.93769 6.34528 6.64329 6.89783 6.42654 7.5H6C5.44772 7.5 5 7.94772 5 8.5C5 8.9581 5.30804 9.3443 5.72828 9.4626C5.82228 9.4891 5.91867 9.5 6.01613 9.5C5.99473 9.8304 5.99473 10.1696 6.01613 10.5C5.91867 10.5 5.82228 10.5109 5.72828 10.5374C5.30804 10.6557 5 11.0419 5 11.5C5 12.0523 5.44772 12.5 6 12.5H6.42654C6.64329 13.1022 6.93769 13.6547 7.29826 14.1355C8.1189 15.2298 9.3289 16 10.7498 16C11.9042 16 12.9274 15.4882 13.7077 14.7065C14.0979 14.3156 14.0973 13.6824 13.7065 13.2923C13.3156 12.9021 12.6824 12.9027 12.2923 13.2935C11.819 13.7676 11.284 14 10.7498 14C9.8025 14 9.0535 13.2818 8.6158 12.5H10C10.5523 12.5 11 12.0523 11 11.5C11 10.9477 10.5523 10.5 10 10.5H8.0217C7.99312 10.1735 7.99312 9.8265 8.0217 9.5H11C11.5523 9.5 12 9.0523 12 8.5C12 7.94772 11.5523 7.5 11 7.5H8.6158Z" fill="black" />
+</svg>
                 <span
                   className="text-sm font-medium text-[#111111] md:text-base"
                   style={{
@@ -124,7 +114,7 @@ export const DiveTrips: React.FC<Props> = ({ diveTripsCards }) => {
 
               {/* Title */}
               <h3
-                className="mb-[12px] text-[28px] font-medium text-white md:mb-[16px] md:text-[42px]"
+                className="mb-[12px] text-[28px] font-medium text-white md:mb-[12px] md:text-[42px]"
                 style={{
                   lineHeight: "130%",
                 }}
@@ -134,7 +124,7 @@ export const DiveTrips: React.FC<Props> = ({ diveTripsCards }) => {
 
               {/* Description */}
               <p
-                className="mb-[24px] max-w-[500px] text-sm font-normal text-white md:mb-[30px] md:text-[15px]"
+                className="mb-[20px] max-w-[500px] text-sm font-normal text-white md:text-[15px]"
                 style={{
                   lineHeight: "160%",
                   opacity: 0.8,
@@ -181,7 +171,7 @@ export const DiveTrips: React.FC<Props> = ({ diveTripsCards }) => {
             </div>
 
             {/* Carousel Controls */}
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mt-auto">
               <div className="relative h-1.5 w-[180px] overflow-hidden rounded-full md:w-[275px]">
                 {/* Background with opacity */}
                 <div className="absolute inset-0 bg-white/30" />
@@ -248,10 +238,9 @@ export const DiveTrips: React.FC<Props> = ({ diveTripsCards }) => {
 
         {/* Equipment Card - 1/3 width on desktop */}
         <div
-          className="relative overflow-hidden lg:flex-1"
+          className="relative h-[584px] md:h-[720px] overflow-hidden lg:flex-1"
           style={{
             borderRadius: "20px",
-            height: "720px",
             backgroundImage: "url(/CTABackgroundImage.png)",
             backgroundSize: "cover",
             backgroundPosition: "center",
@@ -275,7 +264,7 @@ export const DiveTrips: React.FC<Props> = ({ diveTripsCards }) => {
             </div>
 
             {/* Main Content */}
-            <div className="mb-[40px] md:mb-[60px]">
+            <div className="">
               {/* Title */}
               <h3
                 className="mb-[12px] text-center text-[28px] font-medium text-white md:mb-[16px] md:text-[42px]"
@@ -317,7 +306,7 @@ export const DiveTrips: React.FC<Props> = ({ diveTripsCards }) => {
               </div>
 
               {/* Button */}
-              <div className="flex justify-center">
+              <div className="flex justify-center  mt-auto">
                 <ButtonWithIcon
                   width="237px"
                   label="Visit our Online Shop"

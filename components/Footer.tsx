@@ -171,7 +171,7 @@ export const Footer = () => {
               width="160px"
               label="Contact Us"
               textColor="text-black"
-              className="flex items-center gap-3 rounded-full bg-white px-6 py-3 transition-all hover:bg-gray-200"
+              className="flex items-center gap-3 rounded-full bg-white px-6 py-3 transition-all hover:bg-gray-100"
               icon={
                 <svg
                   width="44"
@@ -222,12 +222,11 @@ export const Footer = () => {
                     <li key={linkIndex}>
                       <Link
                         href={link.href}
-                        className="text-white transition-opacity hover:opacity-100"
+                        className="text-white transition-opacity hover:opacity-100 opacity-70"
                         style={{
                           fontSize: "15px",
                           fontWeight: 400,
                           lineHeight: "160%",
-                          opacity: 0.7,
                         }}
                       >
                         {link.label}
@@ -312,55 +311,50 @@ export const Footer = () => {
           <div className="flex flex-col gap-2 text-center md:flex-row md:gap-8 md:text-left">
             <Link
               href="#"
-              className="text-sm text-white transition-opacity hover:opacity-100 md:text-[15px]"
+              className="text-sm text-white transition-opacity hover:opacity-100 opacity-70 md:text-[15px]"
               style={{
                 fontWeight: 400,
                 lineHeight: "160%",
-                opacity: 0.7,
               }}
             >
               Alternative Dispute Resolution
             </Link>
             <Link
               href="#"
-              className="text-sm text-white transition-opacity hover:opacity-100 md:text-[15px]"
+              className="text-sm  opacity-70 text-white transition-opacity hover:opacity-100 md:text-[15px]"
               style={{
                 fontWeight: 400,
                 lineHeight: "160%",
-                opacity: 0.7,
               }}
             >
               Cancellation Policies
             </Link>
             <Link
               href="#"
-              className="text-sm text-white transition-opacity hover:opacity-100 md:text-[15px]"
+              className="text-sm  opacity-70 text-white transition-opacity hover:opacity-100 md:text-[15px]"
               style={{
                 fontWeight: 400,
                 lineHeight: "160%",
-                opacity: 0.7,
               }}
             >
               Privacy Policy
             </Link>
             <Link
               href="#"
-              className="text-sm text-white transition-opacity hover:opacity-100 md:text-[15px]"
+              className="text-sm  opacity-70 text-white transition-opacity hover:opacity-100 md:text-[15px]"
               style={{
                 fontWeight: 400,
                 lineHeight: "160%",
-                opacity: 0.7,
               }}
             >
               Cookie Policy
             </Link>
             <Link
               href="#"
-              className="text-sm text-white transition-opacity hover:opacity-100 md:text-[15px]"
+              className="text-sm  opacity-70 text-white transition-opacity hover:opacity-100 md:text-[15px]"
               style={{
                 fontWeight: 400,
                 lineHeight: "160%",
-                opacity: 0.7,
               }}
             >
               Terms & Conditions

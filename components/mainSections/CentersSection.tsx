@@ -28,7 +28,7 @@ export const CentersSection: React.FC<Props> = ({ locations, centerCards }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const centersSwiperRef = useRef<SwiperType | null>(null);
   const [centersCurrentSlide, setCentersCurrentSlide] = useState(0);
-  
+
   const filteredCenters =
     selectedLocation === "all"
       ? centerCards
@@ -49,7 +49,7 @@ export const CentersSection: React.FC<Props> = ({ locations, centerCards }) => {
     <section className="bg-[#f1f1f1] px-4 py-12 md:px-8 md:py-18.25">
       <div className="flex flex-col lg:flex-row">
         {/* Sidebar */}
-        <div className="mb-8 lg:mr-[34px] lg:mb-0 lg:w-[282px] lg:flex-shrink-0">
+        <div className=" lg:mr-[34px] lg:mb-0 lg:w-[282px] lg:flex-shrink-0">
           <div className="mb-6 flex items-center gap-4 lg:mb-[85px]">
             <div
               className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full p-1.5"
@@ -83,9 +83,9 @@ export const CentersSection: React.FC<Props> = ({ locations, centerCards }) => {
               {/* Dropdown Button */}
               <button
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="flex w-full items-center justify-between rounded-lg bg-[#FFE500] px-4 py-3.5 transition-colors hover:bg-[#fadc00]"
+                className="flex w-full items-center justify-between rounded-lg bg-[#a0c52e] px-4 py-3 transition-colors hover:bg-[#fadc00]"
               >
-                <span className="text-[15px] font-bold uppercase leading-[160%] text-[#0C0C0C]">
+                <span className="text-[16px] font-bold uppercase leading-[160%] text-[#ffff]">
                   {getLocationLabel()}
                 </span>
                 <svg
@@ -100,7 +100,7 @@ export const CentersSection: React.FC<Props> = ({ locations, centerCards }) => {
                 >
                   <path
                     d="M4 6L8 10L12 6"
-                    stroke="#0C0C0C"
+                    stroke="#ffff"
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -112,13 +112,13 @@ export const CentersSection: React.FC<Props> = ({ locations, centerCards }) => {
               {isDropdownOpen && (
                 <div className="absolute left-0 right-0 top-full z-10 mt-2 rounded-lg bg-white shadow-lg">
                   <FilterList
-                 options={locations}
-                 selected={selectedLocation}
-                 onSelect={handleLocationSelect}
-                 bgActive="!bg-[#a0c52e]"
-                  bgNoactive="bg-white"
+                    options={locations}
+                    selected={selectedLocation}
+                    onSelect={handleLocationSelect}
+                    bgActive="!bg-[#a0c52e]"
+                    bgNoactive="bg-white"
                     textActive="!text-white"
-                 arrow="#0C0C0C"
+                    arrow="white"
                   />
                 </div>
               )}
@@ -140,9 +140,9 @@ export const CentersSection: React.FC<Props> = ({ locations, centerCards }) => {
               selected={selectedLocation}
               onSelect={handleLocationSelect}
               bgActive="!bg-[#a0c52e]"
-             bgNoactive="bg-white"
-                    textActive="!text-white"
-              arrow="#0C0C0C"
+              bgNoactive="bg-white"
+              textActive="!text-white"
+              arrow="white"
             />
           </div>
         </div>
@@ -154,7 +154,8 @@ export const CentersSection: React.FC<Props> = ({ locations, centerCards }) => {
                 Discover Where We Dive
               </h2>
               <p className="text-[15px] font-normal leading-[160%] text-black opacity-80">
-                From crystal-clear waters to hidden reefs — choose your next dive.
+                From crystal-clear waters to hidden reefs — choose your next
+                dive.
               </p>
             </div>
             <div className="hidden sm:block">

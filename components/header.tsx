@@ -89,8 +89,9 @@ export const Header: React.FC<Props> = ({
   }, []);
   return (
     <>
-      <header className="mx-auto p-5">
-        <div className="flex items-center justify-between gap-4">
+      <header className="mx-auto p-5 relative">
+      <div className="absolute left-5 right-5 bottom-0 border-b border-[rgba(255,255,255,0.2)]" />
+      <div className="flex items-center justify-between gap-4">
           <div className="relative flex-shrink-0  lg:hidden">
             <svg
               width="173"
@@ -306,8 +307,8 @@ export const Header: React.FC<Props> = ({
                   }}
                     className={`relative flex cursor-pointer items-center whitespace-nowrap uppercase transition-all ${
                       activeNav === item.id
-                        ? "text-[15px] font-normal uppercase leading-[120%] text-white "
-                        : "text-[15px] font-normal uppercase leading-[120%] text-white "
+                        ? "text-[16px] font-bold uppercase leading-[120%] text-white "
+                        : "text-[15px] font-medium uppercase leading-[120%] text-white "
                     }`}
                     style={{ lineHeight: "120%" }}
                   >
@@ -330,8 +331,8 @@ export const Header: React.FC<Props> = ({
                     )}
                     {activeNav === item.id && !openDropdown && (
                       <div
-                        className="absolute -bottom-2 left-0 right-0 mx-auto h-0.5 bg-[#e84814]"
-                        style={{ width: "100%", border: "2px solid #e84814" }}
+                        className="absolute -bottom-[16.5px] left-0 right-0 mx-auto h-0.5 bg-[#e84814]"
+                        style={{ width: "100%", border: "1px solid #e84814" }}
                       />
                     )}
                   </button>
