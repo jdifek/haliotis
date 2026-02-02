@@ -873,7 +873,7 @@ const centerCardsData = [
             <div className="max-w-3xl">
               {/* Показываем только текущий слайд БЕЗ Swiper */}
               <div className="mb-12">
-                <h1 className="mb-3 text-5xl font-bold leading-tight text-white lg:text-7xl">
+                <h1 className="mb-3 text-[32px] font-bold leading-tight text-white lg:text-7xl">
                   {heroSlides[heroCurrentSlide].title}
                 </h1>
                 <div className="mb-6">
@@ -907,7 +907,7 @@ const centerCardsData = [
                     </g>
                   </svg>
                 </div>
-                <p className="max-w-xl text-base text-white lg:text-lg">
+                <p className="max-w-xl text-[16px] font-light text-white lg:text-lg">
                   {heroSlides[heroCurrentSlide].description}
                 </p>
               </div>
