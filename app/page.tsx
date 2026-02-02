@@ -16,13 +16,8 @@ import { TripsSection } from "@/components/mainSections/TripsSection";
 import { DiveTrips } from "@/components/mainSections/DiveTrips";
 import { CentersSection } from "@/components/mainSections/CentersSection";
 export default function Home() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [activeNav, setActiveNav] = useState("snorkeling");
+
   const [heroCurrentSlide, setHeroCurrentSlide] = useState(0);
-  const [isLangMenuOpen, setIsLangMenuOpen] = useState(false); // для языкового меню
-  const [selectedLang, setSelectedLang] = useState("En"); // выбранный язык
-  const [openDropdown, setOpenDropdown] = useState<string | null>(null); // какой dropdown открыт
-  const [selectedCenter, setSelectedCenter] = useState("sesimbra"); // выбранный центр
   
   const heroSwiperRef = useRef<SwiperType | null>(null);
   const locations = [
@@ -35,17 +30,7 @@ export default function Home() {
     { id: "sao-vicente", label: "SAO VICENTE" },
   ];
 
-  const navItems = [
-    { id: "centers", label: "Centers", hasDropdown: true },
-    { id: "courses", label: "Courses", hasDropdown: true },
-    { id: "snorkeling", label: "Snorkeling", hasDropdown: false },
-    { id: "diving", label: "Diving", hasDropdown: false },
-    { id: "freedive", label: "Freedive", hasDropdown: false },
-    { id: "travel", label: "Travel", hasDropdown: false },
-    { id: "shop", label: "Shop", hasDropdown: false },
-    { id: "prices", label: "Prices", hasDropdown: false },
-    { id: "contacts", label: "Contacts", hasDropdown: false },
-  ];
+  
   
   const centersData = [
     { id: "peniche", label: "PENICHE", color: "#F49519" },
@@ -702,8 +687,10 @@ const centerCardsData = [
   ];
 
   return (
-    <main>
-      <section className="relative h-[930px] w-full overflow-hidden">
+    <main className="-mt-[97px]">
+      {/* -mt-[81px] чтобы контент начался под хедером */}
+      
+      <section className="relative h-[930px] w-full pt-[97px]">
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <Swiper
@@ -872,18 +859,12 @@ const centerCardsData = [
     onPrev={() => heroSwiperRef.current?.slidePrev()}
     onNext={() => heroSwiperRef.current?.slideNext()}
     progressClass="hero-progress"
+    theme="light"
   />
 </div>
         {/* Content Container */}
         <div className="relative z-20 min-h-screen">
-          {/* Header */}
-          <Header
-            navItems={navItems}
-            activeNav={activeNav}
-            setActiveNav={setActiveNav}
-            isMenuOpen={isMenuOpen}
-            setIsMenuOpen={setIsMenuOpen}
-          />
+        
         
         
 

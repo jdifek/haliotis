@@ -58,7 +58,7 @@ export const CarouselControls: React.FC<CarouselControlsProps> = ({
           <svg className="h-5 w-5 lg:h-6 lg:w-6" viewBox="0 0 20 20" fill="none">
             <path
               d="M17.5 7.50008H6.25C4.17893 7.50008 2.5 9.17901 2.5 11.2501C2.5 13.3211 4.17893 15.0001 6.25 15.0001H10M17.5 7.50008L14.1667 4.16675M17.5 7.50008L14.1667 10.8334"
-              stroke={theme === 'light' ? 'white' : '#111111'}
+              stroke={'#111111'}
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
