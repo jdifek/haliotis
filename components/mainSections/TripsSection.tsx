@@ -138,10 +138,6 @@ export const TripsSection: React.FC<Props> = ({ locations, tripCards }) => {
                     options={locations}
                     selected={selectedLocation}
                     onSelect={handleLocationSelect}
-                    bgActive="!bg-[#281D4D]"
-                    bgNoactive="bg-white"
-                    textActive="!text-white"
-                    arrow="#ffff"
                   />
                 </div>
               )}
@@ -162,10 +158,6 @@ export const TripsSection: React.FC<Props> = ({ locations, tripCards }) => {
               options={locations}
               selected={selectedLocation}
               onSelect={setSelectedLocation}
-              bgActive="!bg-[#281d4d]"
-              bgNoactive="!bg-white"
-              textActive="!text-white"
-              arrow="white"
             />
           </div>
         </div>

@@ -115,10 +115,6 @@ export const CentersSection: React.FC<Props> = ({ locations, centerCards }) => {
                     options={locations}
                     selected={selectedLocation}
                     onSelect={handleLocationSelect}
-                    bgActive="!bg-[#a0c52e]"
-                    bgNoactive="bg-white"
-                    textActive="!text-white"
-                    arrow="white"
                   />
                 </div>
               )}
@@ -139,10 +135,6 @@ export const CentersSection: React.FC<Props> = ({ locations, centerCards }) => {
               options={locations}
               selected={selectedLocation}
               onSelect={handleLocationSelect}
-              bgActive="!bg-[#a0c52e]"
-              bgNoactive="bg-white"
-              textActive="!text-white"
-              arrow="white"
             />
           </div>
         </div>
