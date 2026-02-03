@@ -70,6 +70,7 @@ export const Header: React.FC = ({}) => {
   const centersButtonRef = useRef<HTMLButtonElement>(null);
   const coursesButtonRef = useRef<HTMLButtonElement>(null);
   const langButtonRef = useRef<HTMLButtonElement>(null);
+  const [langButtonWidth, setLangButtonWidth] = useState<number | null>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -338,13 +339,13 @@ export const Header: React.FC = ({}) => {
 
                       {/* Текст и стрелка поверх фона */}
                       <p
-  className={`
+                        className={`
     relative z-10
     ${openDropdown === item.id ? "text-black" : "text-white"}
   `}
->
-  {item.label}
-</p>
+                      >
+                        {item.label}
+                      </p>
                       {item.hasDropdown && (
                         <svg
                           width="20"
@@ -377,8 +378,7 @@ export const Header: React.FC = ({}) => {
                       <div
                         ref={dropdownRef}
                         data-dropdown
-                        className="absolute left-0 top-5 z-50 mt-2 flex flex-col gap-0 rounded-[10px] border-2 border-white p-0"
-                        style={{
+                        className="absolute -left-2 top-4 z-50 mt-2 flex flex-col gap-0 rounded-tr-[10px] rounded-b-[10px] border-2 border-white p-0"                        style={{
                           width: "238px",
                           background: "rgba(0, 3, 38, 0.5)",
                           backdropFilter: "blur(10px)",
@@ -520,6 +520,10 @@ export const Header: React.FC = ({}) => {
                 <button
                   ref={langButtonRef}
                   onClick={(e) => {
+                    // Сохраняем ширину при открытии
+                    if (langButtonRef.current && !isLangMenuOpen) {
+                      setLangButtonWidth(langButtonRef.current.offsetWidth);
+                    }
                     setIsLangMenuOpen(!isLangMenuOpen);
                   }}
                   className="flex items-center justify-center gap-1.5 rounded-lg border border-black/12 bg-white cursor-pointer hover:bg-gray-100 px-2.5 py-2.5 text-[14px] font-bold text-black xl:gap-2 xl:px-3.5 xl:text-[15px]"
@@ -546,9 +550,9 @@ export const Header: React.FC = ({}) => {
                 {isLangMenuOpen && (
                   <div
                     data-dropdown
-                    className="absolute right-0 top-full mt-2 flex flex-col rounded-[10px] border-2 border-white shadow-lg"
+                    className="absolute left-0 top-full mt-2 flex flex-col rounded-[10px] border-2 border-white shadow-lg"
                     style={{
-                      width: "75px",
+                      width: langButtonWidth ? `${langButtonWidth}px` : "75px",
                       background: "rgba(0, 3, 38, 0.5)",
                       backdropFilter: "blur(10px)",
                       boxShadow: "0 4px 4px 0 rgba(0, 0, 0, 0.25)",
@@ -561,7 +565,7 @@ export const Header: React.FC = ({}) => {
                           setSelectedLang(lang.code);
                           setIsLangMenuOpen(false);
                         }}
-                        className={`flex h-[40px] w-[71px] cursor-pointer items-center justify-center text-center text-[15px] font-semibold leading-[160%] transition-colors ${
+                        className={`flex h-[40px] w-full cursor-pointer items-center justify-center text-center text-[15px] font-semibold leading-[160%] transition-colors ${
                           selectedLang === lang.code
                             ? "text-[#e84814]"
                             : "text-white hover:text-[#e84814]"
