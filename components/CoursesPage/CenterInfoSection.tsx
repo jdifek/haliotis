@@ -132,83 +132,44 @@ const teamMembers = [
 export const CenterInfoSection = () => {
   const [activeTab, setActiveTab] = useState("berlengas");
   const [selectedFilter, setSelectedFilter] = useState("GEOGRAPHY");
-  const [tabWidths, setTabWidths] = useState<{ [key: string]: number }>({});
   const tabRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
 
-  // Calculate tab positions
-  const getTabPosition = () => {
-    const activeTabRef = tabRefs.current[activeTab];
-    if (!activeTabRef) return { left: 0, width: 0 };
-
-    return {
-      left: activeTabRef.offsetLeft,
-      width: activeTabRef.offsetWidth,
-    };
-  };
-
-  const [tabPosition, setTabPosition] = useState({ left: 0, width: 0 });
-
-  // Update tab position when activeTab changes or window resizes
-  useEffect(() => {
-    const updateTabPosition = () => {
-      const activeTabRef = tabRefs.current[activeTab];
-      if (activeTabRef) {
-        setTabPosition({
-          left: activeTabRef.offsetLeft,
-          width: activeTabRef.offsetWidth,
-        });
-      }
-    };
-
-    updateTabPosition();
-
-    const handleResize = () => {
-      setTabWidths({}); // Force recalculation
-      updateTabPosition();
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [activeTab]);
-
+ 
   const renderContent = () => {
     switch (activeTab) {
       case "berlengas":
         return (
           <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
-            {/* Sidebar with filters - Mobile Dropdown */}
-            <div className="lg:hidden">
-              <div className="relative mb-6">
-                <select
-                  value={selectedFilter}
-                  onChange={(e) => setSelectedFilter(e.target.value)}
-                  className="w-full px-4 py-3 text-[15px] font-medium leading-[160%] text-[#111] bg-white border-2 border-[#e5e5e5] rounded-lg appearance-none cursor-pointer focus:outline-none focus:border-[#e84814]"
-                >
-                  {facilitiesFilters.map((filter) => (
-                    <option key={filter} value={filter}>
-                      {filter}
-                    </option>
-                  ))}
-                </select>
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 16 16"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M4 6L8 10L12 6"
-                      stroke="black"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </div>
-              </div>
-            </div>
+          {/* Sidebar with filters - Mobile Dropdown */}
+<div className="lg:hidden">
+  <div className="relative mb-6">
+    <select
+      value={selectedFilter}
+      onChange={(e) => setSelectedFilter(e.target.value)}
+      className="w-full px-[14px] py-[10px] text-[16px] font-bold leading-[120%] uppercase text-center text-[#f1f1f1] bg-[#e84814] rounded-[8px] appearance-none cursor-pointer focus:outline-none h-[44px]"
+    >
+      {facilitiesFilters.map((filter) => (
+        <option key={filter} value={filter}>
+          {filter}
+        </option>
+      ))}
+    </select>
+    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+      <svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M9.8537 6.14663L14.8534 11.1463C14.8999 11.1927 14.9367 11.2478 14.9619 11.3085C14.9871 11.3692 15 11.4343 15 11.5C15 11.5657 14.9871 11.6308 14.9619 11.6915C14.9367 11.7522 14.8999 11.8073 14.8534 11.8537L9.8537 16.8534C9.78377 16.9234 9.69465 16.971 9.59762 16.9904C9.50058 17.0097 9.39999 16.9998 9.30859 16.9619C9.21718 16.924 9.13907 16.8599 9.08414 16.7776C9.0292 16.6953 8.99992 16.5986 9 16.4996L9 6.50036C8.99992 6.40142 9.0292 6.30468 9.08414 6.22239C9.13907 6.1401 9.21718 6.07595 9.30859 6.03808C9.39999 6.00021 9.50058 5.99031 9.59761 6.00963C9.69465 6.02895 9.78377 6.07663 9.8537 6.14663Z"
+          fill="#F1F1F1"
+        />
+      </svg>
+    </div>
+  </div>
+</div>
 
             {/* Sidebar with filters - Desktop */}
             <div className="hidden lg:block w-full lg:w-[253px] flex-shrink-0">
@@ -591,39 +552,36 @@ export const CenterInfoSection = () => {
           </div>
         </div>
 
-        {/* Tabs Navigation - Mobile (Dropdown) */}
-        <div className="mb-8 md:hidden">
-          <div className="relative">
-            <select
-              value={activeTab}
-              onChange={(e) => setActiveTab(e.target.value)}
-              className="w-full px-4 py-3 text-[16px] font-medium leading-[140%] text-black bg-white border-2 border-[#e5e5e5] rounded-lg appearance-none cursor-pointer focus:outline-none focus:border-[#e84814]"
-            >
-              {tabs.map((tab) => (
-                <option key={tab.id} value={tab.id}>
-                  {tab.label}
-                </option>
-              ))}
-            </select>
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M4 6L8 10L12 6"
-                  stroke="black"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </div>
-          </div>
-        </div>
+      {/* Tabs Navigation - Mobile (Dropdown) */}
+<div className="mb-8 md:hidden">
+  <div className="relative">
+    <select
+      value={activeTab}
+      onChange={(e) => setActiveTab(e.target.value)}
+      className="w-full px-[14px] py-[5px] text-[20px] font-medium leading-[140%] text-black bg-white border border-[#e84814] rounded-[10px] appearance-none cursor-pointer focus:outline-none focus:border-[#e84814] h-[48px]"
+    >
+      {tabs.map((tab) => (
+        <option key={tab.id} value={tab.id}>
+          {tab.label}
+        </option>
+      ))}
+    </select>
+    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+      <svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M17.8534 14.1463L12.8537 9.14663C12.8073 9.10015 12.7522 9.06327 12.6915 9.03811C12.6308 9.01295 12.5657 9 12.5 9C12.4343 9 12.3692 9.01295 12.3085 9.03811C12.2478 9.06327 12.1927 9.10015 12.1463 9.14663L7.14663 14.1463C7.07663 14.2162 7.02895 14.3053 7.00963 14.4024C6.9903 14.4994 7.00021 14.6 7.03808 14.6914C7.07595 14.7828 7.1401 14.8609 7.22239 14.9159C7.30468 14.9708 7.40142 15.0001 7.50036 15H17.4996C17.5986 15.0001 17.6953 14.9708 17.7776 14.9159C17.8599 14.8609 17.924 14.7828 17.9619 14.6914C17.9998 14.6 18.0097 14.4994 17.9904 14.4024C17.971 14.3053 17.9234 14.2162 17.8534 14.1463Z"
+          fill="black"
+        />
+      </svg>
+    </div>
+  </div>
+</div>
 
         {/* Tab Content */}
         <div className="animate-fadeIn">{renderContent()}</div>
