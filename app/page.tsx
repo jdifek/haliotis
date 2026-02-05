@@ -1,9 +1,7 @@
 "use client";
 
-import { Header } from "@/components/header";
 import { CarouselControls } from "@/components/CarouselControls";
 import Image from "next/image";
-import { ButtonWithIcon } from "@/components/buttons/ButtonWithIcon";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
 import "swiper/css";
@@ -16,9 +14,8 @@ import { TripsSection } from "@/components/mainSections/TripsSection";
 import { DiveTrips } from "@/components/mainSections/DiveTrips";
 import { CentersSection } from "@/components/mainSections/CentersSection";
 export default function Home() {
-
   const [heroCurrentSlide, setHeroCurrentSlide] = useState(0);
-  
+
   const heroSwiperRef = useRef<SwiperType | null>(null);
   const locations = [
     { id: "all", label: "ALL" },
@@ -30,223 +27,209 @@ export default function Home() {
     { id: "sao-vicente", label: "SAO VICENTE" },
   ];
 
-  
-  
-  const centersData = [
-    { id: "peniche", label: "PENICHE", color: "#F49519" },
-    { id: "sesimbra", label: "SESIMBRA", color: "#A0C52E" },
-    { id: "madeira", label: "MADEIRA", color: "#E84814" },
-    { id: "santa-maria", label: "SANTA MARIA", color: "#FED402" },
-    { id: "faial", label: "FAIAL", color: "#568DD9" },
-    { id: "sao-vicente", label: "SAO VICENTE", color: "#D8D8D8" },
-  ];
-  const languages = [
-    { code: "En", label: "English" },
-    { code: "Pt", label: "Português" },
-    { code: "Es", label: "Español" },
-    { code: "Fr", label: "Français" },
-  ];
-
-  const coursesData = [
-    { id: "promotions", label: "Promotions", image: "/Rectangle 8.png" },
-    { id: "beginner", label: "Beginner", image: "/Rectangle 8.png" },
-    { id: "advanced", label: "Advanced", image: "/Rectangle 8.png" },
-    { id: "rescue", label: "Rescue", image: "/Rectangle 8.png" },
-    { id: "specialties", label: "Specialties", image: "/Rectangle 8.png" },
-    { id: "divemaster", label: "Divemaster", image: "/Rectangle 8.png" },
-    {
-      id: "dive-instructor",
-      label: "Dive Instructor",
-      image: "/Rectangle 8.png",
-    },
-    { id: "tec-diving", label: "Tec Diving", image: "/Rectangle 8.png" },
-  ];
-
   const courseCards = [
     // PENICHE
     {
       image: "/Rectangle 8.png",
-      title: "PENICHE PADI Rescue Diver Course with Emergency First Response Training",
+      title:
+        "PENICHE PADI Rescue Diver Course with Emergency First Response Training",
       price: 349,
       duration: "3 days",
       requestBased: true,
       badge: "New",
-      location: "peniche"
+      location: "peniche",
     },
     {
       image: "/Rectangle 8.png",
-      title: "PENICHE Deep Diving Specialty Course for Advanced Divers in Berlengas",
+      title:
+        "PENICHE Deep Diving Specialty Course for Advanced Divers in Berlengas",
       price: 199,
       duration: "2 days",
       requestBased: false,
       badge: "Specialty",
-      location: "peniche"
+      location: "peniche",
     },
     {
       image: "/Rectangle 8.png",
-      title: "PENICHE Night Diving Adventure Course with Underwater Navigation Skills",
+      title:
+        "PENICHE Night Diving Adventure Course with Underwater Navigation Skills",
       price: 249,
       duration: "2 days",
       requestBased: true,
       badge: "Adventure",
-      location: "peniche"
+      location: "peniche",
     },
-    
+
     // MADEIRA
     {
       image: "/Rectangle 8.png",
-      title: "MADEIRA Curso de Nitrox PADI Enriched Air Diver - inclui mergulhos",
+      title:
+        "MADEIRA Curso de Nitrox PADI Enriched Air Diver - inclui mergulhos",
       price: 239,
       duration: "3hrs",
       requestBased: true,
       badge: "Open Trip",
-      location: "madeira"
+      location: "madeira",
     },
     {
       image: "/Rectangle 8.png",
-      title: "MADEIRA Wreck Diving Specialty exploring Historic Shipwrecks of Madeira",
+      title:
+        "MADEIRA Wreck Diving Specialty exploring Historic Shipwrecks of Madeira",
       price: 279,
       duration: "3 days",
       requestBased: false,
       badge: "Specialty",
-      location: "madeira"
+      location: "madeira",
     },
     {
       image: "/Rectangle 8.png",
-      title: "MADEIRA Marine Life Identification Course with Local Endemic Species",
+      title:
+        "MADEIRA Marine Life Identification Course with Local Endemic Species",
       price: 189,
       duration: "2 days",
       requestBased: true,
       badge: "Educational",
-      location: "madeira"
+      location: "madeira",
     },
     {
       image: "/Rectangle 8.png",
-      title: "MADEIRA Underwater Photography Workshop capturing Atlantic Marine Beauty",
+      title:
+        "MADEIRA Underwater Photography Workshop capturing Atlantic Marine Beauty",
       price: 329,
       duration: "3 days",
       requestBased: false,
       badge: "Creative",
-      location: "madeira"
+      location: "madeira",
     },
-    
+
     // SESIMBRA
     {
       image: "/Rectangle 8.png",
-      title: "SESIMBRA Divemaster Professional Course with Leadership Development Training",
+      title:
+        "SESIMBRA Divemaster Professional Course with Leadership Development Training",
       price: 899,
       duration: "4 weeks",
       requestBased: false,
       badge: "Professional",
-      location: "sesimbra"
+      location: "sesimbra",
     },
     {
       image: "/Rectangle 8.png",
-      title: "SESIMBRA Open Water Diver Certification Course for Complete Beginners",
+      title:
+        "SESIMBRA Open Water Diver Certification Course for Complete Beginners",
       price: 399,
       duration: "3 days",
       requestBased: false,
       badge: "Beginner",
-      location: "sesimbra"
+      location: "sesimbra",
     },
     {
       image: "/Rectangle 8.png",
-      title: "SESIMBRA Peak Performance Buoyancy Course improving Diving Control Skills",
+      title:
+        "SESIMBRA Peak Performance Buoyancy Course improving Diving Control Skills",
       price: 179,
       duration: "1 day",
       requestBased: true,
       badge: "Specialty",
-      location: "sesimbra"
+      location: "sesimbra",
     },
-    
+
     // SANTA MARIA
     {
       image: "/Rectangle 8.png",
-      title: "SANTA MARIA Blue Shark Diving Experience with Marine Biologist Guidance",
+      title:
+        "SANTA MARIA Blue Shark Diving Experience with Marine Biologist Guidance",
       price: 459,
       duration: "1 day",
       requestBased: true,
       badge: "Adventure",
-      location: "santa-maria"
+      location: "santa-maria",
     },
     {
       image: "/Rectangle 8.png",
-      title: "SANTA MARIA Manta Ray Encounter Diving Safari in Azorean Atlantic Waters",
+      title:
+        "SANTA MARIA Manta Ray Encounter Diving Safari in Azorean Atlantic Waters",
       price: 389,
       duration: "2 days",
       requestBased: false,
       badge: "Popular",
-      location: "santa-maria"
+      location: "santa-maria",
     },
     {
       image: "/Rectangle 8.png",
-      title: "SANTA MARIA Drift Diving Specialty Course exploring Strong Ocean Currents",
+      title:
+        "SANTA MARIA Drift Diving Specialty Course exploring Strong Ocean Currents",
       price: 229,
       duration: "2 days",
       requestBased: true,
       badge: "Specialty",
-      location: "santa-maria"
+      location: "santa-maria",
     },
-    
+
     // FAIAL
     {
       image: "/Rectangle 8.png",
-      title: "FAIAL Volcanic Diving Adventure exploring Underwater Lava Formations",
+      title:
+        "FAIAL Volcanic Diving Adventure exploring Underwater Lava Formations",
       price: 319,
       duration: "2 days",
       requestBased: false,
       badge: "Adventure",
-      location: "faial"
+      location: "faial",
     },
     {
       image: "/Rectangle 8.png",
-      title: "FAIAL Whale Watching Diving Tour with Cetacean Research Experience",
+      title:
+        "FAIAL Whale Watching Diving Tour with Cetacean Research Experience",
       price: 429,
       duration: "1 day",
       requestBased: true,
       badge: "Educational",
-      location: "faial"
+      location: "faial",
     },
     {
       image: "/Rectangle 8.png",
-      title: "FAIAL Altitude Diving Specialty Course in Caldeira Lake Ecosystem",
+      title:
+        "FAIAL Altitude Diving Specialty Course in Caldeira Lake Ecosystem",
       price: 269,
       duration: "2 days",
       requestBased: false,
       badge: "Specialty",
-      location: "faial"
+      location: "faial",
     },
-    
+
     // SAO VICENTE
     {
       image: "/Rectangle 8.png",
-      title: "SAO VICENTE Tropical Reef Diving Safari discovering Caribbean Marine Species",
+      title:
+        "SAO VICENTE Tropical Reef Diving Safari discovering Caribbean Marine Species",
       price: 359,
       duration: "3 days",
       requestBased: false,
       badge: "Adventure",
-      location: "sao-vicente"
+      location: "sao-vicente",
     },
     {
       image: "/Rectangle 8.png",
-      title: "SAO VICENTE Cave Diving Introduction Course exploring Underwater Caverns",
+      title:
+        "SAO VICENTE Cave Diving Introduction Course exploring Underwater Caverns",
       price: 399,
       duration: "2 days",
       requestBased: true,
       badge: "Advanced",
-      location: "sao-vicente"
+      location: "sao-vicente",
     },
     {
       image: "/Rectangle 8.png",
-      title: "SAO VICENTE Fish Identification Specialty learning Endemic Cape Verde Species",
+      title:
+        "SAO VICENTE Fish Identification Specialty learning Endemic Cape Verde Species",
       price: 199,
       duration: "2 days",
       requestBased: false,
       badge: "Educational",
-      location: "sao-vicente"
+      location: "sao-vicente",
     },
   ];
-  
   const tripCards = [
     // PENICHE
     {
@@ -482,130 +465,128 @@ export default function Home() {
       equipmentPrice: "€ 40.00"
     },
   ];
-  // Mock data for Centers Section
-
   const SAME_DESCRIPTION =
-  "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
 
-const centerCardsData = [
-  {
-    image: "/CTABackgroundImage.png",
-    title: "Peniche",
-    description: SAME_DESCRIPTION,
-    buttonColor: "#f49519",
-    location: "peniche",
-  },
-  {
-    image: "/CTABackgroundImage.png",
-    title: "Peniche",
-    description: SAME_DESCRIPTION,
-    buttonColor: "#f49519",
-    location: "peniche",
-  },
+  const centerCardsData = [
+    {
+      image: "/CTABackgroundImage.png",
+      title: "Peniche",
+      description: SAME_DESCRIPTION,
+      buttonColor: "#f49519",
+      location: "peniche",
+    },
+    {
+      image: "/CTABackgroundImage.png",
+      title: "Peniche",
+      description: SAME_DESCRIPTION,
+      buttonColor: "#f49519",
+      location: "peniche",
+    },
 
-  {
-    image: "/CTABackgroundImage.png",
-    title: "Madeira",
-    description: SAME_DESCRIPTION,
-    buttonColor: "#e52924",
-    location: "madeira",
-  },
-  {
-    image: "/CTABackgroundImage.png",
-    title: "Madeira",
-    description: SAME_DESCRIPTION,
-    buttonColor: "#e52924",
-    location: "madeira",
-  },
-  {
-    image: "/CTABackgroundImage.png",
-    title: "Madeira",
-    description: SAME_DESCRIPTION,
-    buttonColor: "#e52924",
-    location: "madeira",
-  },
+    {
+      image: "/CTABackgroundImage.png",
+      title: "Madeira",
+      description: SAME_DESCRIPTION,
+      buttonColor: "#e52924",
+      location: "madeira",
+    },
+    {
+      image: "/CTABackgroundImage.png",
+      title: "Madeira",
+      description: SAME_DESCRIPTION,
+      buttonColor: "#e52924",
+      location: "madeira",
+    },
+    {
+      image: "/CTABackgroundImage.png",
+      title: "Madeira",
+      description: SAME_DESCRIPTION,
+      buttonColor: "#e52924",
+      location: "madeira",
+    },
 
-  {
-    image: "/CTABackgroundImage.png",
-    title: "Sesimbra",
-    description: SAME_DESCRIPTION,
-    buttonColor: "#a0c52e",
-    location: "sesimbra",
-  },
-  {
-    image: "/CTABackgroundImage.png",
-    title: "Sesimbra",
-    description: SAME_DESCRIPTION,
-    buttonColor: "#a0c52e",
-    location: "sesimbra",
-  },
+    {
+      image: "/CTABackgroundImage.png",
+      title: "Sesimbra",
+      description: SAME_DESCRIPTION,
+      buttonColor: "#a0c52e",
+      location: "sesimbra",
+    },
+    {
+      image: "/CTABackgroundImage.png",
+      title: "Sesimbra",
+      description: SAME_DESCRIPTION,
+      buttonColor: "#a0c52e",
+      location: "sesimbra",
+    },
 
-  {
-    image: "/CTABackgroundImage.png",
-    title: "Santa Maria",
-    description: SAME_DESCRIPTION,
-    buttonColor: "#fed402",
-    location: "santa-maria",
-  },
-  {
-    image: "/CTABackgroundImage.png",
-    title: "Santa Maria",
-    description: SAME_DESCRIPTION,
-    buttonColor: "#fed402",
-    location: "santa-maria",
-  },
-  {
-    image: "/CTABackgroundImage.png",
-    title: "Santa Maria",
-    description: SAME_DESCRIPTION,
-    buttonColor: "#fed402",
-    location: "santa-maria",
-  },
+    {
+      image: "/CTABackgroundImage.png",
+      title: "Santa Maria",
+      description: SAME_DESCRIPTION,
+      buttonColor: "#fed402",
+      location: "santa-maria",
+    },
+    {
+      image: "/CTABackgroundImage.png",
+      title: "Santa Maria",
+      description: SAME_DESCRIPTION,
+      buttonColor: "#fed402",
+      location: "santa-maria",
+    },
+    {
+      image: "/CTABackgroundImage.png",
+      title: "Santa Maria",
+      description: SAME_DESCRIPTION,
+      buttonColor: "#fed402",
+      location: "santa-maria",
+    },
 
-  {
-    image: "/CTABackgroundImage.png",
-    title: "Faial",
-    description: SAME_DESCRIPTION,
-    buttonColor: "#1b5ba7",
-    location: "faial",
-  },
-  {
-    image: "/CTABackgroundImage.png",
-    title: "Faial",
-    description: SAME_DESCRIPTION,
-    buttonColor: "#1b5ba7",
-    location: "faial",
-  },
-  {
-    image: "/CTABackgroundImage.png",
-    title: "Faial",
-    description: SAME_DESCRIPTION,
-    buttonColor: "#1b5ba7",
-    location: "faial",
-  },
+    {
+      image: "/CTABackgroundImage.png",
+      title: "Faial",
+      description: SAME_DESCRIPTION,
+      buttonColor: "#1b5ba7",
+      location: "faial",
+    },
+    {
+      image: "/CTABackgroundImage.png",
+      title: "Faial",
+      description: SAME_DESCRIPTION,
+      buttonColor: "#1b5ba7",
+      location: "faial",
+    },
+    {
+      image: "/CTABackgroundImage.png",
+      title: "Faial",
+      description: SAME_DESCRIPTION,
+      buttonColor: "#1b5ba7",
+      location: "faial",
+    },
 
-  {
-    image: "/CTABackgroundImage.png",
-    title: "São Vicente",
-    description: SAME_DESCRIPTION,
-    buttonColor: "#f49519",
-    location: "sao-vicente",
-  },
-  {
-    image: "/CTABackgroundImage.png",
-    title: "São Vicente",
-    description: SAME_DESCRIPTION,
-    buttonColor: "#f49519",
-    location: "sao-vicente",
-  },
-  {
-    image: "/CTABackgroundImage.png",
-    title: "São Vicente",
-    description: SAME_DESCRIPTION,
-    buttonColor: "#f49519",
-    location: "sao-vicente",
-  },
-];
+    {
+      image: "/CTABackgroundImage.png",
+      title: "São Vicente",
+      description: SAME_DESCRIPTION,
+      buttonColor: "#f49519",
+      location: "sao-vicente",
+    },
+    {
+      image: "/CTABackgroundImage.png",
+      title: "São Vicente",
+      description: SAME_DESCRIPTION,
+      buttonColor: "#f49519",
+      location: "sao-vicente",
+    },
+    {
+      image: "/CTABackgroundImage.png",
+      title: "São Vicente",
+      description: SAME_DESCRIPTION,
+      buttonColor: "#f49519",
+      location: "sao-vicente",
+    },
+  ];
 
   const diveTripsCards = [
     {
@@ -689,7 +670,7 @@ const centerCardsData = [
   return (
     <main className="-mt-[97px]">
       {/* -mt-[81px] чтобы контент начался под хедером */}
-      
+
       <section className="relative h-[930px] w-full pt-[97px]">
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
@@ -821,53 +802,116 @@ const centerCardsData = [
           </svg>
         </div>
         <div className="absolute right-4 bottom-20 z-10 lg:hidden">
-        <svg width="199" height="184" viewBox="0 0 199 184" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <g clip-path="url(#clip0_1_7629)">
-    <path d="M0.686184 114.46C2.70862 119.179 9.67462 120.321 16.6406 117.342C22.8597 114.68 25.6308 106.73 22.5422 99.5235C19.56 92.5649 16.0072 91.1443 6.30679 93.2378C0.909543 93.8914 -1.22109 110.008 0.686184 114.46Z" fill="#E84814" />
-    <path d="M31.2453 121.301C29.804 125.153 33.2084 129.663 38.8936 131.786C43.9715 133.684 49.9795 130.609 52.1834 124.723C54.3071 119.045 53.0367 116.258 46.2574 112.111C42.7657 109.507 32.6064 117.668 31.2453 121.301Z" fill="#E84814" />
-    <path d="M76.1749 134.943C79.4153 135.792 82.7901 132.667 84.043 127.894C85.1581 123.63 82.1707 119.023 77.2201 117.728C72.4406 116.48 70.2873 117.737 67.4866 123.562C65.6666 126.6 73.1194 134.143 76.1749 134.943Z" fill="#E84814" />
-    <path d="M112.158 129.653C114.863 128.788 115.859 125.022 114.585 121.039C113.446 117.481 109.727 116.309 105.598 117.627C101.609 118.901 100.126 120.008 100.768 125.445C100.847 128.447 109.608 130.465 112.158 129.653Z" fill="#E84814" />
-    <path d="M136.746 104.3C134.429 104.849 133.359 107.935 134.172 111.348C134.898 114.393 138.313 116.283 141.852 115.443C145.267 114.63 146.193 113.122 146.001 108.533C146.129 106.021 138.929 103.781 136.746 104.3Z" fill="#E84814" />
-    <path d="M159.678 96.7457C161.592 97.253 163.592 95.4122 164.339 92.5936C165.007 90.0765 163.248 87.3502 160.327 86.5745C157.506 85.8285 156.23 86.5676 154.563 90.0033C153.483 91.7987 157.874 96.2681 159.678 96.7457Z" fill="#E84814" />
-    <path d="M168.979 75.0553C170.145 76.1186 172.239 75.5538 173.809 73.8368C175.21 72.3046 174.977 69.7283 173.197 68.1037C171.478 66.5348 170.304 66.5889 167.855 68.4035C166.428 69.2716 167.88 74.0512 168.979 75.0553Z" fill="#E84814" />
-    <path d="M176.646 52.0285C177.55 52.7851 179.089 52.297 180.207 50.967C181.202 49.7782 180.945 47.8625 179.563 46.7085C178.232 45.5946 177.358 45.6731 175.592 47.1059C174.557 47.798 175.791 51.3173 176.646 52.0285Z" fill="#E84814" />
-    <path d="M174.517 33.7018C174.848 34.474 175.988 34.6623 177.129 34.1742C178.145 33.7384 178.602 32.4381 178.094 31.2597C177.607 30.1197 177.024 29.8879 175.438 30.2295C174.554 30.3358 174.205 32.9749 174.517 33.7018Z" fill="#E84814" />
-    <path d="M170.093 23.2263C170.273 23.6481 170.892 23.7492 171.513 23.4825C172.068 23.2454 172.314 22.5377 172.04 21.8962C171.775 21.2739 171.458 21.1502 170.592 21.335C170.114 21.3925 169.924 22.8288 170.093 23.2263Z" fill="#E84814" />
-    <path d="M157.372 18.8147C157.484 19.0727 157.866 19.1354 158.248 18.9716C158.586 18.8286 158.738 18.3911 158.571 17.9954C158.408 17.6154 158.211 17.5387 157.681 17.652C157.386 17.6886 157.269 18.5706 157.372 18.8147Z" fill="#E84814" />
-    <path d="M164.103 18.543C164.285 18.9631 164.904 19.0659 165.524 18.7992C166.079 18.5639 166.325 17.8544 166.051 17.2112C165.786 16.5907 165.468 16.4652 164.604 16.6517C164.124 16.7092 163.932 18.1455 164.103 18.543Z" fill="#E84814" />
-    <path d="M153.151 22.478C153.261 22.736 153.643 22.7988 154.025 22.6349C154.366 22.4902 154.516 22.0545 154.35 21.6588C154.186 21.2788 153.991 21.2003 153.46 21.3154C153.163 21.3502 153.045 22.234 153.151 22.478Z" fill="#E84814" />
-    <path d="M154.245 26.0154C154.339 26.2298 154.655 26.2821 154.969 26.1461C155.254 26.0241 155.381 25.6615 155.238 25.3356C155.104 25.0183 154.941 24.9538 154.502 25.0497C154.257 25.0793 154.158 25.8132 154.245 26.0154Z" fill="#E84814" />
-    <path d="M156.939 26.8843C157.013 27.0516 157.261 27.0934 157.507 26.9871C157.73 26.8912 157.826 26.6089 157.716 26.3526C157.611 26.1051 157.484 26.0528 157.14 26.1277C156.946 26.1521 156.873 26.7256 156.939 26.8843Z" fill="#E84814" />
-    <path d="M159.287 26.0398C159.328 26.134 159.469 26.1584 159.61 26.0974C159.738 26.0416 159.792 25.883 159.731 25.7365C159.67 25.5953 159.598 25.5674 159.401 25.6075C159.291 25.6215 159.249 25.9492 159.287 26.0398Z" fill="#E84814" />
-    <path d="M159.942 24.0492C159.967 24.1102 160.054 24.1224 160.143 24.0858C160.22 24.0527 160.256 23.9516 160.216 23.8609C160.179 23.7738 160.134 23.7564 160.012 23.7825C159.944 23.7912 159.918 23.9934 159.942 24.0492Z" fill="#E84814" />
-    <path d="M158.599 22.569C158.623 22.6282 158.711 22.6422 158.8 22.6056C158.878 22.5725 158.915 22.4714 158.875 22.3807C158.838 22.2936 158.791 22.2761 158.671 22.3023C158.603 22.311 158.575 22.5132 158.599 22.569Z" fill="#E84814" />
-    <path d="M157.529 23.695C157.543 23.7299 157.59 23.7351 157.639 23.7142C157.683 23.6968 157.702 23.6427 157.679 23.5922C157.658 23.5451 157.636 23.5364 157.568 23.5504C157.533 23.5538 157.515 23.6637 157.529 23.695Z" fill="#E84814" />
-    <path d="M26.574 162.878C37.8205 165.589 47.8925 168.157 59.6677 167.349C102.345 164.442 144.338 143.833 172.371 111.491C194.412 86.0603 199.371 45.4663 177.953 18.1445C174.212 13.3718 162.444 0.176263 153.988 5.30978L152.993 6.00006L151.998 6.90475L151.002 8.0465L151.03 8.02035L150.829 8.6165L150.63 9.53862L150.512 10.6682C150.369 14.7959 155.63 22.077 160.383 19.2078C162.854 17.7139 162.222 13.6524 162.165 11.3253L162.884 11.1719C163.765 14.7175 164.829 19.9294 160.524 21.7109C153.005 24.8206 146.287 15.7895 146.846 9.06623C147.756 -1.91898 162.226 -1.54595 169.031 2.96527C199.865 23.3913 205.769 63.7674 192.172 96.3988C184.099 115.775 167.337 132.865 150.627 144.795C123.855 163.902 93.2535 176.679 60.3325 179.503C46.8281 180.66 35.2414 177.881 22.2674 174.993C18.917 173.808 17.1668 170.13 18.3569 166.783C19.5469 163.438 23.2254 161.69 26.574 162.878Z" fill="white" fill-opacity="0.5" />
-  </g>
-  <defs>
-    <clipPath id="clip0_1_7629">
-      <rect width="199" height="184" fill="white" />
-    </clipPath>
-  </defs>
-</svg>
-</div>
+          <svg
+            width="199"
+            height="184"
+            viewBox="0 0 199 184"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <g clip-path="url(#clip0_1_7629)">
+              <path
+                d="M0.686184 114.46C2.70862 119.179 9.67462 120.321 16.6406 117.342C22.8597 114.68 25.6308 106.73 22.5422 99.5235C19.56 92.5649 16.0072 91.1443 6.30679 93.2378C0.909543 93.8914 -1.22109 110.008 0.686184 114.46Z"
+                fill="#E84814"
+              />
+              <path
+                d="M31.2453 121.301C29.804 125.153 33.2084 129.663 38.8936 131.786C43.9715 133.684 49.9795 130.609 52.1834 124.723C54.3071 119.045 53.0367 116.258 46.2574 112.111C42.7657 109.507 32.6064 117.668 31.2453 121.301Z"
+                fill="#E84814"
+              />
+              <path
+                d="M76.1749 134.943C79.4153 135.792 82.7901 132.667 84.043 127.894C85.1581 123.63 82.1707 119.023 77.2201 117.728C72.4406 116.48 70.2873 117.737 67.4866 123.562C65.6666 126.6 73.1194 134.143 76.1749 134.943Z"
+                fill="#E84814"
+              />
+              <path
+                d="M112.158 129.653C114.863 128.788 115.859 125.022 114.585 121.039C113.446 117.481 109.727 116.309 105.598 117.627C101.609 118.901 100.126 120.008 100.768 125.445C100.847 128.447 109.608 130.465 112.158 129.653Z"
+                fill="#E84814"
+              />
+              <path
+                d="M136.746 104.3C134.429 104.849 133.359 107.935 134.172 111.348C134.898 114.393 138.313 116.283 141.852 115.443C145.267 114.63 146.193 113.122 146.001 108.533C146.129 106.021 138.929 103.781 136.746 104.3Z"
+                fill="#E84814"
+              />
+              <path
+                d="M159.678 96.7457C161.592 97.253 163.592 95.4122 164.339 92.5936C165.007 90.0765 163.248 87.3502 160.327 86.5745C157.506 85.8285 156.23 86.5676 154.563 90.0033C153.483 91.7987 157.874 96.2681 159.678 96.7457Z"
+                fill="#E84814"
+              />
+              <path
+                d="M168.979 75.0553C170.145 76.1186 172.239 75.5538 173.809 73.8368C175.21 72.3046 174.977 69.7283 173.197 68.1037C171.478 66.5348 170.304 66.5889 167.855 68.4035C166.428 69.2716 167.88 74.0512 168.979 75.0553Z"
+                fill="#E84814"
+              />
+              <path
+                d="M176.646 52.0285C177.55 52.7851 179.089 52.297 180.207 50.967C181.202 49.7782 180.945 47.8625 179.563 46.7085C178.232 45.5946 177.358 45.6731 175.592 47.1059C174.557 47.798 175.791 51.3173 176.646 52.0285Z"
+                fill="#E84814"
+              />
+              <path
+                d="M174.517 33.7018C174.848 34.474 175.988 34.6623 177.129 34.1742C178.145 33.7384 178.602 32.4381 178.094 31.2597C177.607 30.1197 177.024 29.8879 175.438 30.2295C174.554 30.3358 174.205 32.9749 174.517 33.7018Z"
+                fill="#E84814"
+              />
+              <path
+                d="M170.093 23.2263C170.273 23.6481 170.892 23.7492 171.513 23.4825C172.068 23.2454 172.314 22.5377 172.04 21.8962C171.775 21.2739 171.458 21.1502 170.592 21.335C170.114 21.3925 169.924 22.8288 170.093 23.2263Z"
+                fill="#E84814"
+              />
+              <path
+                d="M157.372 18.8147C157.484 19.0727 157.866 19.1354 158.248 18.9716C158.586 18.8286 158.738 18.3911 158.571 17.9954C158.408 17.6154 158.211 17.5387 157.681 17.652C157.386 17.6886 157.269 18.5706 157.372 18.8147Z"
+                fill="#E84814"
+              />
+              <path
+                d="M164.103 18.543C164.285 18.9631 164.904 19.0659 165.524 18.7992C166.079 18.5639 166.325 17.8544 166.051 17.2112C165.786 16.5907 165.468 16.4652 164.604 16.6517C164.124 16.7092 163.932 18.1455 164.103 18.543Z"
+                fill="#E84814"
+              />
+              <path
+                d="M153.151 22.478C153.261 22.736 153.643 22.7988 154.025 22.6349C154.366 22.4902 154.516 22.0545 154.35 21.6588C154.186 21.2788 153.991 21.2003 153.46 21.3154C153.163 21.3502 153.045 22.234 153.151 22.478Z"
+                fill="#E84814"
+              />
+              <path
+                d="M154.245 26.0154C154.339 26.2298 154.655 26.2821 154.969 26.1461C155.254 26.0241 155.381 25.6615 155.238 25.3356C155.104 25.0183 154.941 24.9538 154.502 25.0497C154.257 25.0793 154.158 25.8132 154.245 26.0154Z"
+                fill="#E84814"
+              />
+              <path
+                d="M156.939 26.8843C157.013 27.0516 157.261 27.0934 157.507 26.9871C157.73 26.8912 157.826 26.6089 157.716 26.3526C157.611 26.1051 157.484 26.0528 157.14 26.1277C156.946 26.1521 156.873 26.7256 156.939 26.8843Z"
+                fill="#E84814"
+              />
+              <path
+                d="M159.287 26.0398C159.328 26.134 159.469 26.1584 159.61 26.0974C159.738 26.0416 159.792 25.883 159.731 25.7365C159.67 25.5953 159.598 25.5674 159.401 25.6075C159.291 25.6215 159.249 25.9492 159.287 26.0398Z"
+                fill="#E84814"
+              />
+              <path
+                d="M159.942 24.0492C159.967 24.1102 160.054 24.1224 160.143 24.0858C160.22 24.0527 160.256 23.9516 160.216 23.8609C160.179 23.7738 160.134 23.7564 160.012 23.7825C159.944 23.7912 159.918 23.9934 159.942 24.0492Z"
+                fill="#E84814"
+              />
+              <path
+                d="M158.599 22.569C158.623 22.6282 158.711 22.6422 158.8 22.6056C158.878 22.5725 158.915 22.4714 158.875 22.3807C158.838 22.2936 158.791 22.2761 158.671 22.3023C158.603 22.311 158.575 22.5132 158.599 22.569Z"
+                fill="#E84814"
+              />
+              <path
+                d="M157.529 23.695C157.543 23.7299 157.59 23.7351 157.639 23.7142C157.683 23.6968 157.702 23.6427 157.679 23.5922C157.658 23.5451 157.636 23.5364 157.568 23.5504C157.533 23.5538 157.515 23.6637 157.529 23.695Z"
+                fill="#E84814"
+              />
+              <path
+                d="M26.574 162.878C37.8205 165.589 47.8925 168.157 59.6677 167.349C102.345 164.442 144.338 143.833 172.371 111.491C194.412 86.0603 199.371 45.4663 177.953 18.1445C174.212 13.3718 162.444 0.176263 153.988 5.30978L152.993 6.00006L151.998 6.90475L151.002 8.0465L151.03 8.02035L150.829 8.6165L150.63 9.53862L150.512 10.6682C150.369 14.7959 155.63 22.077 160.383 19.2078C162.854 17.7139 162.222 13.6524 162.165 11.3253L162.884 11.1719C163.765 14.7175 164.829 19.9294 160.524 21.7109C153.005 24.8206 146.287 15.7895 146.846 9.06623C147.756 -1.91898 162.226 -1.54595 169.031 2.96527C199.865 23.3913 205.769 63.7674 192.172 96.3988C184.099 115.775 167.337 132.865 150.627 144.795C123.855 163.902 93.2535 176.679 60.3325 179.503C46.8281 180.66 35.2414 177.881 22.2674 174.993C18.917 173.808 17.1668 170.13 18.3569 166.783C19.5469 163.438 23.2254 161.69 26.574 162.878Z"
+                fill="white"
+                fill-opacity="0.5"
+              />
+            </g>
+            <defs>
+              <clipPath id="clip0_1_7629">
+                <rect width="199" height="184" fill="white" />
+              </clipPath>
+            </defs>
+          </svg>
+        </div>
 
         <div className="absolute right-10 bottom-10 z-10 lg:right-10 lg:bottom-10">
-  <CarouselControls
-    currentSlide={heroCurrentSlide}
-    totalSlides={heroSlides.length}
-    onPrev={() => heroSwiperRef.current?.slidePrev()}
-    onNext={() => heroSwiperRef.current?.slideNext()}
-    progressClass="hero-progress"
-    theme="light"
-  />
-</div>
+          <CarouselControls
+            currentSlide={heroCurrentSlide}
+            totalSlides={heroSlides.length}
+            onPrev={() => heroSwiperRef.current?.slidePrev()}
+            onNext={() => heroSwiperRef.current?.slideNext()}
+            progressClass="hero-progress"
+            theme="light"
+          />
+        </div>
         {/* Content Container */}
         <div className="relative z-20 min-h-screen">
-        
-        
-        
-
           {/* Hero Section */}
           <section className="container mx-auto px-5 py-6 ">
             <div className="max-w-3xl">
