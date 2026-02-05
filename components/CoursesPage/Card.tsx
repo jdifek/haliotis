@@ -20,13 +20,12 @@ export default function Card({
     <div className={`inline-block ${className}`}>
       {/* Зовнішній контейнер */}
       <div 
-        className="flex flex-col gap-2 bg-[#f1f1f1] rounded-[24px] p-2"
-        style={{ width: '194px' }}
+        className="flex md:w-[194px] w-[165px] flex-col gap-2 bg-[#f1f1f1] rounded-[24px] p-2"
       >
         {/* Контейнер з логотипом */}
         <div 
           className="bg-white rounded-2xl p-[15px] flex items-center justify-center overflow-hidden"
-          style={{ width: '178px', height: '107px' }}
+          style={{  height: '107px' }}
         >
           <Image
             src={logo}
@@ -41,7 +40,7 @@ export default function Card({
         {/* Контейнер з назвою */}
         <div 
           className="bg-white rounded-2xl px-[5px] py-3 flex items-center justify-center"
-          style={{ width: '178px', height: heightBottomBlock ? heightBottomBlock : '66px' }}
+          style={{  height: heightBottomBlock ? heightBottomBlock : '66px' }}
         >
           <p className="text-[15px] leading-[160%] text-center text-black font-normal m-0 break-words hyphens-auto">
             {name}

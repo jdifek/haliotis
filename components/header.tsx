@@ -1,8 +1,11 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import { usePathname, useRouter } from "next/navigation";
 
 export const Header: React.FC = ({}) => {
+  const pathname = usePathname();
+
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const [selectedLang, setSelectedLang] = useState("En");
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -10,6 +13,8 @@ export const Header: React.FC = ({}) => {
   const [mobileOpenDropdown, setMobileOpenDropdown] = useState<string | null>(
     null
   );
+  const transparentHeaderPages = ["/", "/another-page"];
+  const isTransparentInitially = transparentHeaderPages.includes(pathname);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeNav, setActiveNav] = useState("snorkeling");
@@ -66,12 +71,14 @@ export const Header: React.FC = ({}) => {
   const dropdownRef = useRef<HTMLDivElement>(null); // для centers
   const coursesRef = useRef<HTMLDivElement>(null);
   const langRef = useRef<HTMLDivElement>(null);
-
+  const router = useRouter();
   const centersButtonRef = useRef<HTMLButtonElement>(null);
   const coursesButtonRef = useRef<HTMLButtonElement>(null);
   const langButtonRef = useRef<HTMLButtonElement>(null);
   const [langButtonWidth, setLangButtonWidth] = useState<number | null>(null);
-
+  const handleToMain = () => {
+    router.push("/");
+  };
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
@@ -100,10 +107,15 @@ export const Header: React.FC = ({}) => {
     <>
       <header className="sticky top-0 z-50 p-5 ">
         {/* Подложка при скролле */}
-        {isScrolled && <div className="absolute inset-0 bg-[#281d4d] -z-10" />}
+        {(!isTransparentInitially || isScrolled) && (
+          <div className="absolute inset-0 bg-[#281d4d] -z-10" />
+        )}{" "}
         <div className="absolute left-5 right-5 bottom-0 border-b border-[rgba(255,255,255,0.2)]" />
         <div className="flex items-center justify-between gap-4">
-          <div className="relative flex-shrink-0  lg:hidden">
+          <div
+            onClick={handleToMain}
+            className="relative cursor-pointer flex-shrink-0  lg:hidden"
+          >
             <svg
               width="173"
               height="41"
@@ -237,7 +249,10 @@ export const Header: React.FC = ({}) => {
               />
             </svg>
           </div>
-          <div className="relative flex-shrink-0 hidden lg:block">
+          <div
+            onClick={handleToMain}
+            className="relative cursor-pointer flex-shrink-0 hidden lg:block"
+          >
             <svg
               width="158"
               height="25"
@@ -378,7 +393,8 @@ export const Header: React.FC = ({}) => {
                       <div
                         ref={dropdownRef}
                         data-dropdown
-                        className="absolute -left-2 top-4 z-50 mt-2 flex flex-col gap-0 rounded-tr-[10px] rounded-b-[10px] border-2 border-white p-0"                        style={{
+                        className="absolute -left-2 top-4 z-50 mt-2 flex flex-col gap-0 rounded-tr-[10px] rounded-b-[10px] border-2 border-white p-0"
+                        style={{
                           width: "238px",
                           background: "rgba(0, 3, 38, 0.5)",
                           backdropFilter: "blur(10px)",

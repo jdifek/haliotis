@@ -216,15 +216,15 @@ export const CenterInfoSection = () => {
                 <h3 className="text-[18px] font-medium leading-[140%] text-[#111] mb-4">
                   Berlengas Information
                 </h3>
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2 ">
                   {facilitiesFilters.map((filter) => (
                     <button
                       key={filter}
                       onClick={() => setSelectedFilter(filter)}
                       className={`w-full text-left px-4 py-2.5 rounded-lg text-[15px] font-medium leading-[160%] transition-colors ${
                         selectedFilter === filter
-                          ? "bg-[#e84814] text-white"
-                          : "bg-[#f1f1f1] text-[#111] hover:bg-[#e5e5e5]"
+                          ? "bg-[#e84814] cursor-pointer text-white"
+                          : "bg-[#f1f1f1] cursor-pointer text-[#111] hover:bg-[#e5e5e5]"
                       }`}
                     >
                       {filter}
@@ -247,7 +247,7 @@ export const CenterInfoSection = () => {
                   alt="Berlengas Geography"
                   width={1228}
                   height={538}
-                  className="w-full  rounded-2xl h-[538px]"
+                  className="w-full  rounded-2xl md:h-[538px] h-[154px]"
                 />
               </div>
 

@@ -16,7 +16,7 @@ export function BlackActionButton({
   return (
     <button
       onClick={onClick}
-      className={`relative mt-4 flex w-full items-center rounded-full bg-[#111] px-[16px] py-[15px] pr-[64px] hover:bg-[#e84814] transition-colors ${className}`}
+      className={`relative cursor-pointer mt-4 flex w-full items-center rounded-full bg-[#111] px-[16px] py-[15px] pr-[64px] hover:bg-[#e84814] transition-colors ${className}`}
     >
       <span className="font-bold text-[15px] leading-[1.2] text-white">
         {label}
