@@ -16,7 +16,7 @@ const COLOR_MAP: Record<string, { bg: string; text: string; arrow: string }> = {
   'santa-maria': { bg: '#fadc00', text: '#000000', arrow: '#000000' },
   'peniche': { bg: '#f49519', text: '#000000', arrow: '#000000' },
   'madeira': { bg: '#e52924', text: '#ffffff', arrow: '#ffffff' },
-  'sao-vicente': { bg: '#e52924', text: '#ffffff', arrow: '#ffffff' },
+  'sao-vicente':{ bg: '#7acbe2', text: '#000000', arrow: '#000000' },
   'all': { bg: '#1e1e3f', text: '#ffffff', arrow: '#ffffff' },
 };
 

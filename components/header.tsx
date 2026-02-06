@@ -51,7 +51,7 @@ export const Header: React.FC = ({}) => {
     { id: "madeira", label: "MADEIRA", color: "#E84814" },
     { id: "santa-maria", label: "SANTA MARIA", color: "#FED402" },
     { id: "faial", label: "FAIAL", color: "#568DD9" },
-    { id: "sao-vicente", label: "SAO VICENTE", color: "#D8D8D8" },
+    { id: "sao-vicente", label: "SAO VICENTE", color: "#7acbe2" },
   ];
 
   const coursesData = [
@@ -1053,6 +1053,8 @@ export const Header: React.FC = ({}) => {
                               key={center.id}
                               onClick={() => {
                                 setSelectedCenter(center.id);
+                                router.push("/centers");
+                                setIsMenuOpen(false)
                                 setMobileOpenDropdown(null);
                               }}
                               className={`flex h-[44px] items-center  cursor-pointer justify-between px-[14px] transition-all hover:bg-[#111d9e] ${
