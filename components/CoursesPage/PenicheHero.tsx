@@ -2,7 +2,7 @@
 export const PenicheHero = () => {
   return (
     <section className="bg-[#f5f5f5] relative pt-4 pb-4 md:pt-6 md:pb-8">
-      <div className="absolute left-0 bottom-0 w-screen border-b-[7px] border-[#f49519]" />
+      <div className="absolute left-0 right-0 bottom-0  border-b-[7px] border-[#f49519]" />
 
       {/* Breadcrumbs */}
       <nav className="mb-6 mx-5 flex items-center gap-2 text-sm md:mb-8">
