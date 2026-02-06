@@ -133,7 +133,7 @@ export const SimpleCoursesSection: React.FC<Props> = ({
         {/* Кнопка "Show more courses" */}
         <div className="flex justify-center ">
           <BlackActionButton
-           className="md:hidden"
+           className="md:w-[280px]"
             label=" Show more courses"
             icon={
               <svg

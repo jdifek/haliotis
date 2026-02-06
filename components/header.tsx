@@ -9,7 +9,7 @@ export const Header: React.FC = ({}) => {
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const [selectedLang, setSelectedLang] = useState("En");
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-  const [selectedCenter, setSelectedCenter] = useState("sesimbra");
+  const [selectedCenter, setSelectedCenter] = useState("");
   const [mobileOpenDropdown, setMobileOpenDropdown] = useState<string | null>(
     null
   );
@@ -404,7 +404,11 @@ export const Header: React.FC = ({}) => {
                         {centersData.map((center, index) => (
                           <button
                             key={center.id}
-                            onClick={() => setSelectedCenter(center.id)}
+                            onClick={() => {
+                              setSelectedCenter(center.id);
+                              router.push("/centers");
+                              setOpenDropdown('');
+                            }}
                             className={`flex h-[44px]  cursor-pointer  items-center justify-between px-[14px] transition-all hover:bg-[#111d9e] ${
                               selectedCenter === center.id ? "bg-[#111d9e]" : ""
                             } ${index === 0 ? "rounded-t-[8px]" : ""} ${

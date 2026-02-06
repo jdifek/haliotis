@@ -106,6 +106,7 @@ export const SimpleTripsSection: React.FC<Props> = ({
             {tripCards.map((card, index) => (
               <SwiperSlide key={index}>
                 <ArticleCard
+                bgTextBlock={'!bg-[#F1F1F1]'}
                   image={card.image}
                   price={card.price}
                   title={card.title}
@@ -136,7 +137,7 @@ export const SimpleTripsSection: React.FC<Props> = ({
       </div>
       <div className="flex justify-center ">
         <BlackActionButton
-          className="md:hidden"
+          className="md:w-[280px]"
           label=" Show more dives"
           icon={
             <svg

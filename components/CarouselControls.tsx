@@ -20,7 +20,7 @@ export const CarouselControls: React.FC<CarouselControlsProps> = ({
   const bgOpacity = theme === 'light' ? 'bg-white/30' : 'bg-black/30';
 
   return (
-    <div className="flex  items-center gap-4 lg:gap-[40px]">
+    <div className="flex justify-between items-center gap-4 lg:gap-[40px]">
    {/* Progress Bar */}
 <div
   className={`relative h-1.5 overflow-hidden  rounded-full ${bgOpacity} w-[200px] lg:w-[275px]`}
