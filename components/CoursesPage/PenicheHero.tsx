@@ -190,7 +190,7 @@ export const PenicheHero = () => {
                   </svg>
                 </div>
               </div>
-              <div className="space-y-3 bg-white p-3 px-4 w-[260px] h-[442px] rounded-r-[16px]">
+              <div className="space-y-3 bg-white p-3 flex flex-col px-4 w-[260px] h-[442px] rounded-r-[16px]">
                 <div className="rounded-[16px] bg-[#f1f1f1] py-[31px] px-4">
                   <a
                     href="tel:+351262781160"
@@ -299,13 +299,15 @@ export const PenicheHero = () => {
                       <p>PT 506 796 876</p>
                       <p>Casal da Ponte S/N</p>
                       <p>2525-376</p>
-                      <p>Atouguia da Baleia Peniche</p>
+                      <p>Atouguia da Baleia </p>
+                      <p>Peniche</p>
                     </div>
                   </div>
                 </div>
 
                 <BlackActionButton
                   label="Show on Map"
+                  className="!m-0"
                   icon={
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                       <path
@@ -630,7 +632,8 @@ export const PenicheHero = () => {
                   <p>PT 506 796 876</p>
                   <p>Casal da Ponte S/N</p>
                   <p>2525-376</p>
-                  <p>Atouguia da Baleia Peniche</p>
+                  <p>Atouguia da Baleia </p>
+                  <p>Peniche</p>
                 </div>
               </div>
               <button className="relative mt-4 flex w-full items-center rounded-full bg-[#111] px-[16px] py-[15px] hover:bg-[#e84814] transition-colors">
