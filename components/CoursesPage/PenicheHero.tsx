@@ -486,7 +486,7 @@ export const PenicheHero = () => {
             <div className="space-y-4 bg-white px-5 sm:px-6 py-5 sm:py-6">
             <div
   className="
-    w-[321px]
+    w-full
     h-[142px]
     rounded-[16px]
     bg-[#f1f1f1]

@@ -476,7 +476,9 @@ export default function PenichePage() {
       <SimpleCoursesSection className={'!bg-[#f1f1f1]'} courseCards={courseCards} />
       <CenterInfoSection />
       <Parceiros />
+      <div className="md:hidden mx-4 md:mx-8  h-px border border-[#e4e4e4] mt-10 " />
       <PaymentMethods />
+
       <LegalInfo />
     </div>
   );
