@@ -3,7 +3,7 @@ import { Breadcrumbs } from "../Breadcrumbs"
 
 export const HeroSection = () => {
   return (
-    <section className="relative h-[80vh] w-full pt-[97px]">
+    <section className="relative h-[90vh] w-full pt-[97px]">
     {/* Breadcrumbs */}
     <div className="absolute bottom-1 z-10 block">
       <Breadcrumbs
