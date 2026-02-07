@@ -3,6 +3,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
+import { Tabs } from "../buttons/Tabs";
 
 type Tab = {
   id: string;
@@ -27,20 +28,7 @@ const facilitiesFilters = [
   "DIVING",
 ];
 
-const boatsList = [
-  {
-    name: "Lascaris",
-    image: "/Rectangle 8.png",
-    description:
-      "Our semi-rigid Searths with 12 meters, with 2 motors YAMAHA 350 horsepower is the best dive boat in Portugal. It has sounder, VHF, d-gps, tanks to equip, access ladders,oxygen kit and first aid kit; everything for the safety and welfare of divers . There is no excuse of discomfort that makes so many people leave dive in Portugal.",
-  },
-  {
-    name: "Necora",
-    image: "/Rectangle 8.png",
-    description:
-      "Our semi-rigid Searths with 9.6 meters, with two Yamaha 200 horsepower offboard engines is specially customized to diving conditions in Portugal. It has sounder, d-gps, oxygen kit and first aid kit; and for divers comfort , Necora is equipped with travelling seats and access ladders.",
-  },
-];
+
 
 const teamMembers = [
   {
@@ -1122,39 +1110,11 @@ export const CenterInfoSection = () => {
     <section className="bg-white py-6 md:py-12 lg:py-16">
       <div className="mx-auto max-w-[1920px] px-4 md:px-8 lg:px-[158px]">
         {/* Tabs Navigation - Desktop */}
-        <div className="mb-8 md:mb-12 hidden md:block">
-          <div className="relative flex gap-6 mb-6">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                ref={(el) => {
-                  tabRefs.current[tab.id] = el;
-                }}
-                onClick={() => setActiveTab(tab.id)}
-                className={`relative text-[24px] font-medium transition-colors
-                ${
-                  activeTab === tab.id
-                    ? "text-black"
-                    : "text-black/50 hover:text-black cursor-pointer"
-                }
-              `}
-              >
-                {tab.label}
-
-                {/* underline */}
-                <span
-                  className={`absolute -bottom-3 left-0 w-full h-[2px] transition-opacity
-                  ${
-                    activeTab === tab.id
-                      ? "bg-[#e84814] opacity-100"
-                      : "bg-[#e84814] opacity-0 group-hover:opacity-50"
-                  }
-                `}
-                />
-              </button>
-            ))}
-          </div>
-        </div>
+        <Tabs
+      tabs={tabs}
+      activeTab={activeTab}
+      onTabChange={setActiveTab}
+    />
 
         {/* Tabs Navigation - Mobile Accordion */}
         <div className="mb-4 md:hidden">

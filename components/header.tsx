@@ -13,8 +13,10 @@ export const Header: React.FC = ({}) => {
   const [mobileOpenDropdown, setMobileOpenDropdown] = useState<string | null>(
     null
   );
-  const transparentHeaderPages = ["/", "/another-page"];
-  const isTransparentInitially = transparentHeaderPages.includes(pathname);
+  const isTransparentInitially =
+    pathname === "/" ||
+    pathname === "/another-page" ||
+    pathname.startsWith("/course/");
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeNav, setActiveNav] = useState("snorkeling");
@@ -407,7 +409,7 @@ export const Header: React.FC = ({}) => {
                             onClick={() => {
                               setSelectedCenter(center.id);
                               router.push("/centers");
-                              setOpenDropdown('');
+                              setOpenDropdown("");
                             }}
                             className={`flex h-[44px]  cursor-pointer  items-center justify-between px-[14px] transition-all hover:bg-[#111d9e] ${
                               selectedCenter === center.id ? "bg-[#111d9e]" : ""
@@ -1054,7 +1056,7 @@ export const Header: React.FC = ({}) => {
                               onClick={() => {
                                 setSelectedCenter(center.id);
                                 router.push("/centers");
-                                setIsMenuOpen(false)
+                                setIsMenuOpen(false);
                                 setMobileOpenDropdown(null);
                               }}
                               className={`flex h-[44px] items-center  cursor-pointer justify-between px-[14px] transition-all hover:bg-[#111d9e] ${
