@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
+import Link from "next/link";
 
 export const Header: React.FC = ({}) => {
   const pathname = usePathname();
@@ -503,13 +504,11 @@ export const Header: React.FC = ({}) => {
               >
                 <div className="flex flex-wrap justify-center gap-[10px]">
                   {coursesData.map((course) => (
-                    <button
+                    <Link
                       key={course.id}
+                      href={`/course/${course.id}`}
                       className="flex flex-col items-center gap-[5px] cursor-pointer rounded-[20px] border-2 border-transparent px-0 pb-[5px] pt-[10px] transition-all hover:border-white hover:bg-[#111d9e]"
-                      style={{
-                        width: "120px",
-                        height: "124px",
-                      }}
+                      style={{ width: "120px", height: "124px" }}
                     >
                       <div className="h-[80px] w-[80px] overflow-hidden rounded-[16px]">
                         <Image
@@ -520,15 +519,14 @@ export const Header: React.FC = ({}) => {
                           className="h-full w-full object-cover"
                         />
                       </div>
+
                       <span
                         className="text-center text-[15px] font-semibold leading-[160%] text-white"
-                        style={{
-                          fontFamily: "var(--font-family)",
-                        }}
+                        style={{ fontFamily: "var(--font-family)" }}
                       >
                         {course.label}
                       </span>
-                    </button>
+                    </Link>
                   ))}
                 </div>
               </div>
@@ -1134,33 +1132,34 @@ export const Header: React.FC = ({}) => {
                           </svg>
                         </button>
                         <div className="grid grid-cols-3  border-2 border-white  rounded-lg gap-[10px] bg-[#1a1a3e] p-[10px] pb-[20px]">
-                          {coursesData.map((course) => (
-                            <button
-                              key={course.id}
-                              onClick={() => {
-                                setMobileOpenDropdown(null);
-                              }}
-                              className="flex flex-col items-center gap-[5px] rounded-[20px] px-0 pb-[5px] pt-[10px]"
-                            >
-                              <div className="h-[80px] w-[80px] overflow-hidden rounded-[16px]">
-                                <Image
-                                  src={course.image}
-                                  alt={course.label}
-                                  width={80}
-                                  height={80}
-                                  className="h-full w-full object-cover"
-                                />
-                              </div>
-                              <span
-                                className="text-center text-[16px] font-normal leading-[140%] text-white"
-                                style={{
-                                  fontFamily: "var(--font-family)",
-                                }}
-                              >
-                                {course.label}
-                              </span>
-                            </button>
-                          ))}
+                        {coursesData.map((course) => (
+  <Link
+    key={course.id}
+    href={`/course/${course.id}`}
+    onClick={() => {
+      setMobileOpenDropdown(null);
+      setIsMenuOpen(false)
+    }}
+    className="flex flex-col items-center gap-[5px] rounded-[20px] px-0 pb-[5px] pt-[10px]"
+  >
+    <div className="h-[80px] w-[80px] overflow-hidden rounded-[16px]">
+      <Image
+        src={course.image}
+        alt={course.label}
+        width={80}
+        height={80}
+        className="h-full w-full object-cover"
+      />
+    </div>
+
+    <span
+      className="text-center text-[16px] font-normal leading-[140%] text-white"
+      style={{ fontFamily: "var(--font-family)" }}
+    >
+      {course.label}
+    </span>
+  </Link>
+))}
                         </div>
                       </div>
                     )}
