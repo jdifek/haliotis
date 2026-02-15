@@ -94,7 +94,7 @@ const generateCourses = (location: string, page: number, selectedCategory: strin
   }));
 };
 
-const CourseDetail = () => {
+const Courses = () => {
   const [activeTab, setActiveTab] = useState("peniche");
   const [currentPage, setCurrentPage] = useState(1);
   const [isTabOpen, setIsTabOpen] = useState(false);
@@ -369,4 +369,4 @@ const CourseDetail = () => {
   );
 };
 
-export default CourseDetail;
+export default Courses;

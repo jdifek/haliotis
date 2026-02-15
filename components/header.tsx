@@ -17,7 +17,7 @@ export const Header: React.FC = ({}) => {
   const isTransparentInitially =
     pathname === "/" ||
     pathname === "/another-page" ||
-    pathname.startsWith("/course/");
+    pathname === ("/courses");
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeNav, setActiveNav] = useState("snorkeling");
@@ -506,7 +506,7 @@ export const Header: React.FC = ({}) => {
                   {coursesData.map((course) => (
                     <Link
                       key={course.id}
-                      href={`/course/${course.id}`}
+                      href={`/courses`}
                       className="flex flex-col items-center gap-[5px] cursor-pointer rounded-[20px] border-2 border-transparent px-0 pb-[5px] pt-[10px] transition-all hover:border-white hover:bg-[#111d9e]"
                       style={{ width: "120px", height: "124px" }}
                     >
@@ -1135,7 +1135,7 @@ export const Header: React.FC = ({}) => {
                         {coursesData.map((course) => (
   <Link
     key={course.id}
-    href={`/course/${course.id}`}
+    href={`/courses`}
     onClick={() => {
       setMobileOpenDropdown(null);
       setIsMenuOpen(false)
