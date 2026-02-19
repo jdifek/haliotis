@@ -39,7 +39,7 @@ export const SimpleCoursesSection: React.FC<Props> = ({
         {/* Заголовок и контролы */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div className="flex flex-col gap-[10px]">
-            <h2 className="text-[28px] font-medium leading-[130%] text-black sm:text-[36px] lg:text-[42px]">
+            <h2 className="text-[28px] font-medium leading-[130%] text-black sm:text-[36px] lg:text-[clamp(32px,2.5vw,42px)]">
               Upcoming Courses
             </h2>
             <p className="text-[15px] font-normal leading-[160%] text-[#101010] opacity-80">

@@ -914,7 +914,7 @@ export default function Home() {
         {/* Content Container */}
         <div className="relative z-20 min-h-screen">
           {/* Hero Section */}
-          <section className="container mx-auto px-5 py-6 ">
+          <section className="container px-5 py-6 ">
             <div className="max-w-3xl">
               {/* Показываем только текущий слайд БЕЗ Swiper */}
               <div className="mb-12">

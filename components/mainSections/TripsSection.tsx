@@ -165,7 +165,7 @@ export const TripsSection: React.FC<Props> = ({ locations, tripCards }) => {
         <div className="flex flex-1 flex-col gap-[30px] overflow-hidden">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div className="flex flex-col gap-[10px]">
-              <h2 className="text-[28px] font-medium leading-[130%] text-black sm:text-[36px] lg:text-[42px]">
+              <h2 className="text-[28px] font-medium leading-[130%] text-black sm:text-[36px] lg:text-[clamp(32px,2.5vw,42px)]">
                 Dive Trips:{" "}
                 <span className="text-[#e84814]">{getLocationLabel()}</span>
               </h2>

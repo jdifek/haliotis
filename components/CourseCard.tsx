@@ -18,7 +18,7 @@ export const CourseCard: React.FC<CourseCardProps> = ({
   onBookClick,
 }) => {
   return (
-    <div className="w-full max-w-[363px] rounded-3xl bg-white p-2">
+    <div className="w-full  rounded-3xl bg-white p-2">
       {/* Image Container */}
       <div className="relative  w-full overflow-hidden rounded-2xl">
       <img

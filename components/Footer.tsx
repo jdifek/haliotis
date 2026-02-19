@@ -91,14 +91,14 @@ export const Footer = () => {
 
   return (
     <footer
-      className="bg-[#1e1e3f] px-4 pb-12 pt-6 md:px-8 md:pb-16 md:pt-8 lg:px-10 lg:pb-20 lg:pt-[30px]"
+      className="bg-[#1e1e3f] px-4 pb-12 pt-6 md:px-8 md:pb-16 md:pt-8 lg:px-8 lg:pb-20 lg:pt-[30px]"
       style={{
         fontFamily: "var(--font-family)",
       }}
     >
       <div className="">
         {/* Top Section */}
-        <div className="mb-8 flex flex-col gap-8 lg:mb-16 lg:flex-row">
+        <div className="mb-8 flex flex-col gap-[85px] lg:mb-16 lg:flex-row">
           {/* Logo & Description */}
           <div className="w-full lg:w-[387px] lg:flex-shrink-0">
             <div className="mb-4 lg:mb-6">
@@ -204,7 +204,7 @@ export const Footer = () => {
           </div>
 
           {/* Footer Links - Desktop Grid / Mobile Accordion */}
-          <div className="hidden flex-1 grid-cols-7 gap-8 lg:grid">
+          <div className="hidden flex-1 grid-cols-7 gap-8 lg-24 lg:grid">
             {footerSections.map((section, index) => (
               <div key={index}>
                 <h3

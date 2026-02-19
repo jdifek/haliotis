@@ -30,10 +30,12 @@ export const CentersSection: React.FC<Props> = ({ locations, centerCards }) => {
   const [centersCurrentSlide, setCentersCurrentSlide] = useState(0);
 
   const filteredCenters =
-    selectedLocation === "all"
-      ? centerCards
-      : centerCards.filter((card) => card.location === selectedLocation);
-
+  selectedLocation === "all"
+    ? centerCards.filter(
+        (card, index, self) =>
+          index === self.findIndex((c) => c.title === card.title)
+      )
+    : centerCards.filter((card) => card.location === selectedLocation);
   // Функция для получения названия локации
   const getLocationLabel = () => {
     const location = locations.find((loc) => loc.id === selectedLocation);
@@ -142,7 +144,7 @@ export const CentersSection: React.FC<Props> = ({ locations, centerCards }) => {
         <div className="flex flex-1 flex-col gap-[30px] overflow-hidden">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div className="flex flex-col gap-[10px]">
-              <h2 className="text-[28px] font-medium leading-[130%] text-black sm:text-[36px] lg:text-[42px]">
+              <h2 className="text-[28px] font-medium leading-[130%] text-black sm:text-[36px] lg:text-[clamp(32px,2.5vw,42px)]">
                 Discover Where We Dive
               </h2>
               <p className="text-[15px] font-normal leading-[160%] text-black opacity-80">

@@ -63,7 +63,7 @@ const CourseDetail = () => {
         price={349}
         image="/Rectangle 8.png"
         imageAlt="PADI Advanced Open Water Diver course"
-        onBookClick={() => setIsOpen(true)} // 👈 ВАЖНО
+        onBookClick={() => setIsOpen(true)} 
         
       />
       <BookingFormModal

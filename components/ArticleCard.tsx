@@ -32,8 +32,8 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
   return (
     <div className="relative">
       <div
-        className="relative w-full max-w-[494px] transition-all duration-300"
-        style={{
+className="relative w-full transition-all duration-300"
+style={{
           height: isExpanded ? "auto" : "445px",
           minHeight: "445px",
         }}

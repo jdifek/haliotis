@@ -37,7 +37,7 @@ export const CarouselControls: React.FC<CarouselControlsProps> = ({
         {/* Previous Button */}
         <button
           onClick={onPrev}
-          className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-[#e84814] transition-all hover:bg-[#d03d0f] lg:h-16 lg:w-16"
+          className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-[#e84814] transition-all hover:bg-[#d03d0f] "
         >
           <svg className="h-5 w-5 lg:h-6 lg:w-6" viewBox="0 0 20 20" fill="none">
             <path
@@ -53,7 +53,7 @@ export const CarouselControls: React.FC<CarouselControlsProps> = ({
         {/* Next Button */}
         <button
           onClick={onNext}
-          className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-[#e4e4e4] transition-all hover:bg-white lg:h-16 lg:w-16"
+          className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-[#e4e4e4] transition-all hover:bg-white "
         >
           <svg className="h-5 w-5 lg:h-6 lg:w-6" viewBox="0 0 20 20" fill="none">
             <path

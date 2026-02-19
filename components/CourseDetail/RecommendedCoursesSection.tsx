@@ -25,7 +25,7 @@ export const RecommendedCoursesSection: React.FC<Props> = ({
       <div className="mx-auto  max-w-[1920px] px-4 md:px-8 lg:px-[158px]  flex flex-col gap-[10px] md:gap-[30px]">
         {/* Заголовок */}
         <div className="flex flex-col gap-[10px]">
-          <h2 className="text-[28px] font-medium leading-[130%] text-black sm:text-[36px] lg:text-[42px]">
+          <h2 className="text-[28px] font-medium leading-[130%] text-black sm:text-[36px] lg:text-[clamp(32px,2.5vw,42px)]">
             The following courses are recommended
           </h2>
           <p className="text-[15px] font-normal leading-[160%] text-[#101010] opacity-80">

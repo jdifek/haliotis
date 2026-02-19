@@ -304,7 +304,7 @@ export const DiveTrips: React.FC<Props> = ({ diveTripsCards }) => {
               </p>
 
               {/* Brand Logos Grid */}
-              <div className="mb-[30px] rounded-2xl bg-white p-4 md:mb-[40px] md:p-8">
+              <div className="mb-[30px] rounded-[30px] bg-white p-4 md:mb-[40px] md:p-8">
   <div className="grid grid-cols-3 gap-x-4 gap-y-4 md:grid-cols-4 md:gap-x-8 md:gap-y-6">
     {partners.map((name) => (
       <div
