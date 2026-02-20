@@ -13,6 +13,7 @@ type ArticleCardProps = {
   equipmentPrice?: string;
   bgTextBlock?: string;
   duration?: string;
+  borderColor?: string;
 };
 
 export const ArticleCard: React.FC<ArticleCardProps> = ({
@@ -28,12 +29,13 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
   details,
   equipmentPrice,
   duration,
+  borderColor = "border-[#f49519]",
 }) => {
   return (
     <div className="relative">
       <div
-className="relative w-full transition-all duration-300"
-style={{
+        className="relative w-full transition-all duration-300"
+        style={{
           height: isExpanded ? "auto" : "445px",
           minHeight: "445px",
         }}
@@ -41,8 +43,9 @@ style={{
         {/* Image */}
         <div
           className={`h-[300px] w-full overflow-hidden rounded-3xl transition-all duration-300 box-border ${
-            isExpanded ? "border-[8px] border-[#f49519]" : ""
+            isExpanded ? `border-[8px]  ` : ""
           }`}
+          style={{ borderColor: borderColor }}
         >
           <img
             src={image}
@@ -81,7 +84,8 @@ style={{
             }
           />
           {/* Price Badge */}
-          <div className="absolute -top-4 left-4 flex items-center gap-2 rounded-lg bg-[#f49519] px-3 py-2">
+          <div  style={{ backgroundColor: borderColor }} className="absolute -top-4 left-4 flex items-center gap-2 rounded-lg  px-3 py-2">
+         
             <svg
               width="20"
               height="20"
@@ -129,7 +133,10 @@ style={{
                 </h3>
 
                 <div className="flex gap-4 w-full">
-                  <div className="flex items-center gap-2 rounded-lg bg-[#f49519] px-3 py-2">
+                  <div
+                    style={{ backgroundColor: borderColor }}
+                    className="flex items-center gap-2 rounded-lg  px-3 py-2"
+                  >
                     <svg
                       width="20"
                       height="20"

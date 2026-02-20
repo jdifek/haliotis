@@ -127,6 +127,8 @@ const Courses = () => {
       {/* Tabs Section - Desktop */}
       <section className="hidden md:flex h-[95px] bg-white justify-center items-end">
         <Tabs
+          useLocationColors={true}
+
           className="mb-1"
           tabsContainerClassName="relative flex gap-6"
           tabs={tabs}

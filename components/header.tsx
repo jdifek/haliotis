@@ -15,7 +15,12 @@ export const Header: React.FC = ({}) => {
     null
   );
   const isTransparentInitially =
-    pathname === "/" || pathname === "/another-page" || pathname === "/courses" || pathname === "/diving";
+    pathname === "/" ||
+    pathname === "/another-page" ||
+    pathname === "/courses" ||
+    pathname === "/diving" ||
+    pathname === "/boat-tours" ||
+    pathname === "dolphin-watching";
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeNav, setActiveNav] = useState("snorkeling");

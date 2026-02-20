@@ -1110,7 +1110,7 @@ export const CenterInfoSection = () => {
     <section className="bg-white py-6 md:py-12 lg:py-16">
       <div className="mx-auto max-w-[1920px] px-4 md:px-8 lg:px-[158px]">
         {/* Tabs Navigation - Desktop */}
-        <Tabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
+        <Tabs  tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
 
         {/* Tabs Navigation - Mobile Accordion */}
         <div className="mb-4 md:hidden">
