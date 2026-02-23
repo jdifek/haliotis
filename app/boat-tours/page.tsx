@@ -176,7 +176,7 @@ const BoatTours = () => {
           />
         </div>
         <div className="absolute inset-0 z-0">
-          <Image src="/image 4.png" alt="Boat Tours" fill className="object-cover" priority />
+          <Image src="/boatBg.png" alt="Boat Tours" fill className="object-cover" priority />
         </div>
         <div className="relative z-20 h-full">
           <section className="container mx-auto px-5 py-6">
@@ -230,7 +230,7 @@ const BoatTours = () => {
         </p>
 
         {card && (
-          <div className="max-w-[420px] mx-auto">
+          <div className="max-w-[600px] mx-auto">
             <div ref={cardRef}>
               <ArticleCard
               borderColor={LOCATION_COLORS[activeTab]}

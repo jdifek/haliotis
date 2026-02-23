@@ -20,7 +20,8 @@ export const Header: React.FC = ({}) => {
     pathname === "/courses" ||
     pathname === "/diving" ||
     pathname === "/boat-tours" ||
-    pathname === "dolphin-watching";
+    pathname === "/snorkeling" ||
+    pathname === "/dolphin-watching";
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeNav, setActiveNav] = useState("snorkeling");
@@ -28,8 +29,8 @@ export const Header: React.FC = ({}) => {
   const navItems = [
     { id: "centers", label: "Centers", hasDropdown: true },
     { id: "courses", label: "Courses", hasDropdown: true },
-    { id: "snorkeling", label: "Snorkeling", hasDropdown: false },
-    { id: "diving", label: "Diving", hasDropdown: false },
+    { id: "snorkeling", label: "Snorkeling", hasDropdown: false, href: "/snorkeling" },
+    { id: "diving", label: "Diving", hasDropdown: false, href: "/diving" },
     { id: "freedive", label: "Freedive", hasDropdown: false },
     { id: "travel", label: "Travel", hasDropdown: false },
     { id: "shop", label: "Shop", hasDropdown: false },
@@ -340,12 +341,13 @@ export const Header: React.FC = ({}) => {
                           openDropdown
                         );
                         setOpenDropdown(willOpen ? item.id : null);
-                      }
+                      }   else if (item.href) router.push(item.href); // добавить это
+
                     }}
                     className={`relative flex cursor-pointer items-center whitespace-nowrap uppercase transition-all ${
-                      activeNav === item.id
-                        ? "text-[16px] font-bold uppercase leading-[120%]  "
-                        : "text-[15px] font-medium uppercase leading-[120%]  "
+                      pathname === `/${item.id}`
+                        ? "text-[16px] font-bold uppercase leading-[120%]"
+                        : "text-[15px] font-medium uppercase leading-[120%]"
                     }`}
                     style={{ lineHeight: "120%" }}
                   >
@@ -384,8 +386,7 @@ export const Header: React.FC = ({}) => {
                         </svg>
                       )}
                     </span>
-                    {activeNav === item.id && !openDropdown && (
-                      <div
+                    {activeNav === item.id && !openDropdown && pathname === `/${item.id}` && (                      <div
                         className="absolute -bottom-[16.5px] left-0 right-0 mx-auto h-0.5 bg-[#e84814]"
                         style={{ width: "100%", border: "1px solid #e84814" }}
                       />

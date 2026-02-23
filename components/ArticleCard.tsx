@@ -29,7 +29,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
   details,
   equipmentPrice,
   duration,
-  borderColor = "border-[#f49519]",
+  borderColor = "#f49519",
 }) => {
   return (
     <div className="relative">
