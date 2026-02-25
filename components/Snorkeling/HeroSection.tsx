@@ -33,7 +33,7 @@ export const HeroSection = () => {
       {/* Content Container */}
       <div className="relative z-20 h-full">
         {/* Hero Section */}
-        <section className="container mx-auto px-5 py-6">
+        <section className="container  px-5 py-6">
           <div className="max-w-3xl">
             <div className="mb-12">
               <h1 className="mb-3 text-[32px] font-bold leading-tight text-white lg:text-7xl">
