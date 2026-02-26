@@ -442,7 +442,7 @@ const DiveSitesSection = () => {
     locationTabs.find((t) => t.id === activeTab) ?? locationTabs[0];
 
   return (
-    <section className="bg-white px-4 py-10 md:px-[30px] lg:px-[158px] md:py-[60px]">
+    <section className="bg-white px-4 py-10 md:px-[30px] lg:px-[188px] md:py-[60px]">
       {/* ── Header ───────────────────────────────────────── */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-8 md:mb-10">
         {/* Title */}
@@ -477,41 +477,41 @@ const DiveSitesSection = () => {
           {locationTabs.map((tab) => {
             const isActive = tab.id === activeTab;
             return (
-             <button
-  key={tab.id}
-  onClick={() => setActiveTab(tab.id)}
-  className="flex-1 lg:flex-none flex items-center justify-center gap-1 cursor-pointer"
-  style={
-    isActive
-      ? {
-          borderRadius: 8,
-          padding: "10px 14px",
-          height: 38,
-          background: "#e84814",
-          fontFamily: "var(--font-family)",
-          fontWeight: 700,
-          fontSize: 16,
-          lineHeight: "120%",
-          textTransform: "uppercase",
-          color: "#fff",
-          border: "none",
-        }
-      : {
-          borderRadius: 8,
-          padding: "10px 14px",
-          height: 38,
-          background: "#f1f1f1",
-          fontFamily: "var(--font-family)",
-          fontWeight: 400,
-          fontSize: 16,
-          lineHeight: "140%",
-          textTransform: "uppercase",
-          textAlign: "center" as const,
-          color: "#000",
-          border: "none",
-        }
-  }
->
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className="flex-1 lg:flex-none flex items-center justify-center gap-1 cursor-pointer"
+                style={
+                  isActive
+                    ? {
+                        borderRadius: 8,
+                        padding: "10px 14px",
+                        height: 38,
+                        background: "#e84814",
+                        fontFamily: "var(--font-family)",
+                        fontWeight: 700,
+                        fontSize: 16,
+                        lineHeight: "120%",
+                        textTransform: "uppercase",
+                        color: "#fff",
+                        border: "none",
+                      }
+                    : {
+                        borderRadius: 8,
+                        padding: "10px 14px",
+                        height: 38,
+                        background: "#f1f1f1",
+                        fontFamily: "var(--font-family)",
+                        fontWeight: 400,
+                        fontSize: 16,
+                        lineHeight: "140%",
+                        textTransform: "uppercase",
+                        textAlign: "center" as const,
+                        color: "#000",
+                        border: "none",
+                      }
+                }
+              >
                 <span>{tab.label}</span>
                 {isActive && <ChevronDownWhite />}
               </button>

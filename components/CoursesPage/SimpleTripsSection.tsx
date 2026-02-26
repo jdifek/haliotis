@@ -34,7 +34,7 @@ export const SimpleTripsSection: React.FC<Props> = ({
 
   return (
     <section
-      className={`bg-[#f1f1f1]  mx-auto max-w-[1920px] px-4 md:px-8 lg:px-[158px] md:py-18.25 ${className}`}
+      className={`bg-[#f1f1f1]  mx-auto max-w-[1920px] px-4 md:px-8 lg:px-[188px] md:py-18.25 ${className}`}
     >
       <div className="flex flex-col gap-[30px] overflow-hidden max-w-[1920px] mx-auto">
         {/* Заголовок и подзаголовок */}
@@ -106,7 +106,7 @@ export const SimpleTripsSection: React.FC<Props> = ({
             {tripCards.map((card, index) => (
               <SwiperSlide key={index}>
                 <ArticleCard
-                bgTextBlock={'!bg-[#F1F1F1]'}
+                  bgTextBlock={"!bg-[#F1F1F1]"}
                   image={card.image}
                   price={card.price}
                   title={card.title}

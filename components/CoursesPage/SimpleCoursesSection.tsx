@@ -32,10 +32,8 @@ export const SimpleCoursesSection: React.FC<Props> = ({
   const [coursesCurrentSlide, setCoursesCurrentSlide] = useState(0);
 
   return (
-    <section
-      className={`bg-white   ${className}`}
-    >
-      <div className=" mx-auto py-12 max-w-[1920px] px-4 md:px-8 lg:px-[158px] md:py-18.25 flex flex-col gap-[10px] md:gap-[30px] overflow-hidden max-w-[1920px] mx-auto">
+    <section className={`bg-white   ${className}`}>
+      <div className=" mx-auto py-12 max-w-[1920px] px-4 md:px-8 lg:px-[188px] md:py-18.25 flex flex-col gap-[10px] md:gap-[30px] overflow-hidden max-w-[1920px] mx-auto">
         {/* Заголовок и контролы */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div className="flex flex-col gap-[10px]">
@@ -133,7 +131,7 @@ export const SimpleCoursesSection: React.FC<Props> = ({
         {/* Кнопка "Show more courses" */}
         <div className="flex justify-center ">
           <BlackActionButton
-           className="md:w-[280px]"
+            className="md:w-[280px]"
             label=" Show more courses"
             icon={
               <svg

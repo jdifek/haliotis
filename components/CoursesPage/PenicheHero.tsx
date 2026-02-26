@@ -16,7 +16,7 @@ export const PenicheHero = () => {
         ]}
       />
 
-      <div className="mx-auto max-w-[1920px] px-4 md:px-8 lg:px-[158px]">
+      <div className="mx-auto max-w-[1920px] px-4 md:px-8 lg:px-[188px]">
         {/* Desktop: 3 columns layout */}
         <div
           className="

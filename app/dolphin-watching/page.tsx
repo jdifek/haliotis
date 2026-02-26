@@ -314,7 +314,7 @@ const DolphinWatching = () => {
       />
 
       {/* Content */}
-      <section className="bg-[#f1f1f1] px-4 pb-12 pt-8 md:px-[30px] lg:px-[158px] md:pb-[50px] md:pt-[46px]">
+      <section className="bg-[#f1f1f1] px-4 pb-12 pt-8 md:px-[30px] lg:px-[188px] md:pb-[50px] md:pt-[46px]">
         <p
           className="text-center mb-10 md:mb-12"
           style={{

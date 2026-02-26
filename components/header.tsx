@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSelectedLayoutSegments } from "next/navigation";
 import Link from "next/link";
 
 export const Header: React.FC = ({}) => {
@@ -14,15 +14,21 @@ export const Header: React.FC = ({}) => {
   const [mobileOpenDropdown, setMobileOpenDropdown] = useState<string | null>(
     null
   );
-  const isTransparentInitially =
-    pathname === "/" ||
-    pathname === "/another-page" ||
-    pathname === "/courses" ||
-    pathname === "/diving" ||
-    pathname === "/boat-tours" ||
-    pathname === "/snorkeling" ||
-    pathname === "/dolphin-watching";
-
+  const segments = useSelectedLayoutSegments();
+  const isNotFound = segments.length === 0 && pathname !== "/";
+  
+  const transparentRoutes = [
+    "/",
+    "/another-page",
+    "/courses",
+    "/diving",
+    "/boat-tours",
+    "/snorkeling",
+    "/dolphin-watching",
+  ];
+  
+  const isTransparentInitially = 
+    transparentRoutes.includes(pathname) || !isNotFound;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeNav, setActiveNav] = useState("snorkeling");
   const [isScrolled, setIsScrolled] = useState(false);
