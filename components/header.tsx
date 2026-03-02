@@ -23,6 +23,7 @@ export const Header: React.FC = ({}) => {
     "/courses",
     "/diving",
     "/boat-tours",
+    "/contacts",
     "/snorkeling",
     "/dolphin-watching",
   ];
@@ -37,11 +38,11 @@ export const Header: React.FC = ({}) => {
     { id: "courses", label: "Courses", hasDropdown: true },
     { id: "snorkeling", label: "Snorkeling", hasDropdown: false, href: "/snorkeling" },
     { id: "diving", label: "Diving", hasDropdown: false, href: "/diving" },
-    { id: "freedive", label: "Freedive", hasDropdown: false },
-    { id: "travel", label: "Travel", hasDropdown: false },
+    { id: "freedive", label: "Freedive", hasDropdown: false ,  href: "/freedive" },
+    { id: "travel", label: "Travel", hasDropdown: false ,  href: "/travel"},
     { id: "shop", label: "Shop", hasDropdown: false },
-    { id: "prices", label: "Prices", hasDropdown: false },
-    { id: "contacts", label: "Contacts", hasDropdown: false },
+    { id: "prices", label: "Prices", hasDropdown: false,  href: "/prices" },
+    { id: "contacts", label: "Contacts", hasDropdown: false ,  href: "/contacts"},
   ];
   useEffect(() => {
     const handleScroll = () => {

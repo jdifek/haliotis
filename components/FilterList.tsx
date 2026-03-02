@@ -1,38 +1,52 @@
+import React from "react";
+
 type FilterOption = {
   id: string;
   label: string;
+  color?: { bg: string; text: string; arrow: string };
 };
 
 type FilterListProps = {
   options: FilterOption[];
   selected: string;
   onSelect: (id: string) => void;
+  maxWidth?: string;
+  activeTabId?: string; // цвет берётся от таба, а не от самой опции
 };
 
 const COLOR_MAP: Record<string, { bg: string; text: string; arrow: string }> = {
-  'sesimbra': { bg: '#a0c52e', text: '#ffffff', arrow: '#ffffff' },
-  'cape-verde': { bg: '#7acbe2', text: '#000000', arrow: '#000000' },
-  'faial': { bg: '#1b5ba7', text: '#ffffff', arrow: '#ffffff' },
-  'santa-maria': { bg: '#fadc00', text: '#000000', arrow: '#000000' },
-  'peniche': { bg: '#f49519', text: '#000000', arrow: '#000000' },
-  'madeira': { bg: '#e52924', text: '#ffffff', arrow: '#ffffff' },
-  'sao-vicente':{ bg: '#7acbe2', text: '#000000', arrow: '#000000' },
-  'all': { bg: '#1e1e3f', text: '#ffffff', arrow: '#ffffff' },
+  sesimbra: { bg: "#a0c52e", text: "#ffffff", arrow: "#ffffff" },
+  "cape-verde": { bg: "#7acbe2", text: "#000000", arrow: "#000000" },
+  faial: { bg: "#1b5ba7", text: "#ffffff", arrow: "#ffffff" },
+  "santa-maria": { bg: "#fadc00", text: "#000000", arrow: "#000000" },
+  peniche: { bg: "#f49519", text: "#000000", arrow: "#000000" },
+  madeira: { bg: "#e52924", text: "#ffffff", arrow: "#ffffff" },
+  "sao-vicente": { bg: "#7acbe2", text: "#000000", arrow: "#000000" },
+  all: { bg: "#1e1e3f", text: "#ffffff", arrow: "#ffffff" },
 };
 
 export const FilterList: React.FC<FilterListProps> = ({
   options,
   selected,
   onSelect,
+  maxWidth = "282px",
+  activeTabId,
 }) => {
-  const getColors = (id: string) => {
-    return COLOR_MAP[id] || { bg: '#fadc00', text: '#000000', arrow: '#000000' };
+  const getColors = (option: FilterOption) => {
+    // activeTabId всегда приоритетнее option.color
+    if (activeTabId && COLOR_MAP[activeTabId]) {
+      return COLOR_MAP[activeTabId];
+    }
+    return (
+      option.color ||
+      COLOR_MAP[option.id] || { bg: "#fadc00", text: "#000000", arrow: "#000000" }
+    );
   };
 
   return (
-    <div className="flex w-full flex-col gap-2 lg:max-w-[282px]">
+    <div className="flex w-full flex-col gap-2" style={{ maxWidth: maxWidth }}>
       {options.map((option) => {
-        const colors = getColors(option.id);
+        const colors = getColors(option);
         const isSelected = option.id === selected;
 
         return (
@@ -40,17 +54,15 @@ export const FilterList: React.FC<FilterListProps> = ({
             key={option.id}
             onClick={() => onSelect(option.id)}
             className={`flex items-center cursor-pointer justify-between rounded-lg px-3.5 py-2.5 transition-colors h-[38px] ${
-              isSelected
-                ? ''
-                : 'bg-white hover:bg-gray-50'
+              isSelected ? "" : "bg-white hover:bg-gray-50"
             }`}
             style={isSelected ? { backgroundColor: colors.bg } : undefined}
           >
             <span
               className={`text-start uppercase leading-[120%] ${
                 isSelected
-                  ? 'text-[16px] font-bold'
-                  : 'text-[15px] font-normal text-black'
+                  ? "text-[16px] font-bold"
+                  : "text-[15px] font-normal text-black"
               }`}
               style={isSelected ? { color: colors.text } : undefined}
             >

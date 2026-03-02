@@ -38,7 +38,7 @@ export default function PrivacyPolicy() {
           <div className="max-w-3xl">
             <div className="mb-12">
               <h1 className="mb-3 text-[32px] font-bold leading-tight text-white lg:text-7xl">
-                Privacy Policy
+              Privacy Policy)
               </h1>
               <div className="mb-6">
                 <svg
