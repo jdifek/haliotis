@@ -646,7 +646,7 @@ export const PenicheHero = () => {
             </div>
           </div>
         </div>
-        ;
+        
       </div>
     </section>
   );
