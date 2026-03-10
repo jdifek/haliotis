@@ -20,15 +20,13 @@ export const PenicheHero = () => {
         {/* Desktop: 3 columns layout */}
         <div
           className="
-    hidden
-    lg:grid
-    lg:grid-cols-[140px_732px]
-    lg:auto-rows-[442px]
-    lg:gap-6
-    lg:justify-center
-
-    min-[1920px]:grid-cols-[140px_732px_1fr]
-  "
+      hidden
+      lg:grid
+      lg:grid-cols-[140px_1fr_auto]
+      lg:auto-rows-[442px]
+      lg:gap-6
+      min-[1920px]:grid-cols-[140px_732px_1fr]
+    "
         >
           {" "}
           <div className="flex items-center justify-center overflow-hidden rounded-[16px] bg-[#f49519] w-[140px] h-[442px]">
@@ -70,7 +68,7 @@ export const PenicheHero = () => {
             </svg>
           </div>
           {/* Main Info Card - 732x442 */}
-          <div className="flex w-[732px] h-[442px] overflow-hidden rounded-[20px] bg-white">
+          <div className="flex w-full h-[442px] overflow-hidden rounded-[20px] bg-white">
             <div className="flex w-1/2 flex-col px-4 py-3">
               <h1 className="mb-3 text-[48px] font-medium leading-[130%] text-[#111]">
                 Peniche
@@ -152,18 +150,17 @@ export const PenicheHero = () => {
           {/* Contact Card - Desktop */}
           <div
             className="
-    col-span-2
-    flex
-    justify-center
-
-    min-[1920px]:col-span-1
-    min-[1920px]:col-start-3
-    min-[1920px]:row-start-1
-  "
+      col-span-3
+      flex
+      justify-center
+      min-[1440px]:col-span-1
+      min-[1920px]:col-start-3
+      min-[1920px]:row-start-1
+    "
           >
             {" "}
             <div className="flex overflow-hidden rounded-[16px] h-[442px]">
-              <div className="relative h-[442px] bg-[#9bb4d4] w-[393px] rounded-l-[16px]">
+              <div className="relative h-[442px] bg-[#9bb4d4] flex-1 min-w-[200px] rounded-l-[16px]">
                 <div
                   className="absolute inset-0 bg-cover bg-center opacity-90"
                   style={{
@@ -646,7 +643,6 @@ export const PenicheHero = () => {
             </div>
           </div>
         </div>
-        
       </div>
     </section>
   );

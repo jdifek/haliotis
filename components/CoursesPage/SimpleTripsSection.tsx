@@ -137,7 +137,7 @@ export const SimpleTripsSection: React.FC<Props> = ({
       </div>
       <div className="flex justify-center ">
         <BlackActionButton
-          className="md:w-[280px]"
+          className="md:w-[280px] mt-[30px]"
           label=" Show more dives"
           icon={
             <svg
