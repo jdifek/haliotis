@@ -36,8 +36,8 @@ export const HeroSection = () => {
         <section className="container  px-5 py-6">
           <div className="max-w-3xl">
             <div className="mb-12">
-              <h1 className="mb-3 text-[32px] font-bold leading-tight text-white lg:text-7xl">
-              Freedive
+              <h1 className="mb-3 text-[32px] font-bold leading-tight text-white lg:text-5xl">
+                Freedive
               </h1>
               <div className="mb-6">
                 <svg
@@ -71,7 +71,7 @@ export const HeroSection = () => {
                 </svg>
               </div>
               <p className="max-w-xl text-[16px] font-light text-white lg:text-lg">
-              Find the freediving and become one with the underwater world!
+                Find the freediving and become one with the underwater world!
               </p>
             </div>
           </div>

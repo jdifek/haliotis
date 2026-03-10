@@ -470,278 +470,167 @@ export const CenterInfoSection = () => {
           </div>
         );
 
-      case "facilities":
-        return (
-          <div className="flex flex-col gap-6">
-            <p className="text-[15px] font-medium leading-[160%] text-[#111]">
-              Customed for the efficiency and comfort of divers, we have male
-              and female seats with a capacity for 60 people, hot water shower
-              with towel, two classrooms, technical zone with all equipment to
-              rent, shop with the best brands and a place where you can relax
-              before and after dives. We are an Aqualung center with about 50
-              equipments available for use by our customers.
-            </p>
-
+        case "facilities":
+          return (
             <div className="flex flex-col gap-6">
-              {/* Diving Center Facilities */}
-              <div>
-                <button
-                  onClick={() => setIsDivingCenterOpen(!isDivingCenterOpen)}
-                  className="w-full flex items-center justify-between text-[18px] font-medium leading-[140%] text-[#111] mb-4 md:pointer-events-none"
-                >
-                  <span>Diving Center Facilities</span>
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    className={`md:hidden transition-transform ${
-                      isDivingCenterOpen ? "" : "rotate-180"
-                    }`}
-                  >
-                    <path
-                      d="M17.8534 14.1463L12.8537 9.14663C12.8073 9.10015 12.7522 9.06327 12.6915 9.03811C12.6308 9.01295 12.5657 9 12.5 9C12.4343 9 12.3692 9.01295 12.3085 9.03811C12.2478 9.06327 12.1927 9.10015 12.1463 9.14663L7.14663 14.1463C7.07663 14.2162 7.02895 14.3053 7.00963 14.4024C6.9903 14.4994 7.00021 14.6 7.03808 14.6914C7.07595 14.7828 7.1401 14.8609 7.22239 14.9159C7.30468 14.9708 7.40142 15.0001 7.50036 15L17.4996 15C17.5986 15.0001 17.6953 14.9708 17.7776 14.9159C17.8599 14.8609 17.924 14.7828 17.9619 14.6914C17.9998 14.6 18.0097 14.4994 17.9904 14.4024C17.971 14.3053 17.9234 14.2162 17.8534 14.1463Z"
-                      fill="black"
+              <p className="text-[15px] font-medium leading-[160%] text-[#111]">
+                Customed for the efficiency and comfort of divers, we have male
+                and female seats with a capacity for 60 people, hot water shower
+                with towel, two classrooms, technical zone with all equipment to
+                rent, shop with the best brands and a place where you can relax
+                before and after dives. We are an Aqualung center with about 50
+                equipments available for use by our customers.
+              </p>
+        
+              {/* Desktop: 3-column grid | Mobile: accordion list */}
+              <div className="hidden md:grid md:grid-cols-3 md:gap-x-6 md:gap-y-8">
+                {[
+                  {
+                    title: "Diving Center Facilities",
+                    img: "/Rectangle 8.png",
+                    alt: "Diving Center Facilities",
+                    text: "Our center is located next to the beach Supertubos in Peniche 5 minutes away from the boarding points, being this route made in one of our vans.",
+                  },
+                  {
+                    title: "Store",
+                    img: "/Rectangle 8.png",
+                    alt: "Store",
+                    text: "The best and best known equipment brands like Aqualung, TUSA, Apeks among many others.",
+                  },
+                  {
+                    title: "Large Classroom",
+                    img: "/Rectangle 8.png",
+                    alt: "Large Classroom",
+                    text: "With capacity for twenty students and fully equipped, being a perfect place for your training.",
+                  },
+                  {
+                    title: "Small Classroom",
+                    img: "/Rectangle 8.png",
+                    alt: "Small Classroom",
+                    text: "For smaller groups or for more specific formations the small room is the perfect solution for you.",
+                  },
+                  {
+                    title: "Filling Station",
+                    img: "/Rectangle 8.png",
+                    alt: "Filling Station",
+                    text: "Our filling station has a BAUER compressor capable of filling all the bottles (Aluminium (AL), Alloy, Trimix and GDI, Having more than 100 bottles (12L, 15L, 18L, Double 12L, Double 15L), we are also a rebreather friendly center.",
+                  },
+                  {
+                    title: "Changing Rooms",
+                    img: "/Rectangle 8.png",
+                    alt: "Changing Rooms",
+                    text: "So that everyone can equip with comfort our changing rooms, male and female, are spacious and comfortable. Always available with hot water shower with towel and shampoo.",
+                  },
+                ].map(({ title, img, alt, text }) => (
+                  <div key={title} className="flex flex-col gap-3">
+                    <h3 className="text-[18px] font-medium leading-[140%] text-[#111]">
+                      {title}
+                    </h3>
+                    <Image
+                      src={img}
+                      alt={alt}
+                      width={495}
+                      height={285}
+                      className="w-full h-[285px] rounded-2xl object-cover"
                     />
-                  </svg>
-                </button>
-                <div
-                  className={`${
-                    isDivingCenterOpen ? "block" : "hidden"
-                  } md:block flex flex-col gap-4`}
-                >
-                  <Image
-                    src="/Rectangle 8.png"
-                    alt="Diving Center Facilities"
-                    width={495}
-                    height={285}
-                    className="w-full h-[200px] md:h-[285px] rounded-2xl"
-                  />
-                  <p className="text-[15px] font-medium leading-[160%] text-[#101010] opacity-80">
-                    Our center is located next to the beach Supertubos in
-                    Peniche 5 minutes away from the boarding points, being this
-                    route made in one of our vans.
-                  </p>
-                </div>
+                    <p className="text-[15px] font-medium leading-[160%] text-[#101010] opacity-80">
+                      {text}
+                    </p>
+                  </div>
+                ))}
               </div>
-
-              {/* Store */}
-              <div>
-                <button
-                  onClick={() => setIsStoreOpen(!isStoreOpen)}
-                  className="w-full flex items-center justify-between text-[18px] font-medium leading-[140%] text-[#111] mb-4 md:pointer-events-none"
-                >
-                  <span>Store</span>
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    className={`md:hidden transition-transform ${
-                      isStoreOpen ? "" : "rotate-180"
-                    }`}
-                  >
-                    <path
-                      d="M17.8534 14.1463L12.8537 9.14663C12.8073 9.10015 12.7522 9.06327 12.6915 9.03811C12.6308 9.01295 12.5657 9 12.5 9C12.4343 9 12.3692 9.01295 12.3085 9.03811C12.2478 9.06327 12.1927 9.10015 12.1463 9.14663L7.14663 14.1463C7.07663 14.2162 7.02895 14.3053 7.00963 14.4024C6.9903 14.4994 7.00021 14.6 7.03808 14.6914C7.07595 14.7828 7.1401 14.8609 7.22239 14.9159C7.30468 14.9708 7.40142 15.0001 7.50036 15L17.4996 15C17.5986 15.0001 17.6953 14.9708 17.7776 14.9159C17.8599 14.8609 17.924 14.7828 17.9619 14.6914C17.9998 14.6 18.0097 14.4994 17.9904 14.4024C17.971 14.3053 17.9234 14.2162 17.8534 14.1463Z"
-                      fill="black"
-                    />
-                  </svg>
-                </button>
-                <div
-                  className={`${
-                    isStoreOpen ? "block" : "hidden"
-                  } md:block flex flex-col gap-4`}
-                >
-                  <Image
-                    src="/Rectangle 8.png"
-                    alt="Store"
-                    width={495}
-                    height={285}
-                    className="w-full h-[200px] md:h-[285px] rounded-2xl"
-                  />
-                  <p className="text-[15px] font-medium leading-[160%] text-[#101010] opacity-80">
-                    The best and best known equipment brands like Aqualung,
-                    TUSA, Apeks among many others.
-                  </p>
-                </div>
-              </div>
-
-              {/* Large Classroom */}
-              <div>
-                <button
-                  onClick={() => setIsLargeClassroomOpen(!isLargeClassroomOpen)}
-                  className="w-full flex items-center justify-between text-[18px] font-medium leading-[140%] text-[#111] mb-4 md:pointer-events-none"
-                >
-                  <span>Large Classroom</span>
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    className={`md:hidden transition-transform ${
-                      isLargeClassroomOpen ? "" : "rotate-180"
-                    }`}
-                  >
-                    <path
-                      d="M17.8534 14.1463L12.8537 9.14663C12.8073 9.10015 12.7522 9.06327 12.6915 9.03811C12.6308 9.01295 12.5657 9 12.5 9C12.4343 9 12.3692 9.01295 12.3085 9.03811C12.2478 9.06327 12.1927 9.10015 12.1463 9.14663L7.14663 14.1463C7.07663 14.2162 7.02895 14.3053 7.00963 14.4024C6.9903 14.4994 7.00021 14.6 7.03808 14.6914C7.07595 14.7828 7.1401 14.8609 7.22239 14.9159C7.30468 14.9708 7.40142 15.0001 7.50036 15L17.4996 15C17.5986 15.0001 17.6953 14.9708 17.7776 14.9159C17.8599 14.8609 17.924 14.7828 17.9619 14.6914C17.9998 14.6 18.0097 14.4994 17.9904 14.4024C17.971 14.3053 17.9234 14.2162 17.8534 14.1463Z"
-                      fill="black"
-                    />
-                  </svg>
-                </button>
-                <div
-                  className={`${
-                    isLargeClassroomOpen ? "block" : "hidden"
-                  } md:block flex flex-col gap-4`}
-                >
-                  <Image
-                    src="/Rectangle 8.png"
-                    alt="Large Classroom"
-                    width={495}
-                    height={285}
-                    className="w-full h-[200px] md:h-[285px] rounded-2xl"
-                  />
-                  <p className="text-[15px] font-medium leading-[160%] text-[#101010] opacity-80">
-                    With capacity for twenty students and fully equipped, being
-                    a perfect place for your training.
-                  </p>
-                </div>
-              </div>
-
-              {/* Small Classroom */}
-              <div>
-                <button
-                  onClick={() => setIsSmallClassroomOpen(!isSmallClassroomOpen)}
-                  className="w-full flex items-center justify-between text-[18px] font-medium leading-[140%] text-[#111] mb-4 md:pointer-events-none"
-                >
-                  <span>Small Classroom</span>
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    className={`md:hidden transition-transform ${
-                      isSmallClassroomOpen ? "" : "rotate-180"
-                    }`}
-                  >
-                    <path
-                      d="M17.8534 14.1463L12.8537 9.14663C12.8073 9.10015 12.7522 9.06327 12.6915 9.03811C12.6308 9.01295 12.5657 9 12.5 9C12.4343 9 12.3692 9.01295 12.3085 9.03811C12.2478 9.06327 12.1927 9.10015 12.1463 9.14663L7.14663 14.1463C7.07663 14.2162 7.02895 14.3053 7.00963 14.4024C6.9903 14.4994 7.00021 14.6 7.03808 14.6914C7.07595 14.7828 7.1401 14.8609 7.22239 14.9159C7.30468 14.9708 7.40142 15.0001 7.50036 15L17.4996 15C17.5986 15.0001 17.6953 14.9708 17.7776 14.9159C17.8599 14.8609 17.924 14.7828 17.9619 14.6914C17.9998 14.6 18.0097 14.4994 17.9904 14.4024C17.971 14.3053 17.9234 14.2162 17.8534 14.1463Z"
-                      fill="black"
-                    />
-                  </svg>
-                </button>
-                <div
-                  className={`${
-                    isSmallClassroomOpen ? "block" : "hidden"
-                  } md:block flex flex-col gap-4`}
-                >
-                  <Image
-                    src="/Rectangle 8.png"
-                    alt="Small Classroom"
-                    width={495}
-                    height={285}
-                    className="w-full h-[200px] md:h-[285px] rounded-2xl"
-                  />
-                  <p className="text-[15px] font-medium leading-[160%] text-[#101010] opacity-80">
-                    For smaller groups or for more specific formations the small
-                    room is the perfect solution for you.
-                  </p>
-                </div>
-              </div>
-
-              {/* Filling Station */}
-              <div>
-                <button
-                  onClick={() => setIsFillingStationOpen(!isFillingStationOpen)}
-                  className="w-full flex items-center justify-between text-[18px] font-medium leading-[140%] text-[#111] mb-4 md:pointer-events-none"
-                >
-                  <span>Filling Station</span>
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    className={`md:hidden transition-transform ${
-                      isFillingStationOpen ? "" : "rotate-180"
-                    }`}
-                  >
-                    <path
-                      d="M17.8534 14.1463L12.8537 9.14663C12.8073 9.10015 12.7522 9.06327 12.6915 9.03811C12.6308 9.01295 12.5657 9 12.5 9C12.4343 9 12.3692 9.01295 12.3085 9.03811C12.2478 9.06327 12.1927 9.10015 12.1463 9.14663L7.14663 14.1463C7.07663 14.2162 7.02895 14.3053 7.00963 14.4024C6.9903 14.4994 7.00021 14.6 7.03808 14.6914C7.07595 14.7828 7.1401 14.8609 7.22239 14.9159C7.30468 14.9708 7.40142 15.0001 7.50036 15L17.4996 15C17.5986 15.0001 17.6953 14.9708 17.7776 14.9159C17.8599 14.8609 17.924 14.7828 17.9619 14.6914C17.9998 14.6 18.0097 14.4994 17.9904 14.4024C17.971 14.3053 17.9234 14.2162 17.8534 14.1463Z"
-                      fill="black"
-                    />
-                  </svg>
-                </button>
-                <div
-                  className={`${
-                    isFillingStationOpen ? "block" : "hidden"
-                  } md:block flex flex-col gap-4`}
-                >
-                  <Image
-                    src="/Rectangle 8.png"
-                    alt="Filling Station"
-                    width={495}
-                    height={285}
-                    className="w-full h-[200px] md:h-[285px] rounded-2xl"
-                  />
-                  <p className="text-[15px] font-medium leading-[160%] text-[#101010] opacity-80">
-                    Our filling station has a BAUER compressor capable of
-                    filling all the bottles (Aluminium (AL), Alloy, Trimix and
-                    GDI, Having more than 100 bottles (12L, 15L, 18L, Double
-                    12L, Double 15L), we are also a rebreather friendly center.
-                  </p>
-                </div>
-              </div>
-
-              {/* Changing Rooms */}
-              <div>
-                <button
-                  onClick={() => setIsChangingRoomsOpen(!isChangingRoomsOpen)}
-                  className="w-full flex items-center justify-between text-[18px] font-medium leading-[140%] text-[#111] mb-4 md:pointer-events-none"
-                >
-                  <span>Changing Rooms</span>
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    className={`md:hidden transition-transform ${
-                      isChangingRoomsOpen ? "" : "rotate-180"
-                    }`}
-                  >
-                    <path
-                      d="M17.8534 14.1463L12.8537 9.14663C12.8073 9.10015 12.7522 9.06327 12.6915 9.03811C12.6308 9.01295 12.5657 9 12.5 9C12.4343 9 12.3692 9.01295 12.3085 9.03811C12.2478 9.06327 12.1927 9.10015 12.1463 9.14663L7.14663 14.1463C7.07663 14.2162 7.02895 14.3053 7.00963 14.4024C6.9903 14.4994 7.00021 14.6 7.03808 14.6914C7.07595 14.7828 7.1401 14.8609 7.22239 14.9159C7.30468 14.9708 7.40142 15.0001 7.50036 15L17.4996 15C17.5986 15.0001 17.6953 14.9708 17.7776 14.9159C17.8599 14.8609 17.924 14.7828 17.9619 14.6914C17.9998 14.6 18.0097 14.4994 17.9904 14.4024C17.971 14.3053 17.9234 14.2162 17.8534 14.1463Z"
-                      fill="black"
-                    />
-                  </svg>
-                </button>
-                <div
-                  className={`${
-                    isChangingRoomsOpen ? "block" : "hidden"
-                  } md:block flex flex-col gap-4`}
-                >
-                  <Image
-                    src="/Rectangle 8.png"
-                    alt="Changing Rooms"
-                    width={495}
-                    height={285}
-                    className="w-full h-[200px] md:h-[285px] rounded-2xl"
-                  />
-                  <p className="text-[15px] font-medium leading-[160%] text-[#101010] opacity-80">
-                    So that everyone can equip with comfort our changing rooms,
-                    male and female, are spacious and comfortable. Always
-                    available with hot water shower with towel and shampoo.
-                  </p>
-                </div>
+        
+              {/* Mobile: accordion list */}
+              <div className="flex flex-col gap-6 md:hidden">
+                {[
+                  {
+                    title: "Diving Center Facilities",
+                    img: "/Rectangle 8.png",
+                    alt: "Diving Center Facilities",
+                    text: "Our center is located next to the beach Supertubos in Peniche 5 minutes away from the boarding points, being this route made in one of our vans.",
+                    isOpen: isDivingCenterOpen,
+                    toggle: () => setIsDivingCenterOpen(!isDivingCenterOpen),
+                  },
+                  {
+                    title: "Store",
+                    img: "/Rectangle 8.png",
+                    alt: "Store",
+                    text: "The best and best known equipment brands like Aqualung, TUSA, Apeks among many others.",
+                    isOpen: isStoreOpen,
+                    toggle: () => setIsStoreOpen(!isStoreOpen),
+                  },
+                  {
+                    title: "Large Classroom",
+                    img: "/Rectangle 8.png",
+                    alt: "Large Classroom",
+                    text: "With capacity for twenty students and fully equipped, being a perfect place for your training.",
+                    isOpen: isLargeClassroomOpen,
+                    toggle: () => setIsLargeClassroomOpen(!isLargeClassroomOpen),
+                  },
+                  {
+                    title: "Small Classroom",
+                    img: "/Rectangle 8.png",
+                    alt: "Small Classroom",
+                    text: "For smaller groups or for more specific formations the small room is the perfect solution for you.",
+                    isOpen: isSmallClassroomOpen,
+                    toggle: () => setIsSmallClassroomOpen(!isSmallClassroomOpen),
+                  },
+                  {
+                    title: "Filling Station",
+                    img: "/Rectangle 8.png",
+                    alt: "Filling Station",
+                    text: "Our filling station has a BAUER compressor capable of filling all the bottles (Aluminium (AL), Alloy, Trimix and GDI, Having more than 100 bottles (12L, 15L, 18L, Double 12L, Double 15L), we are also a rebreather friendly center.",
+                    isOpen: isFillingStationOpen,
+                    toggle: () => setIsFillingStationOpen(!isFillingStationOpen),
+                  },
+                  {
+                    title: "Changing Rooms",
+                    img: "/Rectangle 8.png",
+                    alt: "Changing Rooms",
+                    text: "So that everyone can equip with comfort our changing rooms, male and female, are spacious and comfortable. Always available with hot water shower with towel and shampoo.",
+                    isOpen: isChangingRoomsOpen,
+                    toggle: () => setIsChangingRoomsOpen(!isChangingRoomsOpen),
+                  },
+                ].map(({ title, img, alt, text, isOpen, toggle }) => (
+                  <div key={title}>
+                    <button
+                      onClick={toggle}
+                      className="w-full flex items-center justify-between text-[18px] font-medium leading-[140%] text-[#111] mb-4"
+                    >
+                      <span>{title}</span>
+                      <svg
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        className={`transition-transform ${isOpen ? "" : "rotate-180"}`}
+                      >
+                        <path
+                          d="M17.8534 14.1463L12.8537 9.14663C12.8073 9.10015 12.7522 9.06327 12.6915 9.03811C12.6308 9.01295 12.5657 9 12.5 9C12.4343 9 12.3692 9.01295 12.3085 9.03811C12.2478 9.06327 12.1927 9.10015 12.1463 9.14663L7.14663 14.1463C7.07663 14.2162 7.02895 14.3053 7.00963 14.4024C6.9903 14.4994 7.00021 14.6 7.03808 14.6914C7.07595 14.7828 7.1401 14.8609 7.22239 14.9159C7.30468 14.9708 7.40142 15.0001 7.50036 15L17.4996 15C17.5986 15.0001 17.6953 14.9708 17.7776 14.9159C17.8599 14.8609 17.924 14.7828 17.9619 14.6914C17.9998 14.6 18.0097 14.4994 17.9904 14.4024C17.971 14.3053 17.9234 14.2162 17.8534 14.1463Z"
+                          fill="black"
+                        />
+                      </svg>
+                    </button>
+                    {isOpen && (
+                      <div className="flex flex-col gap-4">
+                        <Image
+                          src={img}
+                          alt={alt}
+                          width={495}
+                          height={285}
+                          className="w-full h-[200px] rounded-2xl object-cover"
+                        />
+                        <p className="text-[15px] font-medium leading-[160%] text-[#101010] opacity-80">
+                          {text}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
-          </div>
-        );
-
+          );
       case "boats":
         return (
           <div className="flex gap-8">
@@ -984,7 +873,7 @@ export const CenterInfoSection = () => {
                     height={232}
                     className="w-full h-[232px] rounded-2xl"
                   />
-                  <div className="px-2 pb-2 flex flex-col gap-3">
+                  <div className="px-3 py-4 h-full flex flex-col gap-3 bg-white rounded-2xl">
                     <div>
                       <h3 className="text-[24px] font-medium leading-[140%] text-black">
                         {member.name}

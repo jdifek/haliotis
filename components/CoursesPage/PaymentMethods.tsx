@@ -64,7 +64,8 @@ export const PaymentMethods = () => {
 
       {/* Контент - на десктопе всегда видим, на мобилке по клику */}
       <div className={`${isOpen ? "block" : "hidden"} md:block`}>
-        <div className="flex flex-wrap justify-start gap-4">
+      <div className="grid grid-cols-2 gap-[23px] md:flex md:flex-wrap md:gap-[30px]">
+      {" "}
           {paymentMethods.map((method, index) => (
             <Card
               key={index}

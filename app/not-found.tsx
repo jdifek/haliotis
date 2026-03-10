@@ -8,10 +8,7 @@ export default function NotFound() {
       <div className="absolute bottom-1 z-10 block">
         <Breadcrumbs
           className="mb-6 mx-5 md:mb-8"
-          items={[
-            { label: "Haliotis", href: "/" },
-            { label: "404" },
-          ]}
+          items={[{ label: "Haliotis", href: "/" }, { label: "404" }]}
           itemLabelColorWhite={true}
         />
       </div>
@@ -35,8 +32,8 @@ export default function NotFound() {
         <section className="container  px-5 py-6">
           <div className="max-w-3xl">
             <div className="mb-12">
-              <h1 className="mb-3 text-[32px] font-bold leading-tight text-white lg:text-7xl">
-              Page Overboard
+              <h1 className="mb-3 text-[32px] font-bold leading-tight text-white lg:text-5xl">
+                Page Overboard
               </h1>
               <div className="mb-6">
                 <svg
@@ -70,8 +67,8 @@ export default function NotFound() {
                 </svg>
               </div>
               <p className="max-w-xl text-[16px] font-light text-white lg:text-lg">
-              This page drifted off course. 
-Let’s bring you back to the main deck.
+                This page drifted off course. Let’s bring you back to the main
+                deck.
               </p>
             </div>
           </div>

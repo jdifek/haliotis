@@ -35,7 +35,7 @@ export default function Contacts() {
           <section className="container  px-5 py-6">
             <div className="max-w-3xl">
               <div className="mb-12">
-                <h1 className="mb-3 text-[32px] font-bold leading-tight text-white lg:text-7xl">
+                <h1 className="mb-3 text-[32px] font-bold leading-tight text-white lg:text-5xl">
                   Contacts
                 </h1>
                 <div className="mb-6">
@@ -80,49 +80,49 @@ export default function Contacts() {
       </section>
       <LocationsSection />
       <section className="bg-[#f1f1f1] px-4 pb-12  md:px-[30px] md:pb-[50px]">
-      {/* Header bar */}
-      <div
-        className="flex items-center justify-center w-full"
-        style={{
-          background: "#281d4d",
-          borderRadius: "24px 24px 0 0",
-          padding: "5px 20px",
-          height: "clamp(72px, 6vw, 102px)",
-        }}
-      >
-        <h2
-          className="text-center"
+        {/* Header bar */}
+        <div
+          className="flex items-center justify-center w-full"
           style={{
-            fontFamily: "var(--font-family)",
-            fontWeight: 500,
-            fontSize: "clamp(24px, 3vw, 48px)",
-            lineHeight: "130%",
-            color: "#fff",
+            background: "#281d4d",
+            borderRadius: "24px 24px 0 0",
+            padding: "5px 20px",
+            height: "clamp(72px, 6vw, 102px)",
           }}
         >
-          Choose the right Center for you
-        </h2>
-      </div>
+          <h2
+            className="text-center"
+            style={{
+              fontFamily: "var(--font-family)",
+              fontWeight: 500,
+              fontSize: "clamp(24px, 3vw, 48px)",
+              lineHeight: "130%",
+              color: "#fff",
+            }}
+          >
+            Choose the right Center for you
+          </h2>
+        </div>
 
-      {/* Map */}
-      <div
-        className="w-full overflow-hidden"
-        style={{
-          borderRadius: "0 0 24px 24px",
-          height: "clamp(200px, 40vw, 1053px)",
-        }}
-      >
-        <iframe
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3065.123456789!2d-9.3817!3d39.3558!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd1f17c6b1234567%3A0x1234567890abcdef!2sHaliotis!5e0!3m2!1sen!2spt!4v1234567890"
-          width="100%"
-          height="100%"
-          style={{ border: 0, display: "block" }}
-          allowFullScreen
-          loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
-        />
-      </div>
-    </section>
+        {/* Map */}
+        <div
+          className="w-full overflow-hidden"
+          style={{
+            borderRadius: "0 0 24px 24px",
+            height: "clamp(200px, 40vw, 1053px)",
+          }}
+        >
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3065.123456789!2d-9.3817!3d39.3558!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd1f17c6b1234567%3A0x1234567890abcdef!2sHaliotis!5e0!3m2!1sen!2spt!4v1234567890"
+            width="100%"
+            height="100%"
+            style={{ border: 0, display: "block" }}
+            allowFullScreen
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          />
+        </div>
+      </section>
     </>
   );
 }

@@ -296,71 +296,29 @@ export const Footer = () => {
           </div>
         </div>
 
-        {/* Bottom Section */}
-        <div className="flex flex-col gap-4  border-white/10 pt-6 md:flex-row md:items-center md:justify-between md:pt-8">
-          <p
-            className="text-center text-sm text-white md:text-left md:text-[15px]"
-            style={{
-              fontWeight: 400,
-              lineHeight: "160%",
-              opacity: 0.7,
-            }}
-          >
-            Copyright © 2025 Haliotis.
-          </p>
-          <div className="flex flex-col gap-2 text-center md:flex-row md:gap-8 md:text-left">
-            <Link
-              href="#"
-              className="text-sm text-white transition-opacity hover:opacity-100 opacity-70 md:text-[15px]"
-              style={{
-                fontWeight: 400,
-                lineHeight: "160%",
-              }}
-            >
-              Alternative Dispute Resolution
-            </Link>
-            <Link
-              href="#"
-              className="text-sm  opacity-70 text-white transition-opacity hover:opacity-100 md:text-[15px]"
-              style={{
-                fontWeight: 400,
-                lineHeight: "160%",
-              }}
-            >
-              Cancellation Policies
-            </Link>
-            <Link
-              href="#"
-              className="text-sm  opacity-70 text-white transition-opacity hover:opacity-100 md:text-[15px]"
-              style={{
-                fontWeight: 400,
-                lineHeight: "160%",
-              }}
-            >
-              Privacy Policy
-            </Link>
-            <Link
-              href="#"
-              className="text-sm  opacity-70 text-white transition-opacity hover:opacity-100 md:text-[15px]"
-              style={{
-                fontWeight: 400,
-                lineHeight: "160%",
-              }}
-            >
-              Cookie Policy
-            </Link>
-            <Link
-              href="#"
-              className="text-sm  opacity-70 text-white transition-opacity hover:opacity-100 md:text-[15px]"
-              style={{
-                fontWeight: 400,
-                lineHeight: "160%",
-              }}
-            >
-              Terms & Conditions
-            </Link>
-          </div>
-        </div>
+      {/* Bottom Section */}
+<div className="flex flex-col gap-4 border-white/10 lg:pt-6 md:flex-row md:items-center md:justify-between md:pt-8">
+  <p className="order-2 md:order-1 text-center text-sm text-white md:text-left md:text-[15px]" style={{ fontWeight: 400, lineHeight: "160%", opacity: 0.7 }}>
+    Copyright © 2025 Haliotis.
+  </p>
+  <div className="order-1 md:order-2 flex flex-col gap-2 text-left md:flex-row md:gap-8 md:text-left">
+    <Link href="#" className="text-sm text-white transition-opacity hover:opacity-100 opacity-70 md:text-[15px]" style={{ fontWeight: 400, lineHeight: "160%" }}>
+      Alternative Dispute Resolution
+    </Link>
+    <Link href="#" className="text-sm opacity-70 text-white transition-opacity hover:opacity-100 md:text-[15px]" style={{ fontWeight: 400, lineHeight: "160%" }}>
+      Cancellation Policies
+    </Link>
+    <Link href="#" className="text-sm opacity-70 text-white transition-opacity hover:opacity-100 md:text-[15px]" style={{ fontWeight: 400, lineHeight: "160%" }}>
+      Privacy Policy
+    </Link>
+    <Link href="#" className="text-sm opacity-70 text-white transition-opacity hover:opacity-100 md:text-[15px]" style={{ fontWeight: 400, lineHeight: "160%" }}>
+      Cookie Policy
+    </Link>
+    <Link href="#" className="text-sm opacity-70 text-white transition-opacity hover:opacity-100 md:text-[15px]" style={{ fontWeight: 400, lineHeight: "160%" }}>
+      Terms & Conditions
+    </Link>
+  </div>
+</div>
       </div>
     </footer>
   );

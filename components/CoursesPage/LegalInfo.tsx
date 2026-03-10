@@ -43,7 +43,7 @@ export const LegalInfo = () => {
   ];
 
   return (
-    <div className="mx-auto max-w-[1920px] bg-white pb-8 md:py-12 px-4 md:px-8 lg:px-[188px]">
+    <div className="mx-auto max-w-[1920px] bg-white pb-8 md:py-12 px-4 md:px-8 lg:px-[188px] mt-8 md:mt-0">
       {/* Desktop - обычный заголовок */}
       <h2 className="hidden md:block text-black text-[24px] font-medium leading-[140%] mb-8">
         Informação Legal
@@ -72,7 +72,7 @@ export const LegalInfo = () => {
 
       {/* Контент - на десктопе всегда видим, на мобилке по клику */}
       <div className={`${isOpen ? "block" : "hidden"} md:block`}>
-        <div className="flex flex-wrap justify-start gap-4">
+      <div className="grid grid-cols-2 gap-[23px] md:flex md:flex-wrap md:gap-[30px]">
           {legalEntities.map((entity, index) => (
             <Card
               heightBottomBlock={"131px"}

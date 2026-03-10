@@ -255,7 +255,7 @@ const DolphinWatching = () => {
           <section className="container  px-5 py-6">
             <div className="max-w-3xl">
               <div className="mb-12">
-                <h1 className="mb-3 text-[32px] font-bold leading-tight text-white lg:text-7xl">
+                <h1 className="mb-3 text-[32px] font-bold leading-tight text-white lg:text-5xl">
                   Dolphin Watching
                 </h1>
                 <div className="mb-6">
