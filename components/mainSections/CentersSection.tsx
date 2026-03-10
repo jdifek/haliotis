@@ -129,8 +129,9 @@ export const CentersSection: React.FC<Props> = ({ centerCards }) => {
       <div className="hidden lg:grid lg:grid-cols-3 lg:gap-5">
         {uniqueCards.map((card, index) => (
           <CenterCard
+           className="!max-w-none !h-[400px]"
             key={index}
-                   className="!max-w-none"
+              
             image={card.image}
             title={card.title}
             description={card.description}
