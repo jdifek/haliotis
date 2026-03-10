@@ -960,7 +960,7 @@ export default function Home() {
           </section>
         </div>
       </section>
-      <CentersSection locations={locations} centerCards={centerCardsData} />
+      <CentersSection  centerCards={centerCardsData} />
 
       <CoursesSection locations={locations} courseCards={courseCards} />
       <TripsSection locations={locations} tripCards={tripCards} />

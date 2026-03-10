@@ -6,6 +6,7 @@ type CenterCardProps = {
   description: string;
   buttonColor: string;
   onMoreInfoClick: () => void;
+  className?: string; // <- добавить
 };
 
 export const CenterCard: React.FC<CenterCardProps> = ({
@@ -14,9 +15,13 @@ export const CenterCard: React.FC<CenterCardProps> = ({
   description,
   buttonColor,
   onMoreInfoClick,
+  className = "", // <- добавить
 }) => {
   return (
-    <div className="relative w-full max-w-[363px] h-[468px] overflow-hidden rounded-[20px] p-5 lg:h-[550px] lg:pt-10">
+    <div
+      className={`relative w-full max-w-[363px] h-[468px] overflow-hidden rounded-[20px] p-5 lg:h-[550px] lg:pt-10 ${className}`}
+    >
+      {" "}
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <img
@@ -27,10 +32,8 @@ export const CenterCard: React.FC<CenterCardProps> = ({
           className="h-full w-full object-cover"
         />
       </div>
-
       {/* Dark Overlay */}
       <div className="absolute inset-0 z-[1] bg-black/40" />
-
       {/* Content */}
       <div className="relative z-10 flex h-full flex-col justify-between">
         {/* Top Content */}
