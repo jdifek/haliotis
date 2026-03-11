@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination as SwiperPagination } from "swiper/modules";
 import type { Swiper as SwiperType } from "swiper";
@@ -435,12 +435,11 @@ export function TripCard({ card }: { card: TripCard }) {
 
   return (
     <div
-      className="flex flex-col lg:flex-row bg-white"
+      className="w-full max-w-[1545px] flex flex-col lg:flex-row bg-white"
       style={{
         borderRadius: "24px",
         padding: "20px 20px",
         gap: "45px",
-        width: "100%",
       }}
     >
       {/* Left: image */}
@@ -505,24 +504,25 @@ export function TripCard({ card }: { card: TripCard }) {
           </p>
         </div>
 
-        {/* Find More button */}
         <div className="mt-6 flex items-center justify-between">
-          <ButtonWithIcon
-            bgColor="#F1F1F1" iconBgColor="#E84814"
-            label="Find More"
-            textColor="text-black"
-            width="184px"
-            height="48px"
-            icon={
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M18 8.33333H6.75C4.67893 8.33333 3 10.0123 3 12.0833C3 14.1544 4.67893 15.8333 6.75 15.8333H10.5M18 8.33333L14.6667 5M18 8.33333L14.6667 11.6667" stroke="#F1F1F1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            }
-          />
-        <div className="lg:hidden">
-  {svg}
+  <ButtonWithIcon
+    bgColor="#F1F1F1" iconBgColor="#E84814"
+    label="Find More"
+    textColor="text-black"
+    width="184px"
+    height="48px"
+    icon={
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18 8.33333H6.75C4.67893 8.33333 3 10.0123 3 12.0833C3 14.1544 4.67893 15.8333 6.75 15.8333H10.5M18 8.33333L14.6667 5M18 8.33333L14.6667 11.6667" stroke="#F1F1F1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    }
+  />
+ <div className="lg:hidden overflow-hidden flex items-center justify-end" style={{ width: 66, height: 48 }}>
+ {/* Mobile */}
+<div className="lg:hidden">
+{svg && React.isValidElement(svg) && React.cloneElement(svg as React.ReactElement<{ width?: number; height?: number }>, { width: 60, height: 40 })}</div>
 </div>
-        </div>
+</div>
       </div>
 
       {/* Right: decorative SVG */}
@@ -555,7 +555,7 @@ export const TravelTripsSection: React.FC<Props> = ({
         className ?? ""
       }`}
     >
-      <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-5 items-center justify-center">
         {visible.map((card, i) => (
           <TripCard key={`${card.locationId}-${start + i}`} card={card} />
         ))}

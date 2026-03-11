@@ -229,7 +229,7 @@ const DolphinWatching = () => {
   return (
     <main className="-mt-[97px]">
       {/* Hero */}
-      <section className="relative h-[90vh] w-full pt-[97px]">
+      <section className="relative h-[75vh] w-full pt-[97px]">
         <div className="absolute bottom-1 z-10 block">
           <Breadcrumbs
             className="mb-6 mx-5 md:mb-8"

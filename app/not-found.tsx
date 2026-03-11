@@ -1,9 +1,11 @@
+/* eslint-disable react/no-unescaped-entities */
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { ButtonWithIcon } from "@/components/buttons/ButtonWithIcon";
 import Image from "next/image";
 
 export default function NotFound() {
   return (
-    <section className="relative h-[90vh] -mt-[97px] pt-[97px] w-full ">
+    <section className="relative h-[75vh] -mt-[97px] pt-[97px] w-full ">
       {/* Breadcrumbs */}
       <div className="absolute bottom-1 z-10 block">
         <Breadcrumbs
@@ -66,10 +68,35 @@ export default function NotFound() {
                   </g>
                 </svg>
               </div>
-              <p className="max-w-xl text-[16px] font-light text-white lg:text-lg">
-                This page drifted off course. Let’s bring you back to the main
-                deck.
+              <p className="max-w-xl mb-3 text-[16px] font-light text-white lg:text-lg">
+                This page drifted off course.
+                <br />
+                Let's bring you back to the main deck.
               </p>
+              <ButtonWithIcon
+                bgColor={"#FFFFFF"}
+                width={"228px"}
+                textColor={"text-black"}
+                iconBgColor={"#e84814"}
+                label="Return to the surface"
+                icon={
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M18 8.33333H6.75C4.67893 8.33333 3 10.0123 3 12.0833C3 14.1544 4.67893 15.8333 6.75 15.8333H10.5M18 8.33333L14.6667 5M18 8.33333L14.6667 11.6667"
+                      stroke="white"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                }
+              />
             </div>
           </div>
         </section>

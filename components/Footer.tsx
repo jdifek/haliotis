@@ -241,8 +241,7 @@ export const Footer = () => {
           {/* Mobile Accordion */}
           <div className="flex flex-1 flex-col gap-2 lg:hidden">
             {footerSections.map((section, index) => (
-              <div key={index} className="border-b border-white/10">
-                <button
+              <div key={index} className={index === footerSections.length - 1 ? "border-b border-white/10" : ""}>                <button
                   onClick={() => toggleSection(section.title)}
                   className="flex w-full items-center justify-between py-4 text-left"
                 >
@@ -294,7 +293,9 @@ export const Footer = () => {
               </div>
             ))}
           </div>
+          
         </div>
+
 
       {/* Bottom Section */}
 <div className="flex flex-col gap-4 border-white/10 lg:pt-6 md:flex-row md:items-center md:justify-between md:pt-8">

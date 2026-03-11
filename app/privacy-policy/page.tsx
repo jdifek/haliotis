@@ -5,7 +5,7 @@ import Image from "next/image";
 export default function PrivacyPolicy() {
   return (
     <>
-      <section className="relative h-[90vh] -mt-[97px] pt-[97px] w-full ">
+      <section className="relative h-[75vh] -mt-[97px] pt-[97px] w-full ">
         {/* Breadcrumbs */}
         <div className="absolute bottom-1 z-10 block">
           <Breadcrumbs
@@ -22,7 +22,7 @@ export default function PrivacyPolicy() {
         <div className="absolute inset-0 z-0">
           <div className="relative h-full w-full">
             <Image
-              src="/404.png"
+              src="/privacy.png"
               alt="Background"
               fill
               className="object-cover"

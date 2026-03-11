@@ -105,17 +105,11 @@ const defaultAccordionItems: AccordionItem[] = [
     content: (
       <p className="text-[15px] font-normal leading-[160%] text-[#101010] opacity-80">
         See the contents of the respective courses:{" "}
-        <a
-          href="#"
-          className="underline decoration-skip-ink-none text-[#e84814]"
-        >
+        <a href="#" className="underline decoration-skip-ink-none text-[#e84814]">
           PADI Advanced Open Water Diver
         </a>{" "}
         e{" "}
-        <a
-          href="#"
-          className="underline decoration-skip-ink-none text-[#e84814]"
-        >
+        <a href="#" className="underline decoration-skip-ink-none text-[#e84814]">
           PADI Underwater Naturalist
         </a>
       </p>
@@ -125,51 +119,55 @@ const defaultAccordionItems: AccordionItem[] = [
     id: "structure",
     label: "Structure",
     content: (
-      <p className="text-[15px] font-normal leading-[160%] text-[#101010] opacity-80">
-        Merge of the two courses, including the following fases: Knowledge
-        development (theoretical modules carried out via eLearning). Open water
-        dives where you will do 6 dives in the sea, 2 of which were dedicated to
-        the Underwater Naturalist course in Sesimbra, held over three days.
-      </p>
+      <div className="text-[15px] font-normal leading-[160%] text-[#101010] opacity-80">
+        <p>Merge of the two courses, including the following fases:</p>
+        <ul className="list-disc pl-5 mt-1">
+          <li>Knowledge development (theoretical modules carried out via eLearning).</li>
+          <li>Open water dives where you will do 6 dives in the sea, 2 of which were dedicated to the Underwater Naturalist course in Sesimbra, held over three days.</li>
+        </ul>
+      </div>
     ),
   },
   {
     id: "duration",
     label: "Duration",
     content: (
-      <p className="text-[15px] font-normal leading-[160%] text-[#101010] opacity-80">
-        The diving courses are held over three days, which can be scheduled on
-        pre-defined dates or on any date arranged with the participants, either
-        during working hours or after work hours. We offer diving courses with
-        just one participant without any additional cost.
-      </p>
+      <div className="text-[15px] font-normal leading-[160%] text-[#101010] opacity-80 flex flex-col gap-3">
+        <p>The diving courses are held over three days, which can be scheduled on pre-defined dates or on any date arranged with the participants, either during working hours or after work hours. We offer diving courses with just one participant without any additional cost.</p>
+        <p>You should contact us in advance to clarify any doubts, enroll in the course, and gain access to study materials.</p>
+        <p>The meeting point is at our center at 9:00 AM, with return between 11:00 AM and 12:00 PM. The schedule may change, as we also have an afternoon departure at 2:00 PM, with return between 3:00 PM and 4:00 PM. Transportation between the dive center and the dock is provided in our vans, and the trips to the dive spots are made in our boats (Rigid inflatable boats). After the dives, you can take a hot shower at our facilities.</p>
+      </div>
     ),
   },
   {
     id: "requirements",
     label: "Requirements",
     content: (
-      <p className="text-[15px] font-normal leading-[160%] text-[#101010] opacity-80">
-        <a
-          href="#"
-          className="underline decoration-skip-ink-none text-[#e84814]"
-        >
-          PADI (Junior) Open Water Diver
-        </a>{" "}
-        or equivalent certification from another scuba diving agency. Be at
-        least 12 years old.
-      </p>
+      <div className="text-[15px] font-normal leading-[160%] text-[#101010] opacity-80">
+        <p>
+          <a href="#" className="underline decoration-skip-ink-none text-[#e84814]">
+            PADI (Junior) Open Water Diver
+          </a>{" "}
+          or equivalent certification from another scuba diving agency.
+        </p>
+        <p>Be at least 12 years old.</p>
+      </div>
     ),
   },
   {
     id: "included",
     label: "Included",
     content: (
-      <p className="text-[15px] font-normal leading-[160%] text-[#101010] opacity-80">
-        Unlimited access to the online eLearning course in the selected
-        language. Your scuba diving training includes all the necessary scuba
-        diving equipment, snack, water between dives and insurance.
-      </p>
+      <div className="text-[15px] font-normal leading-[160%] text-[#101010] opacity-80 flex flex-col gap-3">
+        <p>Unlimited access to the online eLearning course in the selected language (Languages available - Advanced: English, Portuguese, French, Spanish, among others and Languages available - Underwater Naturalist: English), including knowledge reviews, quizzes and final exam.</p>
+        <p>Your scuba diving training include all the necessary scuba diving equipment, snack, water between dives and insurance.</p>
+        <p>
+          Specialised equipment hire is not included in the price of the standard course. In such cases, please consult the prices of the extras at -{" "}
+          <a href="https://haliotis.pt/en/precos/sesimbra" className="underline decoration-skip-ink-none text-[#e84814]">
+            https://haliotis.pt/en/precos/sesimbra
+          </a>
+        </p>
+      </div>
     ),
   },
   {
@@ -177,8 +175,7 @@ const defaultAccordionItems: AccordionItem[] = [
     label: "Assigned",
     content: (
       <p className="text-[15px] font-normal leading-[160%] text-[#101010] opacity-80">
-        International digital certifications PADI Advanced Open Water Diver and
-        PADI Underwater Naturalist.
+        International digital certifications PADI Advanced Open Water Diver and PADI Underwater Naturalist.
       </p>
     ),
   },
