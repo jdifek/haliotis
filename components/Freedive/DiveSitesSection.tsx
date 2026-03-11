@@ -354,7 +354,7 @@ const DiveSiteCard = ({ site }: { site: DiveSite }) => {
           >
             {site.description}
           </p>
-          <VideoBlock src={site.videoSrc} isMobile={false} />
+          <VideoBlock src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" isMobile={false} />
         </div>
       </div>
     </div>

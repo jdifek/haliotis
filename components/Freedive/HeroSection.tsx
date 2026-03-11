@@ -21,7 +21,7 @@ export const HeroSection = () => {
       <div className="absolute inset-0 z-0">
         <div className="relative h-full w-full">
           <Image
-            src="/image 4.png"
+            src="/freedive.png"
             alt="Background"
             fill
             className="object-cover"

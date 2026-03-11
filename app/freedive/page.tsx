@@ -265,7 +265,7 @@ const Diving = () => {
       <section className="bg-[#f1f1f1] px-4 pb-12 pt-8 md:px-[30px]  md:pb-[50px] md:pt-[46px]">
         {/* Description — centered */}
         <p
-          className="text-center mb-10 md:mb-12"
+          className="text-center mb-10 md:mb-12 max-w-[1222px] mx-auto"
           style={{
             fontFamily: "var(--font-family)",
             fontWeight: 400,

@@ -42,10 +42,10 @@ export const CourseCard: React.FC<CourseCardProps> = ({
           {/* Bottom Info Bar */}
           <div className="absolute bottom-3 left-3 flex flex-col md:flex-row items-start md:items-center gap-0.5 md:gap-1 rounded-lg bg-black/50 p-0.5">
             {/* Duration */}
-            <div className="flex items-center gap-1 md:gap-2 rounded-lg bg-black/50 md:px-3 p-1 md:py-2">
-              <svg
+            <div className="flex items-center gap-1 rounded-lg bg-black/50 p-1 lg:px-2 lg:py-1.5 xl:px-3 xl:py-2">
+            <svg
                 width="20"
-                className="w-[10px] h-[10px] md:w-[20px] md:h-[20px]"
+                className="w-[10px] h-[10px] lg:w-[14px] lg:h-[14px] xl:w-[20px] xl:h-[20px]"
                 height="20"
                 viewBox="0 0 20 20"
                 fill="none"
@@ -58,16 +58,16 @@ export const CourseCard: React.FC<CourseCardProps> = ({
                   fill="white"
                 />
               </svg>
-              <span className="whitespace-nowrap text-[10px] md:text-[15px] leading-[160%] text-[#f1f1f1]">
-                {duration}
+              <span className="whitespace-nowrap text-[10px] lg:text-[12px] xl:text-[15px] leading-[160%] text-[#f1f1f1]">
+              {duration}
               </span>
             </div>
 
             {/* Request Based */}
-            <div className="flex items-center gap-1 md:gap-2 rounded-lg bg-black/50 md:px-3 p-1 md:py-2">
-              <svg
-                className="w-[10px] h-[10px] md:w-[20px] md:h-[20px]"
-                width="19"
+            <div className="flex items-center gap-1 rounded-lg bg-black/50 p-1 lg:px-2 lg:py-1.5 xl:px-3 xl:py-2">
+            <svg
+    className="w-[10px] h-[10px] lg:w-[14px] lg:h-[14px] xl:w-[20px] xl:h-[20px]"
+    width="19"
                 height="20"
                 viewBox="0 0 19 20"
                 fill="none"
@@ -78,8 +78,8 @@ export const CourseCard: React.FC<CourseCardProps> = ({
                   fill="white"
                 />
               </svg>
-              <span className="whitespace-nowrap text-[10px] md:text-[15px] leading-[160%] text-[#f1f1f1]">
-                {requestBased ? "Request based" : "Fixed schedule"}
+              <span className="whitespace-nowrap text-[10px] lg:text-[12px] xl:text-[15px] leading-[160%] text-[#f1f1f1]">
+              {requestBased ? "Request based" : "Fixed schedule"}
               </span>
             </div>
           </div>
@@ -112,7 +112,7 @@ export const CourseCard: React.FC<CourseCardProps> = ({
             {/* Book Button */}
             <button
               onClick={() => setIsBookingOpen(true)}
-              className="flex items-center justify-between whitespace-nowrap cursor-pointer w-full rounded-full bg-[#e84814] py-0.5 pl-[14px] md:pl-4 pr-0.5 transition-all hover:bg-[#d63f0f]"
+              className="flex items-center justify-between whitespace-nowrap cursor-pointer w-full md:w-[160px] rounded-full bg-[#e84814] py-0.5 pl-[14px] md:pl-4 pr-0.5 transition-all hover:bg-[#d63f0f]"
             >
               <span className="text-[15px] font-bold leading-[120%] text-white">
                 Book Now
