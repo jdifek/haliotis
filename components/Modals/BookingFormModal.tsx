@@ -816,7 +816,7 @@ const ParticipantBlock = ({
                       item.isSelected ? "bg-[#f7e4de]" : "bg-[#f1f1f1]"
                     } rounded-2xl p-2`}
                   >
-                    {/* Add/Remove btn - поднимаем выше */}
+                    {/* Add/Remove btn */}
                     <button
                       onClick={() => onToggleEquip(p.id, item.id)}
                       className={`absolute -top-2 -left-2 w-12 h-12 rounded-full flex items-center justify-center shadow-md z-20 cursor-pointer transition-colors ${

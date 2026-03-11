@@ -377,8 +377,8 @@ export default function PricesSection() {
         />
       </section>
 
-      <section className="relative bg-[#f1f1f1] px-4 pb-12 pt-8 md:px-[30px] lg:px-[188px] md:pb-[50px] md:pt-[46px]">
-      {/* Mobile tab selector */}
+      <section className="relative overflow-hidden bg-[#f1f1f1] px-4 pb-12 pt-8 md:px-[30px] lg:px-[188px] md:pb-[50px] md:pt-[46px]">
+        {/* Mobile tab selector */}
         <div className="md:hidden mb-4 flex flex-col gap-2">
           <button
             onClick={() => setIsTabOpen(!isTabOpen)}
