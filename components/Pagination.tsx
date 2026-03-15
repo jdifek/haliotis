@@ -135,14 +135,30 @@ export const Pagination = ({
         })}
       </div>
 
-      {/* Current page indicator - Visible only on mobile */}
-      <div className="md:hidden flex h-[38px] min-w-[38px] items-center justify-center rounded-lg bg-[#e84814] px-[14px] py-[10px]"
-        style={{ fontFamily: "var(--font-family)" }}>
-        <span className="text-[15px] font-normal leading-[120%] text-white">
-          {currentPage}
-        </span>
-      </div>
+  {/* Mobile pagination */}
+<div className="md:hidden flex items-center gap-2">
+  {/* Current page */}
+  <div className="flex h-[38px] min-w-[38px] items-center justify-center rounded-lg bg-[#e84814] px-[14px] py-[10px]">
+    <span className="text-[15px] text-white">{currentPage}</span>
+  </div>
 
+  {/* dots */}
+  {currentPage < totalPages - 1 && (
+    <div className="flex h-[38px] w-[41px] items-center justify-center rounded-lg bg-white opacity-40 text-black">
+      ...
+    </div>
+  )}
+
+  {/* last page */}
+  {currentPage !== totalPages && (
+    <button
+      onClick={() => handlePageChange(totalPages)}
+      className="flex h-[38px] min-w-[38px] items-center justify-center rounded-lg bg-white px-[14px] text-black py-[10px]"
+    >
+      {totalPages}
+    </button>
+  )}
+</div>
       {/* NEXT Button */}
       <button
         onClick={() => handlePageChange(currentPage + 1)}

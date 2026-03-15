@@ -199,7 +199,7 @@ export const DiveTrips: React.FC<Props> = ({ diveTripsCards }) => {
 
             {/* Carousel Controls */}
             <div className="flex items-center justify-between mt-auto">
-              <div className="relative h-1.5 w-[180px] overflow-hidden rounded-full md:w-[275px]">
+              <div className="relative h-1.5 w-[60%] md:w-[80%] overflow-hidden rounded-full ">
                 {/* Background with opacity */}
                 <div className="absolute inset-0 bg-white/30" />
                 {/* Active bar without opacity */}
