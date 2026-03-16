@@ -337,8 +337,8 @@ const Courses = () => {
             </p>
 
             {/* Cards Grid */}
-            <div className="grid grid-cols-2 gap-2 sm:gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-              {courses.map((course) => (
+            <div className="grid grid-cols-2 gap-2 sm:gap-4 md:grid-cols-2  xl:grid-cols-4">
+            {courses.map((course) => (
                 <CourseCard
                   key={course.id}
                   image={course.image}
