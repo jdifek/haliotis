@@ -508,8 +508,8 @@ export default function PricesSection() {
         className="hidden lg:block absolute pointer-events-none select-none"
         style={{
           zIndex: 0,
-          right: "-220px",
-          top: "40px",
+          right: "-285px",
+          top: "-20px",
           opacity: 0.6,
         }}
       >

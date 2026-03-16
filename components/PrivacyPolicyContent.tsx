@@ -170,23 +170,14 @@ function AccordionItem({
 export default function PrivacyPolicyContent() {
   return (
     <section className="bg-[#f1f1f1] px-4 pb-12 pt-8 md:px-[30px] lg:px-[188px] md:pb-[50px] md:pt-[46px]">
-      {/* Title */}
-      <h1
-        style={{
-          fontFamily: "var(--font-family)",
-          fontWeight: 500,
-          fontSize: "48px",
-          lineHeight: "130%",
-          color: "#111",
-        }}
-      >
-        Privacy Policy
-      </h1>
+  <h1 className="font-semibold text-[32px] leading-[120%] lg:font-medium lg:text-[48px] lg:leading-[130%] text-[#111]"
+  style={{ fontFamily: "var(--font-family)" }}
+>
+  Privacy Policy
+</h1>
 
-      {/* 50px gap */}
-      <div style={{ height: "50px" }} />
-
-      {/* Desktop layout: flex row with image on right */}
+      {/* Gap */}
+      <div className="h-[30px] lg:h-[50px]" />
       <div className="hidden lg:flex lg:gap-[30px]">
         {/* Left content */}
         <div className="flex-1 min-w-0">
@@ -211,6 +202,7 @@ export default function PrivacyPolicyContent() {
               fontWeight: 400,
               fontSize: "15px",
               lineHeight: "160%",
+              
               color: "#101010",
               opacity: 0.8,
             }}
