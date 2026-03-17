@@ -397,7 +397,7 @@ export const Footer = () => {
                 key={index}
                 className={
                   index === footerSections.length - 1
-                    ? "border-b border-white/10"
+                    ? "border-b md:border-none border-white/10"
                     : ""
                 }
               >
