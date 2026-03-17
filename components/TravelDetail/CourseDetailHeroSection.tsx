@@ -201,7 +201,7 @@ export const CourseDetailHeroSection: React.FC<Props> = ({
     <section className={`bg-white ${className}`}>
       <div className="mx-auto max-w-[1920px] px-4 md:px-8 lg:px-[188px] pt-0 py-8 md:py-12 md:pt-12 flex flex-col gap-6 md:gap-10">
         {/* ── HERO BLOCK ── */}
-        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6 md:gap-10">
+        <div className="flex flex-col min-[980px]:flex-row md:items-start md:justify-between gap-6 md:gap-10">
           {/* Left: Title + Description + Price + Book */}
           <div className="flex flex-col gap-4 md:gap-6 flex-1">
             <h1

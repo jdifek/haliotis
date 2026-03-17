@@ -123,7 +123,28 @@ const Diving = () => {
     (currentPage - 1) * CARDS_PER_PAGE,
     currentPage * CARDS_PER_PAGE
   );
+  // Определяем количество колонок в зависимости от ширины экрана
+  const [colCount, setColCount] = useState(3);
 
+  useEffect(() => {
+    const update = () => {
+      setColCount(
+        window.innerWidth >= 1500 ? 3 : window.innerWidth >= 640 ? 2 : 1
+      );
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  // Строки считаются динамически по реальному colCount
+  const rows: TripCard[][] = [];
+  for (let i = 0; i < paginatedCards.length; i += colCount) {
+    rows.push(paginatedCards.slice(i, i + colCount));
+  }
+
+  const expandedRow =
+    expandedCardId !== null ? Math.floor(expandedCardId / colCount) : null;
   // Calculate triangle position under the expanded card
   useEffect(() => {
     if (expandedCardId === null) return;
@@ -152,16 +173,6 @@ const Diving = () => {
 
   const expandedCard =
     expandedCardId !== null ? paginatedCards[expandedCardId] : null;
-
-  // Determine which row the expanded card is in (0-indexed), so details panel appears after that row
-  const expandedRow =
-    expandedCardId !== null ? Math.floor(expandedCardId / 3) : null;
-
-  // Split cards into rows of 3
-  const rows: TripCard[][] = [];
-  for (let i = 0; i < paginatedCards.length; i += 3) {
-    rows.push(paginatedCards.slice(i, i + 3));
-  }
 
   return (
     <main className="-mt-[97px]">
@@ -281,11 +292,11 @@ const Diving = () => {
         {/* Cards Grid — row by row, details panel inserted after the row of the expanded card */}
         <div className="flex flex-col gap-5">
           {rows.map((row, rowIndex) => {
-            const rowStartIndex = rowIndex * 3;
+            const rowStartIndex = rowIndex * colCount;
             return (
               <div key={`${activeTab}-${currentPage}-row-${rowIndex}`}>
                 {/* Row of cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                <div className="grid max-[700px]:grid-cols-1 max-[1500px]:grid-cols-2 min-[1500px]:grid-cols-3 gap-5">
                   {row.map((card, colIndex) => {
                     const globalIndex = rowStartIndex + colIndex;
                     return (

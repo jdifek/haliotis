@@ -44,7 +44,7 @@ export const FilterList: React.FC<FilterListProps> = ({
   };
 
   return (
-    <div className="flex w-full flex-col gap-2" >
+    <div className="flex w-full flex-col gap-2" style={{ maxWidth: maxWidth }}>
       {options.map((option) => {
         const colors = getColors(option);
         const isSelected = option.id === selected;

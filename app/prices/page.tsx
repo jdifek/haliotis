@@ -6,7 +6,7 @@ import Image from "next/image";
 export default function Prices() {
   return (
     <>
-      <section className="relative h-[75vh] -mt-[97px] pt-[97px] w-full ">
+      <section className="relative h-[90vh] -mt-[97px] pt-[97px] w-full ">
         {/* Breadcrumbs */}
         <div className="absolute bottom-1 z-10 block">
           <Breadcrumbs
