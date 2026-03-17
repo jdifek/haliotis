@@ -289,15 +289,7 @@ type Props = {
 };
 
 const DEFAULT_TRIP_CARDS: TripCard[] = [
-  {
-    locationId: "peniche",
-    images: ["/travel.png", "/travel.png"],
-    price: 890,
-    title: "Peniche",
-    description:
-      "São Vicente is the second more populous island of Cape Verde and it is located at windward group of the archipelago.",
-    link: "/trips/peniche",
-  },
+
   {
     locationId: "sesimbra",
     images: ["/travel.png", "/travel.png"],
@@ -342,6 +334,15 @@ const DEFAULT_TRIP_CARDS: TripCard[] = [
     description:
       "São Vicente is the second more populous island of Cape Verde and it is located at windward group of the archipelago.",
     link: "/trips/sao-vicente",
+  },
+  {
+    locationId: "peniche",
+    images: ["/travel.png", "/travel.png"],
+    price: 890,
+    title: "Peniche",
+    description:
+      "São Vicente is the second more populous island of Cape Verde and it is located at windward group of the archipelago.",
+    link: "/trips/peniche",
   },
 ];
 
@@ -435,7 +436,7 @@ export function TripCard({ card }: { card: TripCard }) {
 
   return (
     <div
-      className="w-full max-w-[1545px] flex flex-col lg:flex-row bg-white"
+      className="w-full max-w-[1545px] flex flex-col min-[1500px]:flex-row bg-white"
       style={{
         borderRadius: "24px",
         padding: "20px 20px",
@@ -443,7 +444,7 @@ export function TripCard({ card }: { card: TripCard }) {
       }}
     >
       {/* Left: image */}
-      <div className="flex-shrink-0 w-full lg:w-[600px]">
+      <div className="flex-shrink-0 w-full min-[1500px]:w-[600px]">
         <CardImageSwiper images={card.images} />
       </div>
 
@@ -452,7 +453,6 @@ export function TripCard({ card }: { card: TripCard }) {
         className="flex flex-col justify-between flex-1 min-w-0"
         style={{ paddingTop: "0px" }}
       >
-        {/* Price badge */}
         <div>
           <div
             className="inline-flex items-center gap-2 mb-4"
@@ -505,32 +505,30 @@ export function TripCard({ card }: { card: TripCard }) {
         </div>
 
         <div className="mt-6 flex items-center justify-between">
-  <ButtonWithIcon
-    bgColor="#F1F1F1" iconBgColor="#E84814"
-    label="Find More"
-    textColor="text-black"
-    width="184px"
-    height="48px"
-    icon={
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M18 8.33333H6.75C4.67893 8.33333 3 10.0123 3 12.0833C3 14.1544 4.67893 15.8333 6.75 15.8333H10.5M18 8.33333L14.6667 5M18 8.33333L14.6667 11.6667" stroke="#F1F1F1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    }
-  />
- <div className="lg:hidden overflow-hidden flex items-center justify-end" style={{ width: 66, height: 48 }}>
- {/* Mobile */}
-<div className="lg:hidden">
-{svg && React.isValidElement(svg) && React.cloneElement(svg as React.ReactElement<{ width?: number; height?: number }>, { width: 60, height: 40 })}</div>
-</div>
-</div>
+          <ButtonWithIcon
+            bgColor="#F1F1F1" iconBgColor="#E84814"
+            label="Find More"
+            textColor="text-black"
+            width="184px"
+            height="48px"
+            icon={
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M18 8.33333H6.75C4.67893 8.33333 3 10.0123 3 12.0833C3 14.1544 4.67893 15.8333 6.75 15.8333H10.5M18 8.33333L14.6667 5M18 8.33333L14.6667 11.6667" stroke="#F1F1F1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            }
+          />
+          <div className="max-[1500px]:flex hidden overflow-hidden items-center justify-end" style={{ width: 66, height: 48 }}>
+            {svg && React.isValidElement(svg) && React.cloneElement(svg as React.ReactElement<{ width?: number; height?: number }>, { width: 60, height: 40 })}
+          </div>
+        </div>
       </div>
 
       {/* Right: decorative SVG */}
-      <div className="hidden lg:flex flex-shrink-0 items-start justify-end">
-        <div style={{ transform: "scale(0.5)", transformOrigin: "top right" }}>
-          {svg}
-        </div>
-      </div>
+    <div className="hidden min-[1500px]:flex flex-shrink-0 items-start justify-end">
+  <div style={{ transformOrigin: "top right" }} className="scale-50 min-[1500px]:scale-100">
+    {svg}
+  </div>
+</div>
     </div>
   );
 }
