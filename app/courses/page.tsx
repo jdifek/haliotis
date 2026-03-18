@@ -125,7 +125,7 @@ const Courses = () => {
       <HeroSection />
 
       {/* Tabs Section - Desktop */}
-      <section className="hidden md:flex h-[95px] bg-white justify-center items-end">
+      <section className="hidden min-[930px]:flex h-[95px] bg-white justify-center items-end">
         <Tabs
           useLocationColors={true}
 
@@ -142,10 +142,10 @@ const Courses = () => {
       </section>
 
       {/* Main Content Section */}
-      <section className="bg-[#f1f1f1] px-4 pb-12 pt-8 md:px-[30px] md:pb-[50px] md:pt-[46px]">
-        <div className="flex flex-col gap-[30px] md:flex-row">
+      <section className="bg-[#f1f1f1] px-4 pb-12 pt-8 min-[930px]:px-[30px] min-[930px]:pb-[50px] min-[930px]:pt-[46px]">
+        <div className="flex flex-col gap-[30px] min-[930px]:flex-row">
           {/* Left Sidebar - Desktop Only */}
-          <div className="hidden md:flex md:flex-col md:gap-[10px]">
+          <div className="hidden min-[930px]:flex min-[930px]:flex-col min-[930px]:gap-[10px]">
             <Image
               alt="PADI Logo"
               src={"/Frame 25.png"}
@@ -157,7 +157,7 @@ const Courses = () => {
           </div>
 
           {/* Mobile - Tabs and Categories */}
-          <div className="md:hidden mb-6 flex flex-col gap-[10px]">
+          <div className="min-[930px]:hidden mb-6 flex flex-col gap-[10px]">
             {/* Tab Selector Accordion */}
             <div className="flex flex-col gap-2">
               <button
@@ -266,12 +266,12 @@ const Courses = () => {
             <>
               {/* Backdrop */}
               <div 
-                className="fixed inset-0 z-40 md:hidden bg-black/50"
+                className="fixed inset-0 z-40 min-[930px]:hidden bg-black/50"
                 onClick={() => setIsCategoryOpen(false)}
               />
               
               {/* Content */}
-              <div className="fixed inset-0 z-50 md:hidden flex flex-col">
+              <div className="fixed inset-0 z-50 min-[930px]:hidden flex flex-col">
                 {/* Header spacer - keeping original header visible */}
                 <div className="h-[82px] flex-shrink-0" />
                 
@@ -330,14 +330,14 @@ const Courses = () => {
           <div className="flex flex-1 flex-col gap-6">
             {/* Description Text - Changes based on active tab */}
             <p
-              className="text-[14px] leading-[160%] text-[#111] md:text-[15px]"
+              className="text-[14px] leading-[160%] text-[#111] min-[930px]:text-[15px]"
               style={{ fontFamily: "var(--font-family)" }}
             >
               {getCurrentTabData().description}
             </p>
 
             {/* Cards Grid */}
-            <div className="grid grid-cols-2 gap-2 sm:gap-4 md:grid-cols-2  xl:grid-cols-4">
+            <div className="grid grid-cols-2 gap-2 sm:gap-4 max-[1500px]:grid-cols-2 min-[1220px]:grid-cols-3 min-[1500px]:grid-cols-4">
             {courses.map((course) => (
                 <CourseCard
                   key={course.id}
