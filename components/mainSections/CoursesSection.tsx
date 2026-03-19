@@ -183,28 +183,29 @@ export const CoursesSection: React.FC<Props> = ({ locations, courseCards }) => {
               }}
               breakpoints={{
                 0: {
-                  slidesPerView: 2, // Две карточки на мобильных
-                  spaceBetween: 0,
-                
+                  slidesPerView: 2,
+                  spaceBetween: 10,
                 },
                 640: {
                   slidesPerView: 2,
-                  spaceBetween: 0,
+                  spaceBetween: 15,
                 },
-                // Medium tablet
                 768: {
                   slidesPerView: 2,
                   slidesPerGroup: 1,
-                  spaceBetween: 25,
+                  spaceBetween: 20,
                 },
-                // Desktop: 3 cards
                 1024: {
+                  slidesPerView: 2,
+                  slidesPerGroup: 1,
+                  spaceBetween: 30,
+                },
+                1260: {
                   slidesPerView: 3,
                   slidesPerGroup: 1,
                   spaceBetween: 30,
                 },
-                // Large desktop: 4 cards
-                1780: {
+                1495: {
                   slidesPerView: 4,
                   slidesPerGroup: 1,
                   spaceBetween: 30,

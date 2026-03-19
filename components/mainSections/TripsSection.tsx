@@ -214,11 +214,8 @@ export const TripsSection: React.FC<Props> = ({ locations, tripCards }) => {
                   slidesPerView: 1,
                   spaceBetween: 25,
                 },
-                1024: {
-                  slidesPerView: 2,
-                  spaceBetween: 30,
-                },
-                1495: {
+               
+                1400: {
                   slidesPerView: 2,
                   spaceBetween: 30,
                 },

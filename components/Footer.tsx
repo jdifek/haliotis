@@ -91,16 +91,16 @@ export const Footer = () => {
 
   return (
     <footer
-      className="bg-[#1e1e3f] px-4 pb-12 pt-6 md:px-8 md:pb-16 md:pt-8 lg:px-8 lg:pb-20 lg:pt-[30px]"
+      className="bg-[#1e1e3f] px-4 pb-12 pt-6 md:px-8 md:pb-16 md:pt-8 xl:px-8 xl:pb-20 xl:pt-[30px]"
       style={{
         fontFamily: "var(--font-family)",
       }}
     >
       <div className="">
         {/* Top Section */}
-        <div className="mb-8 flex flex-col gap-[30px] lg:mb-16 lg:flex-row">
+        <div className="mb-8 flex flex-col gap-[30px] xl:mb-16 xl:flex-row">
           {/* Logo & Description */}
-          <div className="w-full border-b border-white/10 pb-[30px] lg:border-none lg:pb-0 lg:w-[387px] lg:flex-shrink-0">            <div className="mb-4 lg:mb-6">
+          <div className="w-full border-b border-white/10 pb-[30px] xl:border-none xl:pb-0 xl:w-[387px] xl:flex-shrink-0">            <div className="mb-4 xl:mb-6">
               <svg
                 width="195"
                 height="196"
@@ -307,7 +307,7 @@ export const Footer = () => {
               </svg>
             </div>
             <p
-              className="mb-6 text-sm text-white md:text-base lg:mb-8 lg:text-[15px]"
+              className="mb-6 text-sm text-white md:text-base xl:mb-8 xl:text-[15px]"
               style={{
                 fontWeight: 400,
                 lineHeight: "160%",
@@ -356,7 +356,7 @@ export const Footer = () => {
           </div>
 
           {/* Footer Links - Desktop Grid / Mobile Accordion */}
-          <div className="hidden flex-1 grid-cols-7 gap-8 lg-24 lg:grid">
+          <div className="hidden flex-1 grid-cols-7 gap-8 lg-24 xl:grid">
             {footerSections.map((section, index) => (
               <div key={index}>
                 <h3
@@ -391,7 +391,7 @@ export const Footer = () => {
           </div>
 
           {/* Mobile Accordion */}
-          <div className="flex flex-1 flex-col gap-2 lg:hidden">
+          <div className="flex flex-1 flex-col gap-2 xl:hidden">
             {footerSections.map((section, index) => (
               <div
                 key={index}
@@ -457,7 +457,7 @@ export const Footer = () => {
         </div>
 
         {/* Bottom Section */}
-        <div className="flex flex-col gap-4 md:border-t border-white/10 lg:pt-6 md:flex-row md:items-center md:justify-between md:pt-8">
+        <div className="flex flex-col gap-4 md:border-t border-white/10 xl:pt-6 md:flex-row md:items-center md:justify-between md:pt-8">
           <p
             className="order-2 md:order-1 text-center text-sm text-white md:text-left md:text-[15px]"
             style={{ fontWeight: 400, lineHeight: "160%", opacity: 0.7 }}

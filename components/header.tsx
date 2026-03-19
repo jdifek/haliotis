@@ -3,20 +3,32 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { usePathname, useRouter, useSelectedLayoutSegments } from "next/navigation";
 import Link from "next/link";
-
+import { useLocale } from "next-intl";
+type Language = {
+  prefix: string;
+  label: string;
+  default: boolean;
+  icon: string;
+};
 export const Header: React.FC = ({}) => {
   const pathname = usePathname();
 
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
-  const [selectedLang, setSelectedLang] = useState("En");
-  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const locale = useLocale();
+  const [selectedLang, setSelectedLang] = useState(locale.toUpperCase());  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [selectedCenter, setSelectedCenter] = useState("");
   const [mobileOpenDropdown, setMobileOpenDropdown] = useState<string | null>(
     null
   );
   const segments = useSelectedLayoutSegments();
   const isNotFound = segments.length === 0 && pathname !== "/";
-  
+  const [languages, setLanguages] = useState<Language[]>([]);
+
+useEffect(() => {
+  fetch('https://cp.haliotis.space/api/v1/configs/languages')
+    .then(res => res.json())
+    .then(data => setLanguages(data.data));
+}, []);
   const transparentRoutes = [
     "/",
     "/another-page",
@@ -27,9 +39,9 @@ export const Header: React.FC = ({}) => {
     "/snorkeling",
     "/dolphin-watching",
   ];
-  
+
   const isTransparentInitially = 
-    transparentRoutes.includes(pathname) || !isNotFound;
+    transparentRoutes.some((route) => pathname.startsWith(`${route}`)) || !isNotFound;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeNav, setActiveNav] = useState("snorkeling");
   const [isScrolled, setIsScrolled] = useState(false);
@@ -52,12 +64,7 @@ export const Header: React.FC = ({}) => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-  const languages = [
-    { code: "En", label: "English" },
-    { code: "Pt", label: "Português" },
-    { code: "Es", label: "Español" },
-    { code: "Fr", label: "Français" },
-  ];
+
 
   const centersData = [
     { id: "peniche", label: "PENICHE", color: "#F49519" },
@@ -93,6 +100,15 @@ export const Header: React.FC = ({}) => {
   const handleToMain = () => {
     router.push("/");
   };
+  console.log('languages state:', languages);
+  const switchLocale = (newLocale: string) => {
+    // убираем текущий локаль префикс и добавляем новый
+    const pathWithoutLocale = pathname.replace(new RegExp(`^/${locale}`), "") || "/";
+    router.push(`/${newLocale}${pathWithoutLocale}`);
+  };
+  useEffect(() => {
+    setSelectedLang(locale.toUpperCase());
+  }, [locale]);
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
@@ -581,6 +597,7 @@ export const Header: React.FC = ({}) => {
                 {isLangMenuOpen && (
                   <div
                     data-dropdown
+                    ref={langRef} 
                     className="absolute left-0 top-full mt-2 flex flex-col rounded-[10px] border-2 border-white shadow-lg"
                     style={{
                       width: langButtonWidth ? `${langButtonWidth}px` : "75px",
@@ -591,13 +608,14 @@ export const Header: React.FC = ({}) => {
                   >
                     {languages.map((lang, index) => (
                       <button
-                        key={lang.code}
+                        key={lang.prefix.toUpperCase()}
                         onClick={() => {
-                          setSelectedLang(lang.code);
+                          setSelectedLang(lang.prefix.toUpperCase());
+                          switchLocale(lang.prefix);  // ← добавь это
                           setIsLangMenuOpen(false);
                         }}
                         className={`flex h-[40px] w-full cursor-pointer items-center justify-center text-center text-[15px] font-semibold leading-[160%] transition-colors ${
-                          selectedLang === lang.code
+                          selectedLang === lang.prefix.toUpperCase()
                             ? "text-[#e84814]"
                             : "text-white hover:text-[#e84814]"
                         } ${
@@ -610,12 +628,12 @@ export const Header: React.FC = ({}) => {
                         style={{
                           fontFamily: "var(--font-family)",
                           background:
-                            selectedLang === lang.code
+                            selectedLang === lang.prefix.toUpperCase()
                               ? "#111d9e"
                               : "transparent",
                         }}
                       >
-                        {lang.code}
+                        {lang.prefix.toUpperCase()}
                       </button>
                     ))}
                   </div>
@@ -1175,6 +1193,7 @@ export const Header: React.FC = ({}) => {
                   {isLangMenuOpen && (
                     <div
                       data-dropdown
+                      ref={langRef} 
                       className="absolute bottom-full left-0 mb-2 flex flex-col rounded-[10px] border-2 border-white"
                       style={{
                         width: "75px",
@@ -1185,13 +1204,14 @@ export const Header: React.FC = ({}) => {
                     >
                       {languages.map((lang, index) => (
                         <button
-                          key={lang.code}
+                          key={lang.prefix.toUpperCase()}
                           onClick={() => {
-                            setSelectedLang(lang.code);
+                            setSelectedLang(lang.prefix.toUpperCase());
+                            switchLocale(lang.prefix);  // ← добавь это
                             setIsLangMenuOpen(false);
                           }}
                           className={`flex h-[40px] w-[71px] items-center justify-center text-center text-[15px] font-semibold transition-colors ${
-                            selectedLang === lang.code
+                            selectedLang === lang.prefix.toUpperCase()
                               ? "text-[#e84814]"
                               : "text-white hover:text-[#e84814]"
                           } ${
@@ -1203,12 +1223,12 @@ export const Header: React.FC = ({}) => {
                           }`}
                           style={{
                             background:
-                              selectedLang === lang.code
+                              selectedLang === lang.prefix.toUpperCase()
                                 ? "#111d9e"
                                 : "transparent",
                           }}
                         >
-                          {lang.code}
+                          {lang.prefix.toUpperCase()}
                         </button>
                       ))}
                     </div>
