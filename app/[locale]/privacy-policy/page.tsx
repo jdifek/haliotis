@@ -37,7 +37,7 @@ export default function PrivacyPolicy() {
           <section className="container  px-5 py-6">
             <div className="max-w-3xl">
               <div className="mb-12">
-                <h1 className="mb-3 text-[32px] font-bold leading-tight text-white lg:text-5xl">
+                <h1 className="mb-3 text-[32px] font-bold leading-tight text-white xl:text-5xl">
                   Privacy Policy)
                 </h1>
                 <div className="mb-6">
@@ -71,7 +71,7 @@ export default function PrivacyPolicy() {
                     </g>
                   </svg>
                 </div>
-                <p className="max-w-xl text-[16px] font-light text-white lg:text-lg">
+                <p className="max-w-xl text-[16px] font-light text-white xl:text-lg">
                   Get in contact with us and get all the information that you
                   are looking for in an efective and fast way!
                 </p>

@@ -169,16 +169,16 @@ function AccordionItem({
 
 export default function PrivacyPolicyContent() {
   return (
-    <section className="bg-[#f1f1f1] px-4 pb-12 pt-8 md:px-[30px] lg:px-[188px] md:pb-[50px] md:pt-[46px]">
-  <h1 className="font-semibold text-[32px] leading-[120%] lg:font-medium lg:text-[48px] lg:leading-[130%] text-[#111]"
+    <section className="bg-[#f1f1f1] px-4 pb-12 pt-8 md:px-[30px] xl:px-[188px] md:pb-[50px] md:pt-[46px]">
+  <h1 className="font-semibold text-[32px] leading-[120%] xl:font-medium xl:text-[48px] xl:leading-[130%] text-[#111]"
   style={{ fontFamily: "var(--font-family)" }}
 >
   Privacy Policy
 </h1>
 
       {/* Gap */}
-      <div className="h-[30px] lg:h-[50px]" />
-      <div className="hidden lg:flex lg:gap-[30px]">
+      <div className="h-[30px] xl:h-[50px]" />
+      <div className="hidden xl:flex xl:gap-[30px]">
         {/* Left content */}
         <div className="flex-1 min-w-0">
           {/* Subtitle */}
@@ -246,7 +246,7 @@ export default function PrivacyPolicyContent() {
       </div>
 
       {/* Mobile layout */}
-      <div className="lg:hidden">
+      <div className="xl:hidden">
         {/* Accordion items (mobile = collapsible) */}
         <div>
           {accordionItems.map((item, i) => (

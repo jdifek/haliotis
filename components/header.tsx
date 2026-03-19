@@ -144,7 +144,7 @@ useEffect(() => {
         <div className="flex items-center justify-between gap-4">
           <div
             onClick={handleToMain}
-            className="relative cursor-pointer flex-shrink-0  lg:hidden"
+            className="relative cursor-pointer flex-shrink-0  xl:hidden"
           >
             <svg
               width="173"
@@ -281,7 +281,7 @@ useEffect(() => {
           </div>
           <div
             onClick={handleToMain}
-            className="relative cursor-pointer flex-shrink-0 hidden lg:block"
+            className="relative cursor-pointer flex-shrink-0 hidden xl:block"
           >
             <svg
               width="158"
@@ -340,7 +340,7 @@ useEffect(() => {
 
           {/* Desktop Navigation */}
           {/* Desktop Navigation */}
-          <nav className="relative hidden rounded-xl bg-black/10 px-[clamp(8px,1vw,16px)] py-[clamp(10px,0.9vw,16.5px)] lg:flex">
+          <nav className="relative hidden rounded-xl bg-black/10 px-[clamp(8px,1vw,16px)] py-[clamp(10px,0.9vw,16.5px)] xl:flex">
             <div className="flex w-full items-center justify-center gap-[clamp(8px,1.4vw,28px)]">
               {navItems.slice(0, -1).map((item) => (
                 <div key={item.id} className="relative">
@@ -560,7 +560,7 @@ useEffect(() => {
             )}
           </nav>
           {/* Desktop Right Panel */}
-          <div className="hidden flex-shrink-0 rounded-xl bg-black/10 p-1 lg:flex">
+          <div className="hidden flex-shrink-0 rounded-xl bg-black/10 p-1 xl:flex">
             <div className="flex items-center gap-[clamp(2px,0.4vw,8px)] px-[clamp(2px,0.3vw,8px)]">
               {/* Language Selector */}
               <div className="relative">
@@ -672,7 +672,7 @@ useEffect(() => {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="flex items-center justify-center rounded-lg bg-white p-2 lg:hidden"
+            className="flex items-center justify-center rounded-lg bg-white p-2 xl:hidden"
           >
             {isMenuOpen ? (
               <svg
@@ -709,7 +709,7 @@ useEffect(() => {
       </header>
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="fixed inset-0 z-50 bg-[#281D4D] lg:hidden">
+        <div className="fixed inset-0 z-50 bg-[#281D4D] xl:hidden">
           <div className="flex h-full flex-col relative">
             <div className="absolute bottom-20 right-10">
               <svg
