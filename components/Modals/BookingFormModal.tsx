@@ -588,7 +588,10 @@ const ParticipantBlock = ({
         onClick={() => onToggleExpand(p.id)}
         className="flex lg:hidden w-full items-center justify-between px-4 py-3 cursor-pointer"
       >
-        <span className="text-[16px] font-medium text-[#111]">
+        <span
+          className="text-[15px] font-semibold text-[#111] leading-[160%]"
+          style={{ fontFamily: "Inter", textAlign: "center" }}
+        >
           Participant <span className="text-[#e84814]">{p.id}</span>
         </span>
         <ChevronDown
@@ -606,9 +609,12 @@ const ParticipantBlock = ({
       >
         {/* Desktop заголовок */}
         <div className="hidden lg:block mb-2">
-          <span className="text-[16px] font-medium text-[#111]">
+            <span
+            className="text-[15px] font-semibold text-[#111] leading-[160%]"
+            style={{ fontFamily: "Inter", textAlign: "center" }}
+            >
             Participant <span className="text-[#e84814]">{p.id}</span>
-          </span>
+            </span>
         </div>
 
         {/* Row 1: First / Last / DOB */}
@@ -920,10 +926,10 @@ const ReservationSummary = ({
   const grand = courseTotal + equipTotal;
 
   return (
-    <div className="bg-white rounded-2xl border-2 border-[#e84814] p-4 flex flex-col gap-2">
-      <h3 className="text-[18px] font-medium text-black">
+    <div className="bg-white rounded-2xl border-2 border-[#e84814] p-4 pt-1 flex flex-col gap-2">
+      <h2 className="text-[24px] font-medium text-black leading-[130%] ">
         Reservation Details
-      </h3>
+      </h2>
       <div className="h-px bg-[#e4e4e4]" />
       <p className="text-[13px] font-medium text-black leading-[140%]">
         {courseTitle}
@@ -1159,7 +1165,10 @@ export const BookingFormModal: React.FC<Props> = ({
                     <div className="flex flex-col sm:flex-row gap-3">
                       {/* Location */}
                       <div className="flex-1 min-w-[200px] bg-white rounded-2xl p-4 flex flex-col gap-1.5">
-                        <span className="text-[13px] font-medium text-[#111]">
+                        <span
+                          className="text-[15px] font-semibold text-[#111] leading-[160%] "
+                          style={{ fontFamily: "Inter" }}
+                        >
                           Choose location
                         </span>
                         <CustomDropdown
@@ -1180,7 +1189,7 @@ export const BookingFormModal: React.FC<Props> = ({
 
                       {/* Date */}
                       <div className="flex-1 min-w-[200px] bg-white rounded-2xl p-4 flex flex-col gap-1.5 relative">
-                        <span className="text-[13px] font-medium text-[#111]">
+                        <span className="text-[15px] font-semibold text-[#111] leading-[160%]">
                           Choose Date
                         </span>
                         <button
@@ -1225,7 +1234,7 @@ export const BookingFormModal: React.FC<Props> = ({
 
                       {/* Participants */}
                       <div className="w-full sm:w-[180px] flex-shrink-0 bg-white rounded-2xl p-4 flex flex-col gap-1.5">
-                        <span className="text-[13px] font-medium text-[#111]">
+                        <span className="text-[15px] font-semibold text-[#111] leading-[160%]">
                           Participants <span className="text-[#e84814]">*</span>
                         </span>
                         <div className="flex items-center gap-2 px-3 py-2 rounded-[10px] border border-[#d9d9d9] bg-white">
@@ -1247,9 +1256,12 @@ export const BookingFormModal: React.FC<Props> = ({
 
                     {/* Additional Information — mobile только */}
                     <div className="lg:hidden bg-white rounded-2xl p-4 flex flex-col gap-3">
-                      <span className="text-[14px] font-medium text-[#111]">
+                        <span
+                        className="text-[15px] font-semibold text-[#111] leading-[160%]"
+                        style={{ fontFamily: "Inter" }}
+                        >
                         Additional Information
-                      </span>
+                        </span>
                       <textarea
                         className="w-full h-16 px-3 py-2 rounded-[10px] border border-[#d9d9d9] text-[15px] placeholder:text-[#999] resize-none outline-none focus:border-[#e84814]"
                         placeholder="Comment"

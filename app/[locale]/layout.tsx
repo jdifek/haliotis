@@ -39,7 +39,7 @@ export default async function RootLayout({
     <html lang={locale}>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <NextIntlClientProvider locale={locale}>
-          <Header />
+          <Header locale={locale}/>
           {children}
           <Footer />
         </NextIntlClientProvider>

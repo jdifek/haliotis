@@ -10,11 +10,48 @@ type Language = {
   default: boolean;
   icon: string;
 };
-export const Header: React.FC = ({}) => {
-  const pathname = usePathname();
+type MenuItem = {
+  id: number;
+  label: string;
+  new_tab: boolean;
+  menu_layout: string;
+  img_url?: string;
+  link_type: string;
+  url?: string;
+  slug?: string;
+  children?: MenuItem[];
+};
 
+type DivingCenter = {
+  id: number;
+  name: string;
+  slug: string;
+  color: string;
+  position: number;
+  center_icon_url?: string;
+  contact_tripadvisor?: string;
+  contact_facebook?: string;
+  contact_youtube?: string;
+};
+
+type MenuData = {
+  data: {
+    main: MenuItem[];
+    footer: MenuItem[];
+    bottom: MenuItem[];
+  };
+  diving_centers: DivingCenter[];
+};
+export const Header: React.FC<{ locale: string }> = ({ locale }) => {
+  const pathname = usePathname();
+  const [menuData, setMenuData] = useState<MenuData | null>(null);
+  useEffect(() => {
+    fetch(`https://cp.haliotis.space/api/v1/configs/menus?lang=${locale}`)
+      .then(res => res.json())
+      .then(data => setMenuData(data));
+  }, [locale]);
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
-  const locale = useLocale();
+
   const [selectedLang, setSelectedLang] = useState(locale.toUpperCase());  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [selectedCenter, setSelectedCenter] = useState("");
   const [mobileOpenDropdown, setMobileOpenDropdown] = useState<string | null>(
@@ -27,7 +64,7 @@ export const Header: React.FC = ({}) => {
 useEffect(() => {
   fetch('https://cp.haliotis.space/api/v1/configs/languages')
     .then(res => res.json())
-    .then(data => setLanguages(data.data));
+    .then(data => setLanguages(data?.data ?? []));
 }, []);
   const transparentRoutes = [
     "/",
@@ -45,17 +82,14 @@ useEffect(() => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeNav, setActiveNav] = useState("snorkeling");
   const [isScrolled, setIsScrolled] = useState(false);
-  const navItems = [
-    { id: "centers", label: "Centers", hasDropdown: true },
-    { id: "courses", label: "Courses", hasDropdown: true },
-    { id: "snorkeling", label: "Snorkeling", hasDropdown: false, href: "/snorkeling" },
-    { id: "diving", label: "Diving", hasDropdown: false, href: "/diving" },
-    { id: "freedive", label: "Freedive", hasDropdown: false ,  href: "/freedive" },
-    { id: "travel", label: "Travel", hasDropdown: false ,  href: "/travel"},
-    { id: "shop", label: "Shop", hasDropdown: false },
-    { id: "prices", label: "Prices", hasDropdown: false,  href: "/prices" },
-    { id: "contacts", label: "Contacts", hasDropdown: false ,  href: "/contacts"},
-  ];
+  const navItems = (menuData?.data.main ?? []).map(item => ({
+    id: item.slug ?? item.label.toLowerCase(),
+    label: item.label,
+    hasDropdown: (item.children?.length ?? 0) > 0,
+    href: item.url ?? `/${item.slug}`,
+    children: item.children,
+    imgUrl: item.img_url,
+  }));
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 0);
@@ -65,30 +99,29 @@ useEffect(() => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-
-  const centersData = [
-    { id: "peniche", label: "PENICHE", color: "#F49519" },
-    { id: "sesimbra", label: "SESIMBRA", color: "#A0C52E" },
-    { id: "madeira", label: "MADEIRA", color: "#E84814" },
-    { id: "santa-maria", label: "SANTA MARIA", color: "#FED402" },
-    { id: "faial", label: "FAIAL", color: "#568DD9" },
-    { id: "sao-vicente", label: "SAO VICENTE", color: "#7acbe2" },
-  ];
-
-  const coursesData = [
-    { id: "promotions", label: "Promotions", image: "/Rectangle 8.png" },
-    { id: "beginner", label: "Beginner", image: "/Rectangle 8.png" },
-    { id: "advanced", label: "Advanced", image: "/Rectangle 8.png" },
-    { id: "rescue", label: "Rescue", image: "/Rectangle 8.png" },
-    { id: "specialties", label: "Specialties", image: "/Rectangle 8.png" },
-    { id: "divemaster", label: "Divemaster", image: "/Rectangle 8.png" },
-    {
-      id: "dive-instructor",
-      label: "Dive Instructor",
-      image: "/Rectangle 8.png",
-    },
-    { id: "tec-diving", label: "Tec Diving", image: "/Rectangle 8.png" },
-  ];
+  const centersData = (menuData?.diving_centers ?? [])
+  .sort((a, b) => a.position - b.position)
+  .map(c => ({
+    id: c.slug,
+    label: c.name.toUpperCase(),  // ← было c.center_name, стало c.name
+    color: c.color,
+  }));
+  const footerSections = (menuData?.data.footer ?? []).map(section => ({
+    title: section.label,
+    links: (section.children ?? []).map(child => ({
+      label: child.label,
+      href: child.url ?? `/${child.slug}`,
+    })),
+  }));
+  const coursesMenuItem = menuData?.data.main.find(
+    item => item.slug === 'courses' || item.label.toLowerCase() === 'courses'
+  );
+  
+  const coursesData = (coursesMenuItem?.children ?? []).map(course => ({
+    id: course.slug ?? course.label.toLowerCase(),
+    label: course.label,
+    image: course.img_url ?? '/Rectangle 8.png',
+  }));
   const dropdownRef = useRef<HTMLDivElement>(null); // для centers
   const coursesRef = useRef<HTMLDivElement>(null);
   const langRef = useRef<HTMLDivElement>(null);
@@ -606,7 +639,7 @@ useEffect(() => {
                       boxShadow: "0 4px 4px 0 rgba(0, 0, 0, 0.25)",
                     }}
                   >
-                    {languages.map((lang, index) => (
+{languages.filter(lang => lang?.prefix).map((lang, index) => (
                       <button
                         key={lang.prefix.toUpperCase()}
                         onClick={() => {
@@ -1202,7 +1235,7 @@ useEffect(() => {
                         boxShadow: "0 4px 4px 0 rgba(0, 0, 0, 0.25)",
                       }}
                     >
-                      {languages.map((lang, index) => (
+{languages.filter(lang => lang?.prefix).map((lang, index) => (
                         <button
                           key={lang.prefix.toUpperCase()}
                           onClick={() => {
