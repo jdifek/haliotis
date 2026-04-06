@@ -1,30 +1,25 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/set-state-in-effect */
 // app/hooks/usePrices.ts
 "use client";
 import { useState, useEffect } from "react";
 
-type PricesPage = {
-  id: string;
-  slug: string;
-  title: string;
-  seo: {
-    meta_description: string;
-    meta_keywords: string;
-  };
-  banner: {
-    id: number;
-    slides: {
-      id: string;
-      type: string;
-      position: number;
-      desktop_image_url: string;
-      mobile_image_url: string;
-      title: string;
-      description: string;
-    }[];
-  };
-  specialized_maintenance: { title: string; description: string };
-  fills: { title: string; description: string };
+type PricesService = {
+  id: number;
+  name: string;
+  description: string | null;
+  position: number;
+  is_active: boolean;
+  service_category_id: number;
+  price: string;
+};
+
+
+type PricesCategory = {
+  id: number;
+  name: string;
+  position: number;
+  service_type_id: number;
 };
 
 type PricesServiceType = {
@@ -35,29 +30,16 @@ type PricesServiceType = {
   display_type: "information" | "calculator";
 };
 
-type PricesService = {
-  id: number;
-  name: string;
-  description: string | null;
-  position: number;
-  is_active: boolean;
-  service_category_id: number;
-  price: string | null;
-};
-
-type PricesCategory = {
-  id: number;
-  name: string;
-  position: number;
-  service_type_id: number;
-};
-
-type PricesData = {
-  page: PricesPage;
+export type PricesData = {
+  page: {
+    banner: any
+    title: string
+    specialized_maintenance: { title: string; description: string };
+    fills: { title: string; description: string };
+  };
   services: PricesService[];
   service_types: PricesServiceType[];
   categories: PricesCategory[];
-  partners: { id: number; name: string; image_url: string }[];
   calculator_labels: {
     respiratory_blends: string;
     calculate_price: string;

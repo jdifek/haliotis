@@ -1,12 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { HeroBanner } from "@/components/HeroBanner";
 import PricesSections from "@/components/PricesSections";
 import { usePrices } from "@/app/hooks/usePrices";
 import { useMenu } from "@/app/hooks/useMenu";
 import { useLocale } from "next-intl";
-import { useState, useEffect } from "react";
 
 export default function Prices() {
   const locale = useLocale();
@@ -19,7 +18,7 @@ export default function Prices() {
       <HeroBanner
         slides={
           pricesData?.page.banner.slides.length
-            ? pricesData.page.banner.slides.map((s) => ({
+            ? pricesData.page.banner.slides.map((s: any) => ({
                 image: s.desktop_image_url,
                 mobileImage: s.mobile_image_url,
                 title: s.title,
