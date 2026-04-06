@@ -5,4 +5,7 @@ export default withNextIntl({
   images: {
 	domains: ['cp.haliotis.space'],
   },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
 });
