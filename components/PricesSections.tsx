@@ -735,26 +735,32 @@ function SpecializedMaintenanceSection({
 /* ─────────────────────────────────────────
    Fills
 ───────────────────────────────────────── */
-const blendFields = [
-  { label: "Oxygen (%)", initial: 0, final: 18 },
-  { label: "Helium (%)", initial: 0, final: 45 },
-  { label: "Capacity (L)", initial: 24, final: 24 },
-  { label: "Pressure (Bar)", initial: 0, final: 200 },
-];
+
 
 function FillsSection({ pricesData }: { pricesData: PricesData | null }) {
-  const [values, setValues] = useState({
-    initial: blendFields.map((f) => f.initial),
-    final: blendFields.map((f) => f.final),
-  });
-  const [totalPrice] = useState(1038);
+  // Берём calculator service_type
+  const calculatorType = pricesData?.service_types.find(
+    (t) => t.display_type === "calculator"
+  );
+  
+  // Категории Initial и Final
+  const calculatorCategories = (pricesData?.categories ?? [])
+    .filter((c) => c.service_type_id === calculatorType?.id)
+    .sort((a, b) => a.position - b.position);
 
-  const update = (section: "initial" | "final", idx: number, val: string) => {
-    setValues((prev) => {
-      const arr = [...prev[section]];
-      arr[idx] = Number(val);
-      return { ...prev, [section]: arr };
-    });
+  // Сервисы для каждой категории
+  const getFieldsForCategory = (categoryId: number) =>
+    (pricesData?.services ?? [])
+      .filter((s) => s.service_category_id === categoryId)
+      .sort((a, b) => a.position - b.position);
+
+  const labels = pricesData?.calculator_labels;
+  
+  const [fieldValues, setFieldValues] = useState<Record<number, number>>({});
+  const [totalPrice] = useState(0);
+  
+  const updateField = (serviceId: number, val: string) => {
+    setFieldValues((prev) => ({ ...prev, [serviceId]: Number(val) }));
   };
 
   return (
@@ -819,80 +825,34 @@ function FillsSection({ pricesData }: { pricesData: PricesData | null }) {
                 textAlign: "center",
               }}
             >
-              Respiratory Blends
-            </p>
+{labels?.respiratory_blends ?? "Respiratory Blends"}
+</p>
           </div>
 
           {/* Initial + Final blocks */}
-          {(["initial", "final"] as const).map((section) => (
-            <div
-              key={section}
-              style={{
-                background: "#fff",
-                borderRadius: "24px",
-                padding: "10px 15px",
-                marginBottom: "8px",
-              }}
-            >
-              <p
-                style={{
-                  fontFamily: "var(--font-family)",
-                  fontWeight: 500,
-                  fontSize: "15px",
-                  lineHeight: "160%",
-                  color: "#111",
-                  marginBottom: "8px",
-                  textTransform: "capitalize",
-                }}
-              >
-                {section.charAt(0).toUpperCase() + section.slice(1)}
-              </p>
-              <div className="flex flex-col gap-2">
-                {blendFields.map((field, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center justify-between"
-                    style={{
-                      border: "1px solid #d9d9d9",
-                      borderRadius: "10px",
-                      padding: "8px 12px",
-                      height: "40px",
-                      background: "#fff",
-                    }}
-                  >
-                    <span
-                      style={{
-                        fontFamily: "var(--font-family)",
-                        fontWeight: 400,
-                        fontSize: "15px",
-                        lineHeight: "160%",
-                        color: "#111",
-                      }}
-                    >
-                      {field.label}
-                    </span>
-                    <input
-                      type="number"
-                      value={values[section][i]}
-                      onChange={(e) => update(section, i, e.target.value)}
-                      style={{
-                        borderBottom: "1px solid #d9d9d9",
-                        width: "100px",
-                        height: "24px",
-                        textAlign: "right",
-                        fontFamily: "var(--font-family)",
-                        fontSize: "15px",
-                        color: "#111",
-                        background: "transparent",
-                        outline: "none",
-                        border: "none",
-                      }}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
+          {calculatorCategories.map((category) => (
+  <div key={category.id} style={{ background: "#fff", borderRadius: "24px", padding: "10px 15px", marginBottom: "8px" }}>
+    <p style={{ fontFamily: "var(--font-family)", fontWeight: 500, fontSize: "15px", lineHeight: "160%", color: "#111", marginBottom: "8px" }}>
+      {category.name}
+    </p>
+    <div className="flex flex-col gap-2">
+      {getFieldsForCategory(category.id).map((field) => (
+        <div key={field.id} className="flex items-center justify-between"
+          style={{ border: "1px solid #d9d9d9", borderRadius: "10px", padding: "8px 12px", height: "40px", background: "#fff" }}>
+          <span style={{ fontFamily: "var(--font-family)", fontWeight: 400, fontSize: "15px", lineHeight: "160%", color: "#111" }}>
+            {field.name}
+          </span>
+          <input
+            type="number"
+            value={fieldValues[field.id] ?? 0}
+  onChange={(e) => updateField(field.id, e.target.value)}
+            style={{ width: "100px", height: "24px", textAlign: "right", fontFamily: "var(--font-family)", fontSize: "15px", color: "#111", background: "transparent", outline: "none", border: "none" }}
+          />
+        </div>
+      ))}
+    </div>
+  </div>
+))}
 
           {/* Total + button */}
           <div
@@ -913,8 +873,7 @@ function FillsSection({ pricesData }: { pricesData: PricesData | null }) {
                   color: "#000",
                 }}
               >
-                Total price
-              </span>
+{labels?.total_price ?? "Total price"}              </span>
               <span
                 style={{
                   fontFamily: "var(--font-family)",
@@ -946,7 +905,7 @@ function FillsSection({ pricesData }: { pricesData: PricesData | null }) {
                   textAlign: "center",
                 }}
               >
-                Calculate Price
+               {labels?.calculate_price ?? "Calculate Price"}
               </span>
             </button>
           </div>

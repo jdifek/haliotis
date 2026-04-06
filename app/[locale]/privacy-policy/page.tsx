@@ -79,7 +79,7 @@ export default async function PrivacyPolicyPage({
   return (
     <>
       <HeroBanner
-        slides={slides.length > 0 ? slides : [{ image: "/privacy.png" }]}
+        slides={slides.length > 0 ? slides : [{ image: "" }]}
         height="h-[75vh]"
         breadcrumbs={[
           { label: "Haliotis", href: "/" },

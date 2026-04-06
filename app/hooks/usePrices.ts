@@ -3,6 +3,38 @@
 "use client";
 import { useState, useEffect } from "react";
 
+type PricesPage = {
+  id: string;
+  slug: string;
+  title: string;
+  seo: {
+    meta_description: string;
+    meta_keywords: string;
+  };
+  banner: {
+    id: number;
+    slides: {
+      id: string;
+      type: string;
+      position: number;
+      desktop_image_url: string;
+      mobile_image_url: string;
+      title: string;
+      description: string;
+    }[];
+  };
+  specialized_maintenance: { title: string; description: string };
+  fills: { title: string; description: string };
+};
+
+type PricesServiceType = {
+  id: number;
+  name: string;
+  description: string;
+  position: number;
+  display_type: "information" | "calculator";
+};
+
 type PricesService = {
   id: number;
   name: string;
@@ -10,13 +42,7 @@ type PricesService = {
   position: number;
   is_active: boolean;
   service_category_id: number;
-  price: string;
-};
-
-type PricesServiceType = {
-  id: number;
-  name: string;
-  position: number;
+  price: string | null;
 };
 
 type PricesCategory = {
@@ -26,16 +52,18 @@ type PricesCategory = {
   service_type_id: number;
 };
 
-type PricesPage = {
-  specialized_maintenance: { title: string; description: string };
-  fills: { title: string; description: string };
-};
-
-export type PricesData = {
+type PricesData = {
   page: PricesPage;
   services: PricesService[];
   service_types: PricesServiceType[];
   categories: PricesCategory[];
+  partners: { id: number; name: string; image_url: string }[];
+  calculator_labels: {
+    respiratory_blends: string;
+    calculate_price: string;
+    total_price: string;
+  };
+  center_icon_url: string;
 };
 
 async function fetchPrices(centerId: number, lang: string): Promise<PricesData> {
