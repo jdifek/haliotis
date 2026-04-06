@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { Tabs } from "@/components/buttons/Tabs";
 import { CategoriesList } from "@/components/CategoriesList";
@@ -5,155 +6,331 @@ import { HeroSection } from "@/components/CourseDetail/HeroSection";
 import { Pagination } from "@/components/Pagination";
 import { CourseCard } from "@/components/CourseCard";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import CoursesSectionInfo from "@/components/CourseDetail/CoursesSectionInfo";
+import { useMenu, DivingCenter } from "@/app/hooks/useMenu";
+import { useDivingCenter } from "@/app/hooks/useDivingCenter";
+import { useLocale } from "next-intl";
+import { usePathname } from "next/navigation";
 
-type Tab = {
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
+
+type Category = {
   id: string;
-  label: string;
+  name: string;
+  slug: string;
   description: string;
 };
 
-const tabs: Tab[] = [
-  { 
-    id: "peniche", 
-    label: "Peniche",
-    description: "Learn how to scuba dive in Peniche is an incredible experience that will allow you to see amazing creatures in their natural habitat and visit the best scuba diving spots. The beginner PADI courses are internationally recognised which allow you to scuba dive anywhere in the world."
-  },
-  { 
-    id: "sesimbra", 
-    label: "Sesimbra",
-    description: "Discover scuba diving in Sesimbra, one of Portugal's most beautiful diving destinations. Experience crystal-clear waters and diverse marine life while learning from certified PADI instructors in a stunning coastal setting."
-  },
-  { 
-    id: "madeira", 
-    label: "Madeira",
-    description: "Explore the underwater wonders of Madeira with our PADI courses. This Atlantic paradise offers year-round diving conditions and breathtaking marine biodiversity perfect for beginners and experienced divers alike."
-  },
-  { 
-    id: "santa-maria", 
-    label: "Santa Maria",
-    description: "Experience world-class diving in Santa Maria, Azores. Known for its encounters with mobula rays and blue sharks, this destination offers unforgettable diving experiences with our certified PADI instructors."
-  },
-  { 
-    id: "faial", 
-    label: "Faial",
-    description: "Dive into the volcanic underwater landscapes of Faial in the Azores. Our PADI courses will guide you through unique dive sites featuring dramatic rock formations and abundant Atlantic marine life."
-  },
-  { 
-    id: "sao-vicente", 
-    label: "Sao Vicente",
-    description: "Start your diving journey in São Vicente, Madeira. With excellent visibility and rich marine ecosystems, this location is perfect for completing your PADI certification in a beautiful island setting."
-  },
-];
-
-const categories = [
-  "Promotions",
-  "Freediving",
-  "Referral",
-  "Beginner",
-  "Advanced",
-  "Rescue",
-  "Specialties",
-  "AWARE",
-  "Sidemount",
-  "Caverns",
-  "Divemaster",
-  "Dive Instructor",
-  "Specialty Instructor",
-  "First Aid",
-  "Junior",
-  "ReActivate",
-];
-
-const getRandomFromArray = <T,>(arr: T[]) =>
-  arr[Math.floor(Math.random() * arr.length)];
-
-const getRandomPrice = () => {
-  const prices = [149, 179, 199, 219, 239, 259, 299];
-  return getRandomFromArray(prices);
+type Course = {
+  id: string;
+  name: string;
+  slug: string;
+  image: string | null;
+  description: string;
+  agency_id: string;
+  duration_label: string;
+  price: unknown[];
+  label: { id: number; name: string; image: string | null } | null;
+  page: {
+    id: string;
+    title: string;
+  } | null;
 };
 
-const getRandomDuration = () => {
-  const durations = ["2hrs", "2.5hrs", "3hrs", "4hrs", "5hrs"];
-  return getRandomFromArray(durations);
+type CoursesApiResponse = {
+  data: Course[];
+  links: {
+    first: string | null;
+    last: string | null;
+    prev: string | null;
+    next: string | null;
+  };
+  meta: {
+    current_page: number;
+    from: number | null;
+    last_page: number;
+    per_page: number;
+    to: number | null;
+    total: number;
+  };
+  attachCategory: Category[] | string[];
+  attachAgency?: any[];
+  attachPage?: {
+    id: number;
+    title: string;
+    content?: {
+      body?: string;
+      tabs?: { title: string; body: string }[] | null;
+    };
+  };
 };
 
-const generateCourses = (location: string, page: number, selectedCategory: string) => {
-  const coursesPerPage = 12;
-  const startIndex = (page - 1) * coursesPerPage;
+// ---------------------------------------------------------------------------
+// API fetch
+// ---------------------------------------------------------------------------
 
-  return Array.from({ length: coursesPerPage }, (_, i) => ({
-    id: `${location}-${selectedCategory}-${startIndex + i}`,
-    image: "/Rectangle 8.png",
-    title: `${location} - ${selectedCategory} - Curso de Nitrox PADI Enriched Air Diver - incl mergulhos`,
-    price: getRandomPrice(),
-    duration: getRandomDuration(),
-    requestBased: i % 2 === 0,
-    badge: i % 3 === 0 ? "Open Trip" : undefined,
-  }));
-};
+async function fetchCourses(params: {
+  centerId: number;
+  categoryId?: string | null;
+  page: number;
+  attachCategory?: boolean;
+}): Promise<CoursesApiResponse> {
+  const url = new URL("https://cp.haliotis.space/api/v1/courses");
+  url.searchParams.set("center", String(params.centerId));
+  url.searchParams.set("page", String(params.page));
+  url.searchParams.set("per_page", "12");
+
+  if (params.categoryId) {
+    url.searchParams.set("category", params.categoryId);
+  }
+
+  // Всегда запрашиваем attach_category для получения полной информации
+  url.searchParams.set("attach_category", "true");
+  url.searchParams.set("attach_agency", "true");
+  url.searchParams.set("attach_page", "true");
+
+  const res = await fetch(url.toString(), {
+    headers: { Accept: "application/json" },
+  });
+
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+/** Normalize price from API — array of unknown items */
+function formatPrice(price: unknown[]): number | null {
+  if (!price || price.length === 0) return null;
+  const first = price[0] as { amount?: number; value?: number } | number | null;
+  if (first == null) return null;
+  if (typeof first === "number") return first;
+  return first.amount ?? first.value ?? null;
+}
+
+// ---------------------------------------------------------------------------
+// Component
+// ---------------------------------------------------------------------------
 
 const Courses = () => {
-  const [activeTab, setActiveTab] = useState("peniche");
+  const locale = useLocale();
+  const pathname = usePathname();
+  const { divingCenters, loading: menuLoading } = useMenu(locale);
+
+  // ── UI state ──
+  const [activeTabId, setActiveTabId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [isTabOpen, setIsTabOpen] = useState(false);
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState("Promotions");
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(
+    null
+  );
+  const [attachPage, setAttachPage] = useState<CoursesApiResponse['attachPage']>(undefined);
 
-  const totalPages = 12;
-  const courses = generateCourses(activeTab, currentPage, selectedCategory);
+  // ── Data state ──
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [attachAgency, setAttachAgency] = useState<any[]>([]);
+  const [selectedCategoryData, setSelectedCategoryData] =
+    useState<Category | null>(null);
+  const [totalPages, setTotalPages] = useState(1);
+  const [coursesLoading, setCoursesLoading] = useState(false);
+  const [coursesError, setCoursesError] = useState<string | null>(null);
 
-  const getCurrentTabData = () => {
-    return tabs.find((tab) => tab.id === activeTab) || tabs[0];
-  };
+  // ── Set default tab once diving centers load ──
   useEffect(() => {
-    if (isCategoryOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
+    if (divingCenters.length > 0 && activeTabId === null) {
+      setActiveTabId(divingCenters[0].slug);
     }
-  
-    // на всякий случай — очистка
+  }, [divingCenters, activeTabId]);
+
+  // ── Current diving center ──
+  const activeCenter: DivingCenter | null =
+    divingCenters.find((c) => c.slug === activeTabId) ?? null;
+
+  // ── Get diving center data from API ──
+  const centerSlug = activeCenter?.slug || null;
+  const { data: centerData, loading: centerLoading } = useDivingCenter(
+    centerSlug,
+    locale
+  );
+
+  // ── Fetch courses when center / category / page changes ──
+  const loadCourses = useCallback(async () => {
+    if (!activeCenter) return;
+
+    setCoursesLoading(true);
+    setCoursesError(null);
+
+    try {
+      const isFirstLoad = categories.length === 0;
+      const resp = await fetchCourses({
+        centerId: activeCenter.id,
+        categoryId: selectedCategoryId,
+        page: currentPage,
+        attachCategory: true,
+      });
+
+      setCourses(resp.data);
+
+      // Обновляем агентства
+      if (resp.attachAgency && Array.isArray(resp.attachAgency)) {
+        setAttachAgency(resp.attachAgency);
+      }
+      if (resp.attachPage) {
+        setAttachPage(resp.attachPage);
+      }
+
+      setTotalPages(resp.meta.last_page);
+
+      // Обрабатываем категории
+      if (
+        Array.isArray(resp.attachCategory) &&
+        resp.attachCategory.length > 0
+      ) {
+        // Проверяем, это массив объектов Category или массив строк
+        const firstItem = resp.attachCategory[0];
+
+        if (typeof firstItem === "object" && "id" in firstItem) {
+          // Это массив категорий - обновляем список категорий
+          const cats = resp.attachCategory as Category[];
+
+          // Обновляем список категорий только при первой загрузке
+          if (isFirstLoad) {
+            setCategories(cats);
+          }
+
+          // Находим и устанавливаем данные выбранной категории
+          if (selectedCategoryId) {
+            const selectedCat = cats.find(
+              (cat) => cat.id === selectedCategoryId
+            );
+            if (selectedCat) {
+              setSelectedCategoryData(selectedCat);
+            }
+          } else {
+            // Если категория не выбрана, показываем первую категорию или null
+            setSelectedCategoryData(null);
+          }
+        }
+      }
+    } catch (err) {
+      setCoursesError(err instanceof Error ? err.message : "Unknown error");
+    } finally {
+      setCoursesLoading(false);
+    }
+  }, [activeCenter, selectedCategoryId, currentPage, categories.length]);
+
+  useEffect(() => {
+    loadCourses();
+  }, [loadCourses]);
+
+  // ── Reset categories when center changes (re-fetch with attach_category) ──
+  const handleTabChange = (slug: string) => {
+    setActiveTabId(slug);
+    setCurrentPage(1);
+    setSelectedCategoryId(null);
+    setSelectedCategoryData(null);
+    setCategories([]); // force re-fetch categories for new center
+  };
+
+  // ── Handle category change ──
+  const handleCategoryChange = (categoryId: string | null) => {
+    setSelectedCategoryId(categoryId);
+    setCurrentPage(1);
+
+    // Если выбрана конкретная категория, находим её данные
+    if (categoryId) {
+      const categoryData = categories.find((cat) => cat.id === categoryId);
+      setSelectedCategoryData(categoryData || null);
+    } else {
+      setSelectedCategoryData(null);
+    }
+  };
+
+  // ── Lock body scroll when mobile category overlay is open ──
+  useEffect(() => {
+    document.body.style.overflow = isCategoryOpen ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
     };
   }, [isCategoryOpen]);
-  
+
+  // ── Build tabs array for <Tabs> component ──
+  const tabs = divingCenters.map((c) => ({
+    id: c.slug,
+    label: c.name,
+    color: c.color,
+  }));
+
+  const activeTabData =
+    tabs.find((t) => t.id === activeTabId) ?? tabs[0] ?? null;
+
+  const selectedCategoryName =
+    categories.find((c) => c.id === selectedCategoryId)?.name ??
+    "All Categories";
+
+  // ── Loading skeleton ──
+  if (menuLoading) {
+    return (
+      <main className="-mt-[97px]">
+        <HeroSection />
+        <section className="bg-[#f1f1f1] px-4 pb-12 pt-8 min-[930px]:px-[30px] min-[930px]:pb-[50px] min-[930px]:pt-[46px]">
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#e84814]" />
+          </div>
+        </section>
+      </main>
+    );
+  }
+
   return (
     <main className="-mt-[97px]">
-      <HeroSection />
-
+      <HeroSection 
+        centerName={centerData?.center_name}
+        description={centerData?.small_description || undefined}
+      />
+      
       {/* Tabs Section - Desktop */}
       <section className="hidden min-[930px]:flex h-[95px] bg-white justify-center items-end">
         <Tabs
           useLocationColors={true}
-
           className="mb-1"
           tabsContainerClassName="relative flex gap-6"
           tabs={tabs}
-          activeTab={activeTab}
-          onTabChange={(tab) => {
-            setActiveTab(tab);
-            setCurrentPage(1);
-          }}
+          activeTab={activeTabId ?? ""}
+          onTabChange={handleTabChange}
           underlineClassName="absolute -bottom-1 left-0 w-full h-[2px] transition-opacity"
         />
       </section>
-
+      
       {/* Main Content Section */}
       <section className="bg-[#f1f1f1] px-4 pb-12 pt-8 min-[930px]:px-[30px] min-[930px]:pb-[50px] min-[930px]:pt-[46px]">
         <div className="flex flex-col gap-[30px] min-[930px]:flex-row">
           {/* Left Sidebar - Desktop Only */}
           <div className="hidden min-[930px]:flex min-[930px]:flex-col min-[930px]:gap-[10px]">
-            <Image
-              alt="PADI Logo"
-              src={"/Frame 25.png"}
-              width={285}
-              height={140}
-              className="h-[140px] w-[285px]"
+            {(Array.isArray(attachAgency) ? attachAgency : []).map((ag, i) => {
+              return (
+                <Image
+                  key={i}
+                  alt={ag.name}
+                  src={ag.image_url}
+                  width={285}
+                  height={140}
+                  className="h-[140px] w-[285px]"
+                />
+              );
+            })}
+            <CategoriesList
+              categories={categories}
+              selectedCategoryId={selectedCategoryId}
+              onCategorySelect={handleCategoryChange}
             />
-            <CategoriesList />
           </div>
 
           {/* Mobile - Tabs and Categories */}
@@ -165,15 +342,16 @@ const Courses = () => {
                 className="flex items-center cursor-pointer justify-between rounded-[10px] px-3 py-2 h-[42px] bg-white border-1 border-[#e84814]"
               >
                 <span className="text-[16px] font-semibold leading-[160%] text-[#111]">
-                  {getCurrentTabData().label}
+                  {activeTabData?.label ?? ""}
                 </span>
                 <svg
                   width="24"
                   height="24"
                   viewBox="0 0 24 24"
                   fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  className={`transition-transform flex-shrink-0 ${isTabOpen ? "rotate-180" : ""}`}
+                  className={`transition-transform flex-shrink-0 ${
+                    isTabOpen ? "rotate-180" : ""
+                  }`}
                 >
                   <path
                     d="M17.8534 9.85369L12.8537 14.8534C12.8073 14.8999 12.7522 14.9367 12.6915 14.9619C12.6308 14.9871 12.5657 15 12.5 15C12.4343 15 12.3692 14.9871 12.3085 14.9619C12.2478 14.9367 12.1927 14.8999 12.1463 14.8534L7.14663 9.85369C7.07663 9.78377 7.02895 9.69465 7.00963 9.59761C6.9903 9.50058 7.00021 9.39999 7.03808 9.30858C7.07595 9.21718 7.1401 9.13907 7.22239 9.08413C7.30468 9.0292 7.40142 8.99992 7.50036 9H17.4996C17.5986 8.99992 17.6953 9.0292 17.7776 9.08413C17.8599 9.13907 17.924 9.21718 17.9619 9.30858C17.9998 9.39999 18.0097 9.50058 17.9904 9.59761C17.971 9.69465 17.9234 9.78377 17.8534 9.85369Z"
@@ -182,25 +360,30 @@ const Courses = () => {
                 </svg>
               </button>
 
-              {/* Tabs dropdown */}
               {isTabOpen && (
                 <div className="bg-white rounded-[10px] border-2 border-gray-200 overflow-hidden">
                   <div className="flex flex-col gap-[10px] p-2">
                     {tabs.map((tab) => {
-                      const isSelected = tab.id === activeTab;
+                      const isSelected = tab.id === activeTabId;
                       return (
                         <button
                           key={tab.id}
                           onClick={() => {
-                            setActiveTab(tab.id);
+                            handleTabChange(tab.id);
                             setIsTabOpen(false);
-                            setCurrentPage(1);
                           }}
-                          className={`flex items-center cursor-pointer justify-between rounded-[10px] px-3 py-2 h-[40px] border-2 ${
+                          className="flex items-center cursor-pointer justify-between rounded-[10px] px-3 py-2 h-[40px] border-2"
+                          style={
                             isSelected
-                              ? "bg-[#e84814] border-[#e84814]"
-                              : "bg-white border-[#d9d9d9]"
-                          }`}
+                              ? {
+                                  backgroundColor: tab.color,
+                                  borderColor: tab.color,
+                                }
+                              : {
+                                  backgroundColor: "white",
+                                  borderColor: "#d9d9d9",
+                                }
+                          }
                         >
                           <span
                             className={`text-[16px] font-normal leading-[140%] ${
@@ -215,8 +398,6 @@ const Courses = () => {
                               height="24"
                               viewBox="0 0 24 24"
                               fill="none"
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="flex-shrink-0"
                             >
                               <path
                                 d="M9.8537 6.14663L14.8534 11.1463C14.8999 11.1927 14.9367 11.2478 14.9619 11.3085C14.9871 11.3692 15 11.4343 15 11.5C15 11.5657 14.9871 11.6308 14.9619 11.6915C14.9367 11.7522 14.8999 11.8073 14.8534 11.8537L9.8537 16.8534C9.78377 16.9234 9.69465 16.971 9.59762 16.9904C9.50058 17.0097 9.39999 16.9998 9.30859 16.9619C9.21718 16.924 9.13907 16.8599 9.08414 16.7776C9.0292 16.6953 8.99992 16.5986 9 16.4996L9 6.50036C8.99992 6.40142 9.0292 6.30468 9.08414 6.22239C9.13907 6.1401 9.21718 6.07595 9.30859 6.03808C9.39999 6.00021 9.50058 5.99031 9.59761 6.00963C9.69465 6.02895 9.78377 6.07663 9.8537 6.14663Z"
@@ -237,20 +418,19 @@ const Courses = () => {
               Categories
             </h2>
 
-            {/* Category Selector */}
+            {/* Category Selector Button */}
             <button
               onClick={() => setIsCategoryOpen(!isCategoryOpen)}
               className="flex items-center cursor-pointer justify-between rounded-[10px] px-3 py-2 h-[42px] bg-white border-2 border-[#d9d9d9]"
             >
               <span className="text-[16px] font-semibold leading-[160%] text-[#111]">
-                {selectedCategory}
+                {selectedCategoryName}
               </span>
               <svg
                 width="24"
                 height="24"
                 viewBox="0 0 24 24"
                 fill="none"
-                xmlns="http://www.w3.org/2000/svg"
                 className="flex-shrink-0"
               >
                 <path
@@ -264,60 +444,89 @@ const Courses = () => {
           {/* Categories Dropdown Overlay */}
           {isCategoryOpen && (
             <>
-              {/* Backdrop */}
-              <div 
+              <div
                 className="fixed inset-0 z-40 min-[930px]:hidden bg-black/50"
                 onClick={() => setIsCategoryOpen(false)}
               />
-              
-              {/* Content */}
               <div className="fixed inset-0 z-50 min-[930px]:hidden flex flex-col">
-                {/* Header spacer - keeping original header visible */}
                 <div className="h-[82px] flex-shrink-0" />
-                
-                {/* Scrollable content */}
-                <div className="flex-1 overflow-y-auto p-4  bg-[#f1f1f1]">
+                <div className="flex-1 overflow-y-auto p-4 bg-[#f1f1f1]">
                   <h2 className="text-[20px] font-medium leading-[140%] text-center text-black mb-[10px]">
                     Categories
                   </h2>
                   <div className="flex flex-col gap-[10px]">
-                    {categories.map((category) => {
-                      const isSelected = category === selectedCategory;
-                      return (
-                        <button
-                        key={category}
-                        onClick={() => {
-                          setSelectedCategory(category);
-                          setIsCategoryOpen(false);
-                          setCurrentPage(1);
-                        }}
-                        className={`flex items-center cursor-pointer justify-between rounded-[10px] px-3 py-2 h-[40px] border-2 ${
-                          isSelected
-                            ? "bg-[#e84814] border-[#e84814]"
-                            : "bg-white border-[#d9d9d9]"
+                    {/* "All" option */}
+                    <button
+                      onClick={() => {
+                        handleCategoryChange(null);
+                        setIsCategoryOpen(false);
+                      }}
+                      className={`flex items-center cursor-pointer justify-between rounded-[10px] px-3 py-2 h-[40px] border-2 ${
+                        selectedCategoryId === null
+                          ? "bg-[#e84814] border-[#e84814]"
+                          : "bg-white border-[#d9d9d9]"
+                      }`}
+                    >
+                      <span
+                        className={`text-[16px] font-normal leading-[140%] text-center ${
+                          selectedCategoryId === null
+                            ? "text-white"
+                            : "text-[#111]"
                         }`}
                       >
-                        <span
-                          className={`text-[16px] font-normal leading-[140%] text-center ${
-                            isSelected ? "text-white" : "text-[#111]"
+                        All Categories
+                      </span>
+                      <svg
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        className="flex-shrink-0"
+                      >
+                        <path
+                          d="M9.8537 6.14663L14.8534 11.1463C14.8999 11.1927 14.9367 11.2478 14.9619 11.3085C14.9871 11.3692 15 11.4343 15 11.5C15 11.5657 14.9871 11.6308 14.9619 11.6915C14.9367 11.7522 14.8999 11.8073 14.8534 11.8537L9.8537 16.8534C9.78377 16.9234 9.69465 16.971 9.59762 16.9904C9.50058 17.0097 9.39999 16.9998 9.30859 16.9619C9.21718 16.924 9.13907 16.8599 9.08414 16.7776C9.0292 16.6953 8.99992 16.5986 9 16.4996L9 6.50036C8.99992 6.40142 9.0292 6.30468 9.08414 6.22239C9.13907 6.1401 9.21718 6.07595 9.30859 6.03808C9.39999 6.00021 9.50058 5.99031 9.59761 6.00963C9.69465 6.02895 9.78377 6.07663 9.8537 6.14663Z"
+                          fill={
+                            selectedCategoryId === null ? "white" : "#e84814"
+                          }
+                        />
+                      </svg>
+                    </button>
+
+                    {categories.map((category) => {
+                      const isSelected = category.id === selectedCategoryId;
+                      return (
+                        <button
+                          key={category.id}
+                          onClick={() => {
+                            handleCategoryChange(category.id);
+                            setIsCategoryOpen(false);
+                          }}
+                          className={`flex items-center cursor-pointer justify-between rounded-[10px] px-3 py-2 h-[40px] border-2 ${
+                            isSelected
+                              ? "bg-[#e84814] border-[#e84814]"
+                              : "bg-white border-[#d9d9d9]"
                           }`}
                         >
-                          {category}
-                        </span>
-                        <svg
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="flex-shrink-0"
-                        >
-                          <path
-                            d="M9.8537 6.14663L14.8534 11.1463C14.8999 11.1927 14.9367 11.2478 14.9619 11.3085C14.9871 11.3692 15 11.4343 15 11.5C15 11.5657 14.9871 11.6308 14.9619 11.6915C14.9367 11.7522 14.8999 11.8073 14.8534 11.8537L9.8537 16.8534C9.78377 16.9234 9.69465 16.971 9.59762 16.9904C9.50058 17.0097 9.39999 16.9998 9.30859 16.9619C9.21718 16.924 9.13907 16.8599 9.08414 16.7776C9.0292 16.6953 8.99992 16.5986 9 16.4996L9 6.50036C8.99992 6.40142 9.0292 6.30468 9.08414 6.22239C9.13907 6.1401 9.21718 6.07595 9.30859 6.03808C9.39999 6.00021 9.50058 5.99031 9.59761 6.00963C9.69465 6.02895 9.78377 6.07663 9.8537 6.14663Z"
-                            fill={isSelected ? "white" : "#e84814"}
-                          />
-                        </svg>
-                      </button>
+                          <span
+                            className={`text-[16px] font-normal leading-[140%] text-center ${
+                              isSelected ? "text-white" : "text-[#111]"
+                            }`}
+                          >
+                            {category.name}
+                          </span>
+                          <svg
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            className="flex-shrink-0"
+                          >
+                            <path
+                              d="M9.8537 6.14663L14.8534 11.1463C14.8999 11.1927 14.9367 11.2478 14.9619 11.3085C14.9871 11.3692 15 11.4343 15 11.5C15 11.5657 14.9871 11.6308 14.9619 11.6915C14.9367 11.7522 14.8999 11.8073 14.8534 11.8537L9.8537 16.8534C9.78377 16.9234 9.69465 16.971 9.59762 16.9904C9.50058 17.0097 9.39999 16.9998 9.30859 16.9619C9.21718 16.924 9.13907 16.8599 9.08414 16.7776C9.0292 16.6953 8.99992 16.5986 9 16.4996L9 6.50036C8.99992 6.40142 9.0292 6.30468 9.08414 6.22239C9.13907 6.1401 9.21718 6.07595 9.30859 6.03808C9.39999 6.00021 9.50058 5.99031 9.59761 6.00963C9.69465 6.02895 9.78377 6.07663 9.8537 6.14663Z"
+                              fill={isSelected ? "white" : "#e84814"}
+                            />
+                          </svg>
+                        </button>
                       );
                     })}
                   </div>
@@ -328,43 +537,88 @@ const Courses = () => {
 
           {/* Right Content */}
           <div className="flex flex-1 flex-col gap-6">
-            {/* Description Text - Changes based on active tab */}
-            <p
-              className="text-[14px] leading-[160%] text-[#111] min-[930px]:text-[15px]"
-              style={{ fontFamily: "var(--font-family)" }}
-            >
-              {getCurrentTabData().description}
-            </p>
+            {/* Category Description */}
+            {selectedCategoryData && selectedCategoryData.description && (
+              <div
+                className="text-[14px] leading-[160%] text-[#111] min-[930px]:text-[15px]"
+                style={{ fontFamily: "var(--font-family)" }}
+                dangerouslySetInnerHTML={{
+                  __html: selectedCategoryData.description,
+                }}
+              />
+            )}
 
-            {/* Cards Grid */}
-            <div className="grid grid-cols-2 gap-2 sm:gap-4 max-[1500px]:grid-cols-2 min-[1220px]:grid-cols-3 min-[1500px]:grid-cols-4">
-            {courses.map((course) => (
-                <CourseCard
-                  key={course.id}
-                  image={course.image}
-                  title={course.title}
-                  price={course.price}
-                  duration={course.duration}
-                  requestBased={course.requestBased}
-                  badge={course.badge}
-                  onBookClick={() => console.log("Book:", course.id)}
-                />
-              ))}
-            </div>
+            {/* Error state */}
+            {coursesError && (
+              <div className="rounded-[10px] bg-red-50 border border-red-200 px-4 py-3 text-red-600 text-[14px]">
+                Failed to load courses: {coursesError}
+                <button
+                  onClick={loadCourses}
+                  className="ml-2 underline cursor-pointer"
+                >
+                  Retry
+                </button>
+              </div>
+            )}
+
+            {/* Loading overlay */}
+            {coursesLoading ? (
+              <div className="grid grid-cols-2 gap-2 sm:gap-4 max-[1500px]:grid-cols-2 min-[1220px]:grid-cols-3 min-[1500px]:grid-cols-4">
+                {Array.from({ length: 12 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="rounded-[10px] bg-white animate-pulse h-[280px]"
+                  />
+                ))}
+              </div>
+            ) : courses.length === 0 ? (
+              <div className="flex justify-center items-center h-48 text-[#666] text-[15px]">
+                No courses found for this selection.
+              </div>
+            ) : (
+              /* Cards Grid */
+              <div className="grid grid-cols-2 gap-2 sm:gap-4 max-[1500px]:grid-cols-2 min-[1220px]:grid-cols-3 min-[1500px]:grid-cols-4">
+                {courses.map((course) => {
+                  const price = formatPrice(course.price);
+                  return (
+                    <CourseCard
+                      key={course.id}
+                      image={course.image ?? "/Rectangle 8.png"}
+                      title={course.name}
+                      price={price ?? 0}
+                      duration={course.duration_label}
+                      requestBased={price === null}
+                      badge={course.label?.name}
+                      onBookClick={() => console.log("Book:", course.slug)}
+                    />
+                  );
+                })}
+              </div>
+            )}
 
             {/* Pagination */}
-            <div className="mt-6 flex justify-center">
-              <Pagination
-                totalPages={totalPages}
-                currentPage={currentPage}
-                onPageChange={setCurrentPage}
-              />
-            </div>
+            {!coursesLoading && totalPages > 1 && (
+              <div className="mt-6 flex justify-center">
+                <Pagination
+                  totalPages={totalPages}
+                  currentPage={currentPage}
+                  onPageChange={(page) => {
+                    setCurrentPage(page);
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                />
+              </div>
+            )}
           </div>
         </div>
       </section>
-
-      <CoursesSectionInfo />
+      
+      <CoursesSectionInfo
+        body={attachPage?.content?.body}
+        tabs={attachPage?.content?.tabs ?? undefined}
+        contactPhone={centerData?.contact_phone}
+        contactAddress={centerData?.contact_address}
+      />
     </main>
   );
 };

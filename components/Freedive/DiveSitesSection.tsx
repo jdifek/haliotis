@@ -1,6 +1,7 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -15,11 +16,7 @@ type DiveSite = {
   videoSrc?: string;
 };
 
-type LocationTab = {
-  id: string;
-  label: string;
-  sites: DiveSite[];
-};
+
 
 // ─── SVG Icons ────────────────────────────────────────────────────────────────
 
@@ -165,12 +162,13 @@ const VideoBlock = ({ src, isMobile }: { src?: string; isMobile: boolean }) => (
     }}
   >
     {src ? (
-      <video
-        src={src}
-        className="w-full h-full object-cover"
-        controls
-        style={{ borderRadius: 16 }}
-      />
+       <iframe
+       src={src}
+       className="w-full h-full"
+       style={{ borderRadius: 16, border: "none" }}
+       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+       allowFullScreen
+     />
     ) : (
       <div
         className="flex flex-col items-center gap-3"
@@ -334,8 +332,8 @@ const DiveSiteCard = ({ site }: { site: DiveSite }) => {
             >
               {site.description}
             </p>
-            <VideoBlock src={site.videoSrc} isMobile={true} />
-          </div>
+            <VideoBlock src={site.videoSrc} isMobile={false} />
+            </div>
         </div>
 
         {/* Desktop: всегда раскрыто */}
@@ -354,92 +352,82 @@ const DiveSiteCard = ({ site }: { site: DiveSite }) => {
           >
             {site.description}
           </p>
-          <VideoBlock src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" isMobile={false} />
-        </div>
+          <VideoBlock src={site.videoSrc} isMobile={false} />
+          </div>
       </div>
     </div>
   );
 };
 
-// ─── Sample data ──────────────────────────────────────────────────────────────
-
-const locationTabs: LocationTab[] = [
-  {
-    id: "berlengas",
-    label: "Berlengas",
-    sites: [
-      {
-        id: "baixa-berlengas",
-        name: "Baixa do Broeiro",
-        fishes: 3,
-        difficulty: 3,
-        maxDepth: "18 meters",
-        padiLevel: "PADI OWD (or equivalent)",
-        description:
-          "For many the best dive site in Portugal - This is one of the richest fish spots of the Natural Reserve of Berlengas. It is an advanced dive, frequently with currents. Sometimes can note be done due to the conditions of the sea, the experience of the divers and presence of fishermen in spot. When all conditions are good it is frequently amazing. The Reef comes from 40 meters of depth until 5 meters, in its higher point. The north wall drops to 25 meters, wherethere is a platform, then continuing until 40 meters. The spot is full of live. In the shallow areas there are lots of Sea-bream, feeding in the rock. The diving has a usual visibility of 10/15 meters.",
-      },
-      {
-        id: "parados-berlengas",
-        name: "Parados",
-        fishes: 3,
-        difficulty: 2,
-        maxDepth: "18 meters",
-        padiLevel: "PADI OWD (or equivalent)",
-        description:
-          "The Parados, located in the Estelas, are a site between 2 and 18 metres deep, usually a dive around a reef that comes to the surface. Triggerfish, Seabreams, and Cowbreams are very common. It's a place where there are plenty of Jewel Anemones. There is a well lined with Soft Coral. Sometimes it's a place where there can be some current, and where we can only dive when the sea is calm and windless.",
-      },
-    ],
-  },
-  {
-    id: "estelas",
-    label: "Estelas",
-    sites: [
-      {
-        id: "baixa-estelas",
-        name: "Baixa do Broeiro",
-        fishes: 3,
-        difficulty: 3,
-        maxDepth: "18 meters",
-        padiLevel: "PADI OWD (or equivalent)",
-        description:
-          "For many the best dive site in Portugal - This is one of the richest fish spots of the Natural Reserve of Berlengas. It is an advanced dive, frequently with currents. Sometimes can note be done due to the conditions of the sea, the experience of the divers and presence of fishermen in spot. When all conditions are good it is frequently amazing.",
-      },
-      {
-        id: "parados-estelas",
-        name: "Parados",
-        fishes: 3,
-        difficulty: 2,
-        maxDepth: "18 meters",
-        padiLevel: "PADI OWD (or equivalent)",
-        description:
-          "The Parados, located in the Estelas, are a site between 2 and 18 metres deep, usually a dive around a reef that comes to the surface. Triggerfish, Seabreams, and Cowbreams are very common.",
-      },
-    ],
-  },
-  {
-    id: "farilhoes",
-    label: "Farilhões",
-    sites: [
-      {
-        id: "farilhoes-main",
-        name: "Farilhões North",
-        fishes: 4,
-        difficulty: 4,
-        maxDepth: "30 meters",
-        padiLevel: "PADI AOW (or equivalent)",
-        description:
-          "Farilhões offers some of the most remote and pristine diving in the Berlengas archipelago. This site features dramatic underwater topography and frequent encounters with large groupers and barracuda.",
-      },
-    ],
-  },
-];
 
 // ─── Main Component ───────────────────────────────────────────────────────────
+type Region = { id: number; name: string; position: number };
+type Location = {
+  id: number;
+  region_id: number;
+  name: string;
+  description: string;
+  certification: string;
+  fish_level: number;
+  difficulty_level: number;
+  max_depth: string;
+  video_url: string;
+  video_cover: string;
+};
 
-const FreediveSitesSection = () => {
-  const [activeTab, setActiveTab] = useState("estelas");
-  const currentLocation =
-    locationTabs.find((t) => t.id === activeTab) ?? locationTabs[0];
+type FreediveSitesSectionProps = {
+  regions: Region[];
+  locations: Location[];
+};
+
+function normalizeVideoUrl(url: string): string {
+  if (!url) return "";
+  // Извлекаем ID из разных форматов
+  const match = url.match(
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/
+  );
+  const id = match ? match[1] : url.length === 11 ? url : null;
+  if (!id) return "";
+  return `https://www.youtube.com/embed/${id}`;
+}
+
+const FreediveSitesSection = ({ regions, locations }: FreediveSitesSectionProps) => {
+  const uniqueRegions = regions
+    .sort((a, b) => a.position - b.position)
+    .filter((r, idx, arr) => arr.findIndex(x => x.name === r.name) === idx);
+
+  const locationTabs = uniqueRegions.map(region => {
+    const regionIds = regions.filter(r => r.name === region.name).map(r => r.id);
+    return {
+      id: String(region.id),
+      label: region.name,
+      sites: locations
+        .filter(loc => regionIds.includes(loc.region_id))
+        .map(loc => ({
+          id: String(loc.id),
+          name: loc.name,
+          fishes: loc.fish_level,
+          difficulty: loc.difficulty_level,
+          maxDepth: `${parseFloat(loc.max_depth)} meters`,
+          padiLevel: loc.certification,
+          description: loc.description,
+          videoSrc: normalizeVideoUrl(loc.video_url),
+          videoCover: loc.video_cover,
+        })),
+    };
+  }).filter(tab => tab.sites.length > 0);
+
+  const [activeTab, setActiveTab] = useState("");
+
+  useEffect(() => {
+    if (locationTabs.length > 0 && !activeTab) {
+      setActiveTab(locationTabs[0].id);
+    }
+  }, [locationTabs.length]);
+
+  if (locationTabs.length === 0) return null;
+
+  const currentLocation = locationTabs.find(t => t.id === activeTab) ?? locationTabs[0];
 
   return (
     <section className="bg-white px-4 py-10 md:px-[30px] lg:px-[188px] md:py-[60px]">

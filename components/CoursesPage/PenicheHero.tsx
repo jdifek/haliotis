@@ -1,8 +1,8 @@
 import { Breadcrumbs } from "../Breadcrumbs";
 import { BlackActionButton } from "../buttons/BlackActionButton";
-
-/* eslint-disable react/no-unescaped-entities */
-export const PenicheHero = () => {
+import type { CenterData } from "@/types/center";
+type Props = { center: CenterData };
+export const PenicheHero = ({ center }: Props) => {
   return (
     <section className="bg-[#f5f5f5] relative pt-4 pb-4 md:pt-6 md:pb-8">
       <div className="absolute left-0 right-0 bottom-0  border-b-[7px] border-[#f49519]" />
@@ -12,7 +12,7 @@ export const PenicheHero = () => {
         items={[
           { label: "Haliotis", href: "/" },
           { label: "Centers", href: "/centers" },
-          { label: "Peniche" },
+          { label: center.center_name },
         ]}
       />
 
@@ -71,7 +71,8 @@ export const PenicheHero = () => {
           <div className="flex w-full h-[442px] overflow-hidden rounded-[20px] bg-white">
             <div className="flex w-1/2 flex-col px-4 py-3">
               <h1 className="mb-3 text-[48px] font-medium leading-[130%] text-[#111]">
-                Peniche
+              {center.center_name}
+
               </h1>
               <div className="mb-6 flex items-center gap-2">
                 <div className="flex items-center gap-2 border border-[#d9d9d9] rounded-[10px] px-3 py-2 h-[40px]">
@@ -100,24 +101,15 @@ export const PenicheHero = () => {
                   </svg>
                 </div>
               </div>
-              <p className="text-[15px] leading-[160%] text-[#101010] opacity-80">
-                Nestled on the Portuguese coast next to Supertubos beach,
-                Haliotis Peniche is the original flagship location of the brand
-                — a fully equipped dive center offering top-tier facilities
-                including classrooms, fullsize compressor station, shop, and hot
-                showers. Your gateway to the Berlengas Natural Reserve (a UNESCO
-                Biosphere), with crystal-clear waters, reefs, wrecks, caves, and
-                abundant marine life — whether you're a beginner or experienced
-                diver, this center delivers adventure, comfort, and safety
-                year-round.
-              </p>
+           <p className="text-[15px] leading-[160%] text-[#101010] opacity-80"
+  dangerouslySetInnerHTML={{ __html: center.description ?? "" }}
+/>
             </div>
             <div className="relative w-1/2 h-full">
               <div
                 className="absolute inset-0 bg-cover bg-center"
                 style={{
-                  backgroundImage:
-                    "url(https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200&q=80)",
+                  backgroundImage: `url(${center.center_image_url ?? "/Rectangle 8.png"})`,
                 }}
               />
               <div className="absolute bottom-4 right-4 flex items-center gap-1.5 rounded-[12px] bg-black/50 px-3 py-2">
@@ -165,7 +157,7 @@ export const PenicheHero = () => {
                   className="absolute inset-0 bg-cover bg-center opacity-90"
                   style={{
                     backgroundImage:
-                      "url(https://api.mapbox.com/styles/v1/mapbox/light-v11/static/pin-s+e84814(-9.381,39.356)/[-9.381,39.356,8,0]/393x442@2x?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw)",
+`url(https://api.mapbox.com/styles/v1/mapbox/light-v11/static/pin-s+e84814(${center.longitude},${center.latitude})/[${center.longitude},${center.latitude},8,0]/393x442@2x?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw)`
                   }}
                 />
                 <div className="absolute bottom-[45%] left-1/2 -translate-x-1/2">
@@ -181,8 +173,7 @@ export const PenicheHero = () => {
               <div className="space-y-3 bg-white p-3 flex flex-col px-4 w-[260px] h-[442px] rounded-r-[16px]">
                 <div className="rounded-[16px] bg-[#f1f1f1] py-[31px] px-4">
                   <a
-                    href="tel:+351262781160"
-                    className="flex items-center gap-3 text-[15px] text-[#111] hover:text-[#e84814] mb-3"
+href={`tel:${center.contact_phone}`}                    className="flex items-center gap-3 text-[15px] text-[#111] hover:text-[#e84814] mb-3"
                   >
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                       <path
@@ -190,8 +181,8 @@ export const PenicheHero = () => {
                         fill="#E84814"
                       />
                     </svg>
-                    +351 262 781 160
-                  </a>
+                    {center.contact_phone}
+                    </a>
                   <div className="flex items-center gap-3 text-[15px] text-[#111] mb-3">
                     <svg width="20" height="23" viewBox="0 0 20 23" fill="none">
                       <path
@@ -239,8 +230,8 @@ export const PenicheHero = () => {
                         fill="#E84814"
                       />
                     </svg>
-                    +351 262 781 163
-                  </div>
+                    {center.contact_fax}
+                    </div>
                   <a
                     href="tel:+351913054926"
                     className="flex items-center gap-3 text-[15px] text-[#111] hover:text-[#e84814] mb-3"
@@ -283,12 +274,8 @@ export const PenicheHero = () => {
                       />
                     </svg>
                     <div>
-                      <p className="font-normal">Haliotis Lda</p>
-                      <p>PT 506 796 876</p>
-                      <p>Casal da Ponte S/N</p>
-                      <p>2525-376</p>
-                      <p>Atouguia da Baleia </p>
-                      <p>Peniche</p>
+                    <p className="font-normal">{center.center_name}</p>
+                    <p>{center.contact_address}</p>
                     </div>
                   </div>
                 </div>
@@ -394,7 +381,7 @@ export const PenicheHero = () => {
                 including classrooms, fullsize compressor station, shop, and hot
                 showers. Your gateway to the Berlengas Natural Reserve (a UNESCO
                 Biosphere), with crystal-clear waters, reefs, wrecks, caves, and
-                abundant marine life — whether you're a beginner or experienced
+                abundant marine life — whether you&rsquo;re a beginner or experienced
                 diver, this center delivers adventure, comfort, and safety
                 year-round.
               </p>
@@ -461,7 +448,7 @@ export const PenicheHero = () => {
                 className="absolute inset-0 bg-cover bg-center opacity-90"
                 style={{
                   backgroundImage:
-                    "url(https://api.mapbox.com/styles/v1/mapbox/light-v11/static/pin-s+e84814(-9.381,39.356)/[-9.381,39.356,10,0]/600x240@2x?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw)",
+                   `url(https://api.mapbox.com/styles/v1/mapbox/light-v11/static/pin-s+e84814(${center.longitude},${center.latitude})/[${center.longitude},${center.latitude},10,0]/600x240@2x?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw)`,
                 }}
               />
               <div className="absolute bottom-[45%] left-1/2 -translate-x-1/2">
@@ -489,8 +476,7 @@ export const PenicheHero = () => {
   "
               >
                 <a
-                  href="tel:+351262781160"
-                  className="flex items-center gap-3 text-[14px] sm:text-[15px] text-[#111] hover:text-[#e84814] transition-colors"
+href={`tel:${center.contact_phone}`}                  className="flex items-center gap-3 text-[14px] sm:text-[15px] text-[#111] hover:text-[#e84814] transition-colors"
                 >
                   <svg
                     width="20"
@@ -504,8 +490,8 @@ export const PenicheHero = () => {
                       fill="#E84814"
                     />
                   </svg>
-                  +351 262 781 160
-                </a>
+                  {center.contact_phone}
+                  </a>
                 <div className="flex items-center gap-3 text-[14px] sm:text-[15px] text-[#111]">
                   <svg
                     width="20"

@@ -3,36 +3,12 @@
 import React, { useState } from "react";
 import Card from "./Card";
 
-interface PaymentMethod {
-  logo: string;
-  name: string;
-}
 
-export const PaymentMethods = () => {
-  const [isOpen, setIsOpen] = useState(false);
 
-  const paymentMethods: PaymentMethod[] = [
-    {
-      logo: "/Rectangle 8-3.png",
-      name: "MB WAY",
-    },
-    {
-      logo: "/Rectangle 8-3.png",
-      name: "MB MULTIBANCO",
-    },
-    {
-      logo: "/Rectangle 8-3.png",
-      name: "VISA",
-    },
-    {
-      logo: "/Rectangle 8-3.png",
-      name: "MasterCard",
-    },
-    {
-      logo: "/Rectangle 8-3.png",
-      name: "SIBS",
-    },
-  ];
+type Props = { paymentMethods: { id: number; name: string; images: string }[] };
+export const PaymentMethods = ({ paymentMethods }: Props) => {  const [isOpen, setIsOpen] = useState(false);
+
+
 
   return (
     <div className="mx-auto max-w-[1920px] bg-white pt-8 md:py-12 px-4 md:px-8 lg:px-[188px]">
@@ -66,14 +42,14 @@ export const PaymentMethods = () => {
       <div className={`${isOpen ? "block" : "hidden"} md:block`}>
       <div className="grid grid-cols-2 gap-[23px] md:flex md:flex-wrap md:gap-[30px]">
       {" "}
-          {paymentMethods.map((method, index) => (
-            <Card
-              key={index}
-              logo={method.logo}
-              name={method.name}
-              alt={`${method.name} logo`}
-            />
-          ))}
+      {paymentMethods.map((method) => (
+  <Card
+    key={method.id}
+    logo={method.images}
+    name={method.name}
+    alt={`${method.name} logo`}
+  />
+))}
         </div>
       </div>
     </div>

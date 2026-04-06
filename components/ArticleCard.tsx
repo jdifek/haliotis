@@ -34,7 +34,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
   return (
     <div className="relative">
       <div
-        className="relative w-full transition-all duration-300"
+        className="relative w-full transition-all  duration-300"
         style={{
           height: isExpanded ? "auto" : "445px",
           minHeight: "445px",
@@ -57,7 +57,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
         </div>
         <div
           onClick={onToggleExpand}
-          className={`relative mx-4 rounded-2xl bg-white px-4 pb-3 pt-10 transition-all duration-300 lg:mx-0 lg:absolute lg:bottom-0 lg:left-4 lg:right-[35%] lg:w-[310px] lg:h-[205px] ${bgTextBlock}`}
+          className={`relative cursor-pointer mx-4 rounded-2xl bg-white  px-4 pb-3 pt-10 transition-all duration-300 lg:mx-0 lg:absolute lg:bottom-0 lg:left-4 lg:right-[35%] lg:w-[310px] ${bgTextBlock}`}
           style={{
             marginTop: "-65px",
             minHeight: "205px",

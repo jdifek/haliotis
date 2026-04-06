@@ -1,9 +1,9 @@
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import PricesSections from "@/components/PricesSections";
-import PrivacyPolicyContent from "@/components/PrivacyPolicyContent";
 import Image from "next/image";
 
 export default function Prices() {
+  
   return (
     <>
       <section className="relative h-[90vh] -mt-[97px] pt-[97px] w-full ">

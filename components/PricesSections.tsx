@@ -4,12 +4,9 @@
 import { useState, useEffect } from "react";
 import { FilterList } from "@/components/FilterList";
 import { Tabs } from "@/components/buttons/Tabs";
-import {
-  TAB_CATEGORIES,
-  TAB_MAINTENANCE_CATEGORIES,
-  type PriceCategory,
-  type PriceItem,
-} from "@/data/pricesData";
+import { useLocale } from "next-intl";
+import { useMenu } from "@/app/hooks/useMenu";
+import { PricesData, usePrices } from "@/app/hooks/usePrices";
 
 // ─── Per-tab fish SVGs ───────────────────────────────────────────────────────
 // Replace each null with your <svg>...</svg> for that location
@@ -265,8 +262,14 @@ const ChevronDown = ({ color = "#D9D9D9" }: { color?: string }) => (
     />
   </svg>
 );
+// Вместо PriceItem из pricesData.ts
+type PriceRowItem = {
+  name: string;
+  description: string | null;
+  price: string;
+};
 
-function PriceRow({ item }: { item: PriceItem }) {
+function PriceRow({ item }: { item: PriceRowItem }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -291,7 +294,7 @@ function PriceRow({ item }: { item: PriceItem }) {
             color: "#111",
           }}
         >
-          {item.label}
+          {item.name}
         </span>
         <div className="flex items-center gap-1">
           <span
@@ -336,28 +339,44 @@ function PriceRow({ item }: { item: PriceItem }) {
   );
 }
 
-const priceTabs = [
-  { id: "peniche", label: "Peniche" },
-  { id: "sesimbra", label: "Sesimbra" },
-  { id: "madeira", label: "Madeira" },
-  { id: "santa-maria", label: "Santa Maria" },
-  { id: "faial", label: "Faial" },
-  { id: "sao-vicente", label: "Sao Vicente" },
-];
-
 export default function PricesSection() {
-  const [activeTab, setActiveTab] = useState("peniche");
-  const [selected, setSelected] = useState("equipment-rental-diving");
-  const [isTabOpen, setIsTabOpen] = useState(false);
+  const locale = useLocale();
+const { divingCenters } = useMenu(locale);
+const [activeTabId, setActiveTabId] = useState<string | null>(null);
+const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
+const [isTabOpen, setIsTabOpen] = useState(false);
 
-  const tabCategories = TAB_CATEGORIES[activeTab];
-  const filterOptions = tabCategories.map((c) => ({
-    id: c.id,
-    label: c.label,
-  }));
-  const activeCategory =
-    tabCategories.find((c) => c.id === selected) ?? tabCategories[0];
-  const fish = TAB_FISH[activeTab];
+useEffect(() => {
+  if (divingCenters.length > 0 && activeTabId === null) {
+    setActiveTabId(divingCenters[0].slug);
+  }
+}, [divingCenters, activeTabId]);
+
+const activeCenter = divingCenters.find((c) => c.slug === activeTabId) ?? null;
+const { data: pricesData, loading } = usePrices(activeCenter?.id ?? null, locale);
+
+const tabs = divingCenters.map((c) => ({ id: c.slug, label: c.name, color: c.color }));
+
+const defaultType = pricesData?.service_types.find((t) => t.name === "Default");
+const defaultCategories = (pricesData?.categories ?? [])
+  .filter((c) => c.service_type_id === defaultType?.id)
+  .sort((a, b) => a.position - b.position);
+
+useEffect(() => {
+  if (defaultCategories.length > 0) {
+    setSelectedCategoryId(String(defaultCategories[0].id));
+  }
+}, [activeCenter?.id, defaultType?.id]);
+
+const filterOptions = defaultCategories.map((c) => ({ id: String(c.id), label: c.name }));
+const activeCategoryName = defaultCategories.find((c) => String(c.id) === selectedCategoryId)?.name ?? "";
+const activeServices = (pricesData?.services ?? [])
+  .filter((s) => String(s.service_category_id) === selectedCategoryId)
+  .sort((a, b) => a.position - b.position);
+
+const fish = TAB_FISH[activeTabId ?? ""];
+
+
 
   return (
     <>
@@ -367,11 +386,11 @@ export default function PricesSection() {
           useLocationColors={true}
           className="mb-1"
           tabsContainerClassName="relative flex gap-6"
-          tabs={priceTabs}
-          activeTab={activeTab}
+          tabs={tabs}
+          activeTab={activeTabId ?? ""}
           onTabChange={(tab) => {
-            setActiveTab(tab);
-            setSelected(TAB_CATEGORIES[tab]?.[0]?.id ?? "dive-trips");
+            setActiveTabId(tab);
+            setSelectedCategoryId(null);
           }}
           underlineClassName="absolute -bottom-1 left-0 w-full h-[2px] transition-opacity"
         />
@@ -385,8 +404,7 @@ export default function PricesSection() {
             className="flex items-center cursor-pointer justify-between rounded-[10px] px-3 py-2 h-[42px] bg-white border border-[#e84814]"
           >
             <span className="text-[16px] font-semibold leading-[160%] text-[#111]">
-              {priceTabs.find((t) => t.id === activeTab)?.label}
-            </span>
+            {tabs.find((t) => t.id === activeTabId)?.label ?? ""}            </span>
             <svg
               width="24"
               height="24"
@@ -405,17 +423,15 @@ export default function PricesSection() {
           {isTabOpen && (
             <div className="bg-white rounded-[10px] border-2 border-gray-200 overflow-hidden">
               <div className="flex flex-col gap-2 p-2">
-                {priceTabs.map((tab) => {
-                  const isSelected = tab.id === activeTab;
-                  return (
+              {tabs.map((tab) => {
+  const isSelected = tab.id === activeTabId;
+  return (
                     <button
                       key={tab.id}
                       onClick={() => {
-                        setActiveTab(tab.id);
+                        setActiveTabId(tab.id);
+                        setSelectedCategoryId(null);
                         setIsTabOpen(false);
-                        setSelected(
-                          TAB_CATEGORIES[tab.id]?.[0]?.id ?? "dive-trips"
-                        );
                       }}
                       className={`flex items-center cursor-pointer justify-between rounded-[10px] px-3 py-2 h-[40px] border-2 ${
                         isSelected
@@ -451,111 +467,145 @@ export default function PricesSection() {
             </div>
           )}
         </div>
-
-        <div className="relative z-10">
-          {/* Mobile: stacked */}
-          <div className="flex flex-col gap-4 lg:hidden">
-            <FilterList
-              options={filterOptions}
-              selected={selected}
-              onSelect={setSelected}
-              maxWidth="395px"
-              activeTabId={activeTab}
-            />
-            <div
-              style={{
-                background: "#fff",
-                borderRadius: "24px",
-                padding: "10px 15px",
-              }}
-            >
-              <h2
-                className="mb-3"
-                style={{
-                  fontFamily: "var(--font-family)",
-                  fontWeight: 500,
-                  fontSize: "24px",
-                  lineHeight: "140%",
-                  color: "#111",
-                }}
-              >
-                {activeCategory.label}
-              </h2>
-              <div className="flex flex-col gap-2">
-                {activeCategory.items.map((item, i) => (
-                  <PriceRow key={i} item={item} />
-                ))}
-              </div>
-            </div>
-          </div>
-
-     {/* Desktop: side by side */}
-<div className="hidden lg:flex gap-20 items-start">
-  <FilterList
-    options={filterOptions}
-    selected={selected}
-    onSelect={setSelected}
-    maxWidth="395px"
-    activeTabId={activeTab}
-  />
-
-  {/* Обёртка карточки + рыбки */}
-  <div className="flex-1 relative min-w-0" style={{ maxWidth: "757px" }}>
-
-    {/* Рыбка за карточкой */}
-    {fish && (
-      <div
-        className="hidden lg:block absolute pointer-events-none select-none"
-        style={{
-          zIndex: 0,
-          right: "-285px",
-          top: "-20px",
-          opacity: 0.6,
-        }}
-      >
-        {fish}
-      </div>
-    )}
-
-    {/* Карточка поверх рыбки */}
-    <div
-      style={{
-        background: "#fff",
-        borderRadius: "24px",
-        padding: "10px 15px",
-        position: "relative",
-        zIndex: 1,
-      }}
-    >
-      <h2
-        className="mb-3"
-        style={{
-          fontFamily: "var(--font-family)",
-          fontWeight: 500,
-          fontSize: "24px",
-          lineHeight: "140%",
-          color: "#111",
-        }}
-      >
-        {activeCategory.label}
-      </h2>
-      <div className="flex flex-col gap-2">
-        {activeCategory.items.map((item, i) => (
-          <PriceRow key={i} item={item} />
+        {loading ? (
+  <>
+    {/* Desktop skeleton */}
+    <div className="hidden lg:flex gap-20 items-start">
+      <div className="flex flex-col gap-2 w-[395px] flex-shrink-0">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div
+            key={i}
+            className="animate-pulse rounded-[10px] bg-white"
+            style={{ height: "40px", opacity: 1 - i * 0.1 }}
+          />
         ))}
+      </div>
+      <div className="flex-1 min-w-0" style={{ maxWidth: "757px" }}>
+        <div
+          className="animate-pulse rounded-[24px] bg-white"
+          style={{ height: "32px", width: "40%", marginBottom: "12px" }}
+        />
+        <div className="flex flex-col gap-2">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div
+              key={i}
+              className="animate-pulse rounded-[10px] bg-white"
+              style={{ height: "40px", opacity: 1 - i * 0.08 }}
+            />
+          ))}
+        </div>
       </div>
     </div>
 
-  </div>
-</div>
+    {/* Mobile skeleton */}
+    <div className="flex flex-col gap-2 lg:hidden">
+      <div className="animate-pulse rounded-[10px] bg-white h-[42px]" />
+      <div className="animate-pulse rounded-[24px] bg-white h-[28px] w-1/2 mt-2" />
+      <div className="flex flex-col gap-2 mt-1">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div
+            key={i}
+            className="animate-pulse rounded-[10px] bg-white"
+            style={{ height: "40px", opacity: 1 - i * 0.1 }}
+          />
+        ))}
+      </div>
+    </div>
+  </>
+) : (
+  <div className="relative z-10">
+    {/* Mobile: stacked */}
+    <div className="flex flex-col gap-4 lg:hidden">
+      <FilterList
+        options={filterOptions}
+        selected={selectedCategoryId ?? ""}
+        onSelect={setSelectedCategoryId}
+        maxWidth="395px"
+        activeTabId={activeTabId ?? ""}
+      />
+      <div
+        style={{
+          background: "#fff",
+          borderRadius: "24px",
+          padding: "10px 15px",
+        }}
+      >
+        <h2
+          className="mb-3"
+          style={{
+            fontFamily: "var(--font-family)",
+            fontWeight: 500,
+            fontSize: "24px",
+            lineHeight: "140%",
+            color: "#111",
+          }}
+        >
+          {activeCategoryName}
+        </h2>
+        <div className="flex flex-col gap-2">
+          {activeServices.map((s) => (
+            <PriceRow key={s.id} item={{ name: s.name, description: s.description, price: `€ ${s.price}` }} />
+          ))}
         </div>
+      </div>
+    </div>
+
+    {/* Desktop: side by side */}
+    <div className="hidden lg:flex gap-20 items-start">
+      <FilterList
+        options={filterOptions}
+        selected={selectedCategoryId ?? ""}
+        onSelect={setSelectedCategoryId}
+        maxWidth="395px"
+        activeTabId={activeTabId ?? ""}
+      />
+      <div className="flex-1 relative min-w-0" style={{ maxWidth: "757px" }}>
+        {fish && (
+          <div
+            className="hidden lg:block absolute pointer-events-none select-none"
+            style={{ zIndex: 0, right: "-285px", top: "-20px", opacity: 0.6 }}
+          >
+            {fish}
+          </div>
+        )}
+        <div
+          style={{
+            background: "#fff",
+            borderRadius: "24px",
+            padding: "10px 15px",
+            position: "relative",
+            zIndex: 1,
+          }}
+        >
+          <h2
+            className="mb-3"
+            style={{
+              fontFamily: "var(--font-family)",
+              fontWeight: 500,
+              fontSize: "24px",
+              lineHeight: "140%",
+              color: "#111",
+            }}
+          >
+            {activeCategoryName}
+          </h2>
+          <div className="flex flex-col gap-2">
+            {activeServices.map((s) => (
+              <PriceRow key={s.id} item={{ name: s.name, description: s.description, price: `€ ${s.price}` }} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
       </section>
 
       {/* ── Specialized Maintenance Services ── */}
-      <SpecializedMaintenanceSection activeTab={activeTab} />
-
+      <SpecializedMaintenanceSection pricesData={pricesData} activeTabId={activeTabId ?? ""} />
       {/* ── Fills ── */}
-      <FillsSection />
+      <FillsSection pricesData={pricesData} />
+
     </>
   );
 }
@@ -563,72 +613,62 @@ export default function PricesSection() {
 /* ─────────────────────────────────────────
    Specialized Maintenance Services
 ───────────────────────────────────────── */
+function SpecializedMaintenanceSection({
+  pricesData,
+  activeTabId,
+}: {
+  pricesData: PricesData | null;
+  activeTabId: string;
+}) {
+  const maintenanceType = pricesData?.service_types.find((t) => t.name === "Specialized Maintenance");
+  const maintenanceCategories = (pricesData?.categories ?? [])
+    .filter((c) => c.service_type_id === maintenanceType?.id)
+    .sort((a, b) => a.position - b.position);
 
-function SpecializedMaintenanceSection({ activeTab }: { activeTab: string }) {
-  const tabCategories =
-    TAB_MAINTENANCE_CATEGORIES[activeTab] ??
-    TAB_MAINTENANCE_CATEGORIES["peniche"];
-  const [selected, setSelected] = useState(
-    tabCategories[0]?.id ?? "regulators"
-  );
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
 
   useEffect(() => {
-    setSelected(tabCategories[0]?.id ?? "regulators");
-  }, [activeTab]);
+    if (maintenanceCategories.length > 0) {
+      setSelectedCategoryId(String(maintenanceCategories[0].id));
+    }
+  }, [activeTabId]);
 
-  const activeCategory =
-    tabCategories.find((c) => c.id === selected) ?? tabCategories[0];
-
-  const maintenanceFilterOptions = tabCategories.map((c) => ({
-    id: c.id,
-    label: c.label,
-  }));
-
+  const maintenanceFilterOptions = maintenanceCategories.map((c) => ({ id: String(c.id), label: c.name }));
+  const activeCategoryName = maintenanceCategories.find((c) => String(c.id) === selectedCategoryId)?.name ?? "";
+  const activeServices = (pricesData?.services ?? [])
+    .filter((s) => String(s.service_category_id) === selectedCategoryId)
+    .sort((a, b) => a.position - b.position);
   return (
     <section className="bg-[#eaeaea] px-4 pb-12 pt-8 md:px-[30px] lg:px-[188px] md:pb-[50px] md:pt-[46px]">
       {/* Title + description */}
       <div className="mb-6 lg:mb-8">
-        <h2
-          style={{
-            fontFamily: "var(--font-family)",
-            fontWeight: 500,
-            fontSize: "clamp(28px, 3vw, 42px)",
-            lineHeight: "130%",
-            color: "#000",
-            marginBottom: "12px",
-          }}
-        >
-          Specialized Maintenance Services
-        </h2>
-        <p
-          style={{
-            fontFamily: "var(--font-family)",
-            fontWeight: 400,
-            fontSize: "15px",
-            lineHeight: "160%",
-            color: "#101010",
-            opacity: 0.8,
-            maxWidth: "760px",
-          }}
-        >
-          We maintain several brands always betting on quality through the
-          certification of the technicians involved. We are the only company
-          with two Aqualung certified technicians, also certified by SCUBAPRO,
-          and TUSA. We are also able to maintain brands such as Poseidon, Mares,
-          Cressi and many others. We maintain all types of equipment, from
-          bottles, regulators, vests and dry suits.
-        </p>
+      <h2 style={{
+  fontFamily: "var(--font-family)",
+  fontWeight: 500,
+  fontSize: "clamp(28px, 3vw, 42px)",
+  lineHeight: "130%",
+  color: "#000",
+  marginBottom: "12px",
+}}>
+  {pricesData?.page.specialized_maintenance.title ?? "Specialized Maintenance Services"}
+</h2>
+<p style={{
+  fontFamily: "var(--font-family)",
+  fontWeight: 400,
+  fontSize: "15px",
+  lineHeight: "160%",
+  color: "#101010",
+  opacity: 0.8,
+  maxWidth: "760px",
+}}>
+  {pricesData?.page.specialized_maintenance.description}
+</p>
       </div>
 
       {/* Mobile */}
       <div className="flex flex-col gap-4 lg:hidden">
-        <FilterList
-          options={maintenanceFilterOptions}
-          selected={selected}
-          onSelect={setSelected}
-          maxWidth="395px"
-          activeTabId={activeTab}
-        />
+      <FilterList options={maintenanceFilterOptions} selected={selectedCategoryId ?? ""} onSelect={setSelectedCategoryId} activeTabId={activeTabId} />
+
         <div
           style={{
             background: "#fff",
@@ -646,25 +686,20 @@ function SpecializedMaintenanceSection({ activeTab }: { activeTab: string }) {
               color: "#111",
             }}
           >
-            {activeCategory.label}
+            {activeCategoryName}
           </h3>
           <div className="flex flex-col gap-2">
-            {activeCategory.items.map((item, i) => (
-              <PriceRow key={i} item={item} />
-            ))}
+          {activeServices.map((s) => (
+  <PriceRow key={s.id} item={{ name: s.name, description: s.description, price: `€ ${s.price}` }} />
+))}
           </div>
         </div>
       </div>
 
       {/* Desktop */}
       <div className="hidden lg:flex gap-6 items-start">
-        <FilterList
-          options={maintenanceFilterOptions}
-          selected={selected}
-          onSelect={setSelected}
-          maxWidth="395px"
-          activeTabId={activeTab}
-        />
+      <FilterList options={maintenanceFilterOptions} selected={selectedCategoryId ?? ""} onSelect={setSelectedCategoryId} activeTabId={activeTabId} />
+
         <div
           className="flex-1 min-w-0"
           style={{
@@ -684,12 +719,12 @@ function SpecializedMaintenanceSection({ activeTab }: { activeTab: string }) {
               color: "#111",
             }}
           >
-            {activeCategory.label}
+            {activeCategoryName}
           </h3>
           <div className="flex flex-col gap-2">
-            {activeCategory.items.map((item, i) => (
-              <PriceRow key={i} item={item} />
-            ))}
+          {activeServices.map((s) => (
+  <PriceRow key={s.id} item={{ name: s.name, description: s.description, price: `€ ${s.price}` }} />
+))}
           </div>
         </div>
       </div>
@@ -707,7 +742,7 @@ const blendFields = [
   { label: "Pressure (Bar)", initial: 0, final: 200 },
 ];
 
-function FillsSection() {
+function FillsSection({ pricesData }: { pricesData: PricesData | null }) {
   const [values, setValues] = useState({
     initial: blendFields.map((f) => f.initial),
     final: blendFields.map((f) => f.final),
@@ -737,29 +772,20 @@ function FillsSection() {
               marginBottom: "16px",
             }}
           >
-            Fills
+         {pricesData?.page.fills.title ?? "Fills"}
           </h2>
-          {[
-            "We make all types of fillings with Oxygen and Helium, from Nitrox 22% up to 100%, and any type of Trimix. For this we chose as partner the recognized brand Bauer.",
-            "We have the Bauer Pure Air certification which ensures the quality of the air we produce.",
-            "We produce all mixtures by continuous flow or partial pressures according to the type of filling required.",
-            "We can not make fillings without having the necessary training and as such we have specialized technicians with the course PADI Trimix Blender Instructor and PADI Trimix Blender with the technical coordination of a PADI Trimix Blender Instructor Trainer.",
-          ].map((text, i) => (
-            <p
-              key={i}
-              style={{
-                fontFamily: "var(--font-family)",
-                fontWeight: 400,
-                fontSize: "15px",
-                lineHeight: "160%",
-                color: "#101010",
-                opacity: 0.8,
-                marginBottom: "12px",
-              }}
-            >
-              {text}
-            </p>
-          ))}
+          {pricesData?.page.fills.description && (
+  <p style={{
+    fontFamily: "var(--font-family)",
+    fontWeight: 400,
+    fontSize: "15px",
+    lineHeight: "160%",
+    color: "#101010",
+    opacity: 0.8,
+  }}>
+    {pricesData.page.fills.description}
+  </p>
+)}
         </div>
 
         {/* Right: calculator card */}

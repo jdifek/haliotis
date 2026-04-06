@@ -8,39 +8,11 @@ interface LegalInfo {
   name: string;
 }
 
-export const LegalInfo = () => {
-  const [isOpen, setIsOpen] = useState(false);
+type Props = { legalSupports: { id: number; name: string; images: string }[] };
+export const LegalInfo = ({ legalSupports }: Props) => {
+    const [isOpen, setIsOpen] = useState(false);
 
-  const legalEntities: LegalInfo[] = [
-    {
-      logo: "/Rectangle 8-3.png",
-      name: "Licenced by Instituto do Desporto de Portugal",
-    },
-    {
-      logo: "/Rectangle 8-3.png",
-      name: "Tourism licence 9/2009",
-    },
-    {
-      logo: "/Rectangle 8-3.png",
-      name: "Licened by Instituto da conservação da Natureza",
-    },
-    {
-      logo: "/Rectangle 8-3.png",
-      name: "Company registered in RNAAT with activities recognized as Nature Tourism",
-    },
-    {
-      logo: "/Rectangle 8-3.png",
-      name: "Operador Marítimo Turístico with licence Nº17 by Capitania do Porto de Peniche",
-    },
-    {
-      logo: "/Rectangle 8-3.png",
-      name: "All insurance by Mútua dos Pescadores",
-    },
-    {
-      logo: "/Rectangle 8-3.png",
-      name: "Livro de Reclamações",
-    },
-  ];
+
 
   return (
     <div className="mx-auto max-w-[1920px] bg-white pb-8 md:py-12 px-4 md:px-8 lg:px-[188px] mt-8 md:mt-0">
@@ -73,15 +45,15 @@ export const LegalInfo = () => {
       {/* Контент - на десктопе всегда видим, на мобилке по клику */}
       <div className={`${isOpen ? "block" : "hidden"} md:block`}>
       <div className="grid grid-cols-2 gap-[23px] md:flex md:flex-wrap md:gap-[30px]">
-          {legalEntities.map((entity, index) => (
-            <Card
-              heightBottomBlock={"131px"}
-              key={index}
-              logo={entity.logo}
-              name={entity.name}
-              alt={`${entity.name} logo`}
-            />
-          ))}
+      {legalSupports.map((entity) => (
+  <Card
+    heightBottomBlock={"131px"}
+    key={entity.id}
+    logo={entity.images}
+    name={entity.name}
+    alt={`${entity.name} logo`}
+  />
+))}
         </div>
       </div>
     </div>
