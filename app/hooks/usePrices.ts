@@ -55,6 +55,8 @@ async function fetchPrices(centerId: number, lang: string): Promise<PricesData> 
   );
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const json = await res.json();
+  console.log(json, 'json');
+  
   return json.data;
 }
 

@@ -1,43 +1,63 @@
-import { Breadcrumbs } from "@/components/Breadcrumbs";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { HeroBanner } from "@/components/HeroBanner";
 import { TravelTripsSection } from "@/components/TravelTripsSection";
-import Image from "next/image";
 
-export default function Travel() {
+async function getTravelsData(locale: string) {
+  const res = await fetch(
+    `https://cp.haliotis.space/api/v1/travels?attach_page=true&lang=${locale}`,
+    { next: { revalidate: 60 } }
+  );
+  if (!res.ok) throw new Error('Failed to fetch travels');
+  return res.json();
+}
+
+type Props = {
+  params: Promise<{ slug: string; locale: string }>;
+};
+
+export default async function Travel({ params }: Props) {
+  const { locale } = await params;
+  const data = await getTravelsData(locale);
+
+  const tripCards = data.data.map((trip: any) => ({
+    locationId: trip.slug || trip.id.toString(),
+    images: trip.gallery.length > 0
+      ? trip.gallery.map((g: any) => g.image)
+      : [trip.image || "/travel.png"],
+    price: parseFloat(trip.price.amount),
+    title: trip.name,
+    description: trip.summary.replace(/<[^>]*>/g, ''),
+    link: `/trip/${trip.slug || trip.id}`,
+  }));
+
+  const bannerSlides = data.attachPage?.banner?.slides?.length
+    ? data.attachPage.banner.slides.map((s: any) => ({
+        image: s.desktop_image_url,
+        mobileImage: s.mobile_image_url,
+        title: s.title,
+        description: s.description,
+      }))
+    : [{ image: "/prices.png" }];
+
+  const pageTitle = data.attachPage?.title || "Travel";
+
   return (
     <>
-      <section className="relative h-[75vh] -mt-[97px] pt-[97px] w-full ">
-        {/* Breadcrumbs */}
-        <div className="absolute bottom-1 z-10 block">
-          <Breadcrumbs
-            className="mb-6 mx-5 md:mb-8"
-            items={[{ label: "Haliotis", href: "/" }, { label: "Travel" }]}
-            itemLabelColorWhite={true}
-          />
-        </div>
-
-        {/* Background Image */}
-        <div className="absolute inset-0 z-0">
-          <div className="relative h-full w-full">
-            <Image
-              src="/prices.png"
-              alt="Background"
-              fill
-              className="object-cover"
-              priority
-            />
-          </div>
-        </div>
-
-        {/* Content Container */}
-        <div className="relative z-20 h-full">
-          {/* Hero Section */}
-          <section className="container  px-5 py-6">
-            <div className="max-w-3xl">
-              <div className="mb-12">
-                <h1 className="mb-3 text-[32px] font-bold leading-tight text-white lg:text-5xl">
-                  Travel
-                </h1>
-                <div className="mb-6">
+      <HeroBanner
+        slides={bannerSlides}
+        height="h-[75vh]"
+        breadcrumbs={[
+          { label: "Haliotis", href: "/" },
+          { label: pageTitle },
+        ]}
+      >
+        <section className="container px-5 py-6">
+          <div className="max-w-3xl">
+            <div className="mb-12">
+              <h1 className="mb-3 text-[32px] font-bold leading-tight text-white lg:text-5xl">
+                {pageTitle}
+              </h1>
+              <div className="mb-6">
                   <svg
                     width="157"
                     height="7"
@@ -68,17 +88,17 @@ export default function Travel() {
                     </g>
                   </svg>
                 </div>
+              {bannerSlides[0].description && (
                 <p className="max-w-xl text-[16px] font-light text-white lg:text-lg">
-                  Discover the best destinations always accompanied by a travel
-                  specialist, with you on the spot. Much more than a simple dive
-                  trip.
+                  {bannerSlides[0].description}
                 </p>
-              </div>
+              )}
             </div>
-          </section>
-        </div>
-      </section>
-      <TravelTripsSection />
+          </div>
+        </section>
+      </HeroBanner>
+
+      <TravelTripsSection tripCards={tripCards} />
     </>
   );
 }

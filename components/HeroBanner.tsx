@@ -1,4 +1,3 @@
-// components/HeroBanner.tsx
 "use client";
 
 import Image from "next/image";
@@ -23,8 +22,8 @@ type BreadcrumbItem = {
 type HeroBannerProps = {
   slides: Slide[];
   breadcrumbs?: BreadcrumbItem[];
-  height?: string; // например "h-[75vh]" или "h-[930px]"
-  children?: React.ReactNode; // контент поверх баннера
+  height?: string;
+  children?: React.ReactNode;
 };
 
 export function HeroBanner({
@@ -37,11 +36,9 @@ export function HeroBanner({
   const swiperRef = useRef<SwiperType | null>(null);
 
   const isMultiple = slides.length > 1;
-  const activeSlide = slides[currentSlide];
 
   return (
     <section className={`relative ${height} -mt-[97px] pt-[97px] w-full`}>
-      {/* Breadcrumbs */}
       {breadcrumbs && (
         <div className="absolute bottom-1 z-10 block">
           <Breadcrumbs
@@ -52,7 +49,6 @@ export function HeroBanner({
         </div>
       )}
 
-      {/* Background */}
       <div className="absolute inset-0 z-0">
         {isMultiple ? (
           <Swiper
@@ -91,7 +87,6 @@ export function HeroBanner({
         )}
       </div>
 
-      {/* Carousel controls — только если несколько слайдов */}
       {isMultiple && (
         <div className="absolute right-10 bottom-10 z-10">
           <CarouselControls
@@ -105,13 +100,10 @@ export function HeroBanner({
         </div>
       )}
 
-      {/* Content */}
-    {/* Content */}
-<div className="relative z-20 h-full">
-  {typeof children === "function"
-    ? (children as (props: { activeSlide: Slide; currentSlide: number }) => React.ReactNode)({ activeSlide, currentSlide })
-    : children}
-</div>
+      {/* Новый рендер children */}
+      <div className="relative z-20 h-full">
+        {children}
+      </div>
     </section>
   );
 }

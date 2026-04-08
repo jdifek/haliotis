@@ -288,63 +288,7 @@ type Props = {
   className?: string;
 };
 
-const DEFAULT_TRIP_CARDS: TripCard[] = [
 
-  {
-    locationId: "sesimbra",
-    images: ["/travel.png", "/travel.png"],
-    price: 839,
-    title: "Sesimbra",
-    description:
-      "São Vicente is the second more populous island of Cape Verde and it is located at windward group of the archipelago.",
-    link: "/trips/sesimbra",
-  },
-  {
-    locationId: "madeira",
-    images: ["/travel.png", "/travel.png"],
-    price: 1695,
-    title: "Madeira",
-    description:
-      "São Vicente is the second more populous island of Cape Verde and it is located at windward group of the archipelago.",
-    link: "/trips/madeira",
-  },
-  {
-    locationId: "santa-maria",
-    images: ["/travel.png", "/travel.png"],
-    price: 810,
-    title: "Santa Maria - Azores",
-    description:
-      "São Vicente is the second more populous island of Cape Verde and it is located at windward group of the archipelago.",
-    link: "/trips/santa-maria",
-  },
-  {
-    locationId: "faial",
-    images: ["/travel.png", "/travel.png"],
-    price: 950,
-    title: "Faial",
-    description:
-      "São Vicente is the second more populous island of Cape Verde and it is located at windward group of the archipelago.",
-    link: "/trips/faial",
-  },
-  {
-    locationId: "sao-vicente",
-    images: ["/travel.png", "/travel.png"],
-    price: 1200,
-    title: "Cape Verde",
-    description:
-      "São Vicente is the second more populous island of Cape Verde and it is located at windward group of the archipelago.",
-    link: "/trips/sao-vicente",
-  },
-  {
-    locationId: "peniche",
-    images: ["/travel.png", "/travel.png"],
-    price: 890,
-    title: "Peniche",
-    description:
-      "São Vicente is the second more populous island of Cape Verde and it is located at windward group of the archipelago.",
-    link: "/trips/peniche",
-  },
-];
 
 // ─── Price badge ──────────────────────────────────────────────────────────────
 
@@ -506,6 +450,7 @@ export function TripCard({ card }: { card: TripCard }) {
 
         <div className="mt-6 flex items-center justify-between">
           <ButtonWithIcon
+          href={card.link}
             bgColor="#F1F1F1" iconBgColor="#E84814"
             label="Find More"
             textColor="text-black"
@@ -536,9 +481,8 @@ export function TripCard({ card }: { card: TripCard }) {
 // ─── Main section ─────────────────────────────────────────────────────────────
 
 const ITEMS_PER_PAGE = 3;
-
 export const TravelTripsSection: React.FC<Props> = ({
-  tripCards = DEFAULT_TRIP_CARDS,
+  tripCards = [], // пустой массив по умолчанию
   className,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
