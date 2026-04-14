@@ -1,3 +1,5 @@
+'use client'
+
 import { ArticleCard } from "../ArticleCard";
 import { CarouselControls } from "../CarouselControls";
 import { Swiper, SwiperSlide } from "swiper/react";

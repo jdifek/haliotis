@@ -1,80 +1,74 @@
-"use client";
-
 import { Breadcrumbs } from "@/components/Breadcrumbs";
-import { CourseDetailHeroSection } from "@/components/TravelDetail/CourseDetailHeroSection";
 import { RecommendedCoursesSection } from "@/components/TravelDetail/RecommendedCoursesSection";
-import { BookingFormModal } from "@/components/Modals/BookingFormModal";
-import { useState } from "react";
+import { TravelBookingWrapper } from "@/components/TravelDetail/TravelBookingWrapper";
+import { getTravelBySlug } from "@/services/travels";
 
-const mockCourseCards = [
-  {
-    image: "/Rectangle 8.png",
-    title: "Curso de Nitrox PADI Enriched Air Diver Madeira - inclui mergulhos",
-    price: 239,
-    duration: "3hrs",
-    requestBased: true,
-    badge: "Open Trip",
-    location: "Madeira",
-  },
-  {
-    image: "/Rectangle 8.png",
-    title: "Curso de Mergulho Profundo PADI Deep Diver Santa Maria, Açores",
-    price: 349,
-    duration: "3hrs",
-    requestBased: true,
-    badge: "Open Trip",
-    location: "Santa Maria",
-  },
-  {
-    image: "/Rectangle 8.png",
-    title: "Curso de Nitrox PADI Enriched Air Diver Madeira - inclui mergulhos",
-    price: 239,
-    duration: "3hrs",
-    requestBased: true,
-    badge: "Open Trip",
-    location: "Madeira",
-  },
-  {
-    image: "/Rectangle 8.png",
-    title: "Curso de Mergulho Profundo PADI Deep Diver Santa Maria, Açores",
-    price: 349,
-    duration: "3hrs",
-    requestBased: true,
-    badge: "Open Trip",
-    location: "Santa Maria",
-  },
-];
+type Props = {
+  params: Promise<{ slug: string; locale: string }>;
+};
 
-const TravelDetail = () => {
-  const [isOpen, setIsOpen] = useState(false);
+export default async function TravelDetailPage({ params }: Props) {
+  const { slug, locale } = await params;
+  const { data, recommended } = await getTravelBySlug(slug, locale);
+
+  const price = parseFloat(data.price[0]?.amount ?? "0");
+
+  const accordionItems = [
+    ...(data.information ? [{
+      id: "information",
+      label: "Information",
+      content: (
+        <div
+          className="text-[15px] font-normal leading-[160%] text-[#101010] opacity-80"
+          dangerouslySetInnerHTML={{ __html: data.information }}
+        />
+      ),
+    }] : []),
+    ...(data.other_information?.tabs ?? []).map((tab: any) => ({
+      id: tab.title,
+      label: tab.title,
+      content: (
+        <div
+          className="text-[15px] font-normal leading-[160%] text-[#101010] opacity-80"
+          dangerouslySetInnerHTML={{ __html: tab.body }}
+        />
+      ),
+    })),
+  ];
+
+  const recommendedTripCards = recommended.travels.map((t: any) => ({
+    locationId: t.divingCenter.slug,
+    images: t.image ? [t.image] : ["/travel.png"],
+    price: parseFloat(t.price[0]?.amount ?? "0"),
+    title: t.name,
+    description: "",
+    link: `/trips/${t.slug}`,
+  }));
+
   return (
-    <main className="min-h-screen bg-[#ffffff] relative pt-4  md:pt-6 ">
+    <main className="min-h-screen bg-white relative pt-4 md:pt-6">
       <Breadcrumbs
-        className="mb-6 mx-5 md:mb-8 "
+        className="mb-6 mx-5 md:mb-8"
         items={[
           { label: "Haliotis", href: "/" },
           { label: "Travel", href: "/travel" },
-          { label: "Peniche" },
+          { label: data.destination?.name ?? data.name },
         ]}
       />
-      <CourseDetailHeroSection
-        title="PADI Advanced Open Water Diver & PADI Underwater Naturalist Sesimbra"
-        description="Take two courses at a time, saving you money and time: the PADI Advanced Open Water Diver course and the specialty PADI Underwater Naturalist. You will be able to dive up to 30 metres deep and will be prepared to scientifically observe marine ecosystems, emphasising the relationships between organisms, the environment and human beings, making the most of every dive!"
-        price={839}
-        image="/Rectangle 9.png"
-        imageAlt="PADI Advanced Open Water Diver course"
-        onBookClick={() => setIsOpen(true)} 
-        
+    <TravelBookingWrapper
+  title={data.name}
+  description={data.summary?.replace(/<[^>]*>/g, "") ?? ""}
+  price={price}
+  image={data.image_url ?? "/travel.png"}
+  imageAlt={data.name}
+  pricePerPerson={price}
+  accordionItems={accordionItems}
+/>
+      <RecommendedCoursesSection
+        title={recommended.headers.title}
+        description={recommended.headers.description}
+        courseCards={recommendedTripCards}
       />
-      <BookingFormModal
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-        courseTitle="PADI Advanced Open Water Diver..."
-        pricePerPerson={519}
-      />
-      <RecommendedCoursesSection courseCards={mockCourseCards} />
     </main>
   );
-};
-
-export default TravelDetail;
+}

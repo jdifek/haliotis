@@ -1,3 +1,5 @@
+'use client'
+
 import { CarouselControls } from "../CarouselControls";
 import { FilterList } from "../FilterList";
 import { CourseCard } from "../CourseCard";

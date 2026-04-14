@@ -16,8 +16,10 @@ export const Footer: React.FC<{ logoUrl: string; logoAlt: string }> = ({ logoUrl
   const [openSection, setOpenSection] = useState<string | null>(null);
 
   const footerSections = (menuData?.data.footer ?? []).map((section) => ({
+    id: section.id, // 👈 ДОБАВЬ
     title: section.label,
     links: (section.children ?? []).map((child) => ({
+      id: child.id, // 👈 тоже желательно
       label: child.label,
       href: child.url ?? `/${child.slug}`,
     })),
@@ -79,8 +81,7 @@ export const Footer: React.FC<{ logoUrl: string; logoAlt: string }> = ({ logoUrl
             <>
               <div className="hidden flex-1 xl:grid xl:grid-cols-7 gap-8">
                 {footerSections.map((section) => (
-                  <div key={section.title}>
-                    <h3 className="mb-4 text-white" style={{ fontSize: "15px", fontWeight: 600, lineHeight: "160%" }}>
+                  <div key={section.id}>                    <h3 className="mb-4 text-white" style={{ fontSize: "15px", fontWeight: 600, lineHeight: "160%" }}>
                       {section.title}
                     </h3>
                     <ul className="space-y-2">
@@ -99,7 +100,7 @@ export const Footer: React.FC<{ logoUrl: string; logoAlt: string }> = ({ logoUrl
               {/* Mobile Accordion */}
               <div className="flex flex-1 flex-col gap-2 xl:hidden">
                 {footerSections.map((section, index) => (
-                  <div key={section.title} className={index === footerSections.length - 1 ? "border-b md:border-none border-white/10" : ""}>
+                  <div key={section.id} className={index === footerSections.length - 1 ? "border-b md:border-none border-white/10" : ""}>
                     <button onClick={() => toggleSection(section.title)} className="flex w-full items-center justify-between py-4 text-left">
                       <h3 className="text-white" style={{ fontSize: "15px", fontWeight: 600, lineHeight: "160%" }}>
                         {section.title}
