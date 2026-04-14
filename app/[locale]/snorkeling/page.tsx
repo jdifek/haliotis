@@ -153,7 +153,7 @@ const Courses = () => {
               height={140}
               className="h-[140px] w-[285px]"
             />
-            <CategoriesList />
+            {/* <CategoriesList /> */}
           </div>
 
           {/* Mobile - Tabs and Categories */}

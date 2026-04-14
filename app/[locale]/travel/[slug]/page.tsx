@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { RecommendedCoursesSection } from "@/components/TravelDetail/RecommendedCoursesSection";
 import { TravelBookingWrapper } from "@/components/TravelDetail/TravelBookingWrapper";
