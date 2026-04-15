@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { ArticleCard } from "@/components/ArticleCard";
@@ -69,7 +70,7 @@ const FALLBACK_COLOR = "#e84814";
 
 const Diving = ({ params }: { params: Promise<{ locale: string }> }) => {
   const locale = useLocale();
-  const [freediveData, setFreediveData] = useState<FreediveApiData | null>(
+  const [freediveData, setFreediveData] = useState<any | null>(
     null
   );
   const [dataLoading, setDataLoading] = useState(false);
@@ -107,7 +108,7 @@ const Diving = ({ params }: { params: Promise<{ locale: string }> }) => {
     setFreediveData(null);
 
     fetch(
-      `https://cp.haliotis.space/api/v1/diving-centers/${activeCenter.id}/freedive?lang=${locale}`,
+`https://cp.haliotis.space/api/v1/diving-category/freedive?center_id=${activeCenter.id}&lang=${locale}&attach_regions=true`,
       { headers: { Accept: "application/json" } }
     )
       .then((r) => r.json())
@@ -129,16 +130,14 @@ const Diving = ({ params }: { params: Promise<{ locale: string }> }) => {
 
   const activeColor = (activeTab ? colorBySlug[activeTab] : null) ?? FALLBACK_COLOR;
   // Карточки — в идеале приходят с бэкенда, пока генерим моки по slug
-  const allCards = (freediveData?.dive_trip_types ?? []).map((trip) => ({
-    image: trip.image,
-    price: Number(trip.price.amount),
+  const allCards = (freediveData?.dive_trips ?? []).map((trip: any) => ({
+    image: trip.image_url || "",                    // обрати внимание: image_url, а не image
+    price: Number(trip.price?.amount || 0),
     title: trip.name,
-    description: trip.short_description,
+    description: trip.description || trip.short_description || "",   // в твоём API description есть
     link: "#",
-    details: trip.description,
-    equipmentPrice: trip.price.amount_description
-      ? trip.price.amount_description
-      : "",
+    details: trip.description || "",
+    equipmentPrice: trip.price?.amount_description || "",
   }));
   console.log(allCards, "allCards");
 
@@ -183,31 +182,32 @@ const Diving = ({ params }: { params: Promise<{ locale: string }> }) => {
 
   return (
     <main className="-mt-[97px]">
-      <HeroBanner
-        slides={
-          freediveData?.page.banner.slides.length
-            ? freediveData.page.banner.slides.map((s) => ({
-                image: s.desktop_image_url,
-                mobileImage: s.mobile_image_url,
-                title: s.title,
-                description: s.description,
-              }))
-            : [{ image: "" }]
-        }
-        height="h-[75vh]"
-        breadcrumbs={[
-          { label: "Haliotis", href: "/" },
-          { label: freediveData?.page.title ?? "Freedive" },
-        ]}
-        >
-        {(({ activeSlide }: { activeSlide: { title?: string; description?: string } }) => (
-          <section className="container px-5 py-6">
-            <div className="max-w-3xl">
-              <h1 className="mb-3 text-[32px] font-bold leading-tight text-white xl:text-5xl">
-                {activeSlide.title || freediveData?.page.title || "Freedive"}
-              </h1>
-              <div className="mb-6">
-                    <svg
+<HeroBanner
+  slides={
+    freediveData?.banner?.slides?.length
+      ? freediveData.banner.slides.map((s: any) => ({
+          image: s.desktop_image_url,
+          mobileImage: s.mobile_image_url,
+          title: s.title,
+          description: s.description,
+        }))
+      : [{ image: "" }]
+  }
+  height="h-[75vh]"
+  breadcrumbs={[
+    { label: "Haliotis", href: "/" },
+    { label: freediveData?.title ?? "Freedive" },
+  ]}
+>
+  <section className="container px-5 py-6">
+    <div className="max-w-3xl">
+      <div className="mb-12">
+        <h1 className="mb-3 text-[32px] font-bold leading-tight text-white xl:text-5xl">
+          {freediveData?.title || "Freedive"}
+        </h1>
+
+        <div className="mb-6">
+        <svg
                       width="157"
                       height="7"
                       viewBox="0 0 157 7"
@@ -235,17 +235,17 @@ const Diving = ({ params }: { params: Promise<{ locale: string }> }) => {
                           fill="white"
                         />
                       </g>
-                    </svg>
-                  </div>
-              {activeSlide.description && (
-                <p className="max-w-xl text-[16px] font-light text-white xl:text-lg">
-                  {activeSlide.description}
-                </p>
-              )}
-            </div>
-          </section>
-        )) as unknown as React.ReactNode}
-      </HeroBanner>
+                    </svg>        </div>
+
+        {freediveData?.banner?.slides?.[0]?.description && (
+          <p className="max-w-xl text-[16px] font-light text-white xl:text-lg">
+            {freediveData.banner.slides[0].description}
+          </p>
+        )}
+      </div>
+    </div>
+  </section>
+</HeroBanner>
       {/* ── Desktop tabs ── */}
       <section className="hidden md:flex h-[95px] bg-white justify-center items-end">
         <Tabs
@@ -423,9 +423,27 @@ const Diving = ({ params }: { params: Promise<{ locale: string }> }) => {
         )}
       </section>
       <FreediveSitesSection
-        regions={freediveData?.regions ?? []}
-        locations={freediveData?.locations ?? []}
-      />{" "}
+  regions={freediveData?.regions?.entities?.map((entity: any) => ({
+    id: entity.id,
+    name: entity.name,
+    position: entity.position,
+  })) || []}
+  
+  locations={freediveData?.regions?.entities?.flatMap((entity: any) =>
+    entity.locations?.map((loc: any) => ({
+      id: loc.id,
+      region_id: loc.region_id || entity.id,
+      name: loc.name,
+      description: loc.description,
+      certification: loc.certifications ? loc.certifications.join(", ") : "",
+      fish_level: loc.fish_level,
+      difficulty_level: loc.difficulty_level,
+      max_depth: loc.max_depth,
+      video_url: loc.banner?.slides?.[0]?.video_url || "",
+      video_cover: loc.banner?.slides?.[0]?.video_cover_url || "",
+    })) || []
+  ) || []}
+/>
     </main>
   );
 };

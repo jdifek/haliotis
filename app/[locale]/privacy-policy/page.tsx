@@ -16,7 +16,10 @@ interface PrivacyPolicyData {
   id: string;
   slug: string;
   title: string;
-  content: string | null;
+  content: {
+    body: string | null;
+    tabs: { title: string; body: string }[] | null;
+  } | null;
   image: string | null;
   banner: {
     id: number;
@@ -30,7 +33,7 @@ interface PrivacyPolicyData {
 
 async function getPrivacyPolicy(locale: string): Promise<PrivacyPolicyData> {
   const res = await fetch(
-    `https://cp.haliotis.space/api/v1/privacy-policy?lang=${locale}`,
+    `https://cp.haliotis.space/api/v1/pages/system/privacy_policy?lang=${locale}`,
     {
       headers: { Accept: "application/json" },
       next: { revalidate: 3600 },

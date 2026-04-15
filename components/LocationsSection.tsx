@@ -327,7 +327,7 @@ type ApiContact = {
 export default function LocationsSection({
   contacts,
 }: {
-  contacts: ApiContact[];
+  contacts: any[];
 }) {
   console.log(contacts, "contacts");
 

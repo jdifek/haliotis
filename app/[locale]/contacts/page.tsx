@@ -1,6 +1,54 @@
 import { HeroBanner } from "@/components/HeroBanner";
 import LocationsSection from "@/components/LocationsSection";
 
+interface Slide {
+  id: number;
+  type: "video" | "image";
+  position: number;
+  video_url?: string;
+  video_cover_url?: string;
+  desktop_image_url?: string;
+  mobile_image_url?: string;
+  title?: string;
+  description?: string;
+}
+
+interface DivingCenter {
+  id: number;
+  name: string;
+  slug: string;
+  color: string;
+  icon_url: string;
+  contacts: {
+    tripadvisor?: string;
+    facebook?: string;
+    youtube?: string;
+    email?: string;
+    phone?: string;
+    fax?: string | null;
+    address?: string;
+  };
+}
+
+interface ContactsPageData {
+  id: number;
+  slug: string;
+  title: string;
+  system_key: string;
+  system_data: {
+    center_label: string;
+  };
+  seo: {
+    meta_description: string;
+    meta_keywords: string;
+  };
+  banner: {
+    id: number;
+    slides: Slide[];
+  };
+  diving_centers: DivingCenter[];
+}
+
 export default async function Contacts({
   params,
 }: {
@@ -8,34 +56,48 @@ export default async function Contacts({
 }) {
   const { locale } = await params;
 
-  const res = await fetch(`https://cp.haliotis.space/api/v1/contact-us?lang=${locale}`);
+  const res = await fetch(
+    `https://cp.haliotis.space/api/v1/pages/system/contact_us?lang=${locale}`
+  );
   const json = await res.json();
-  const { page, contacts } = json.data;
 
-  const slides = page.banner.slides.map((slide: {
-    desktop_image_url: string;
-    mobile_image_url: string;
-    title?: string;
-    description?: string;
-  }) => ({
-    image: slide.desktop_image_url,
-    mobileImage: slide.mobile_image_url,
-    title: slide.title,
-    description: slide.description,
-  }));
+  // Данные лежат прямо в json.data, без вложенного "page"
+  const data: ContactsPageData = json.data;
+
+  // Маппим слайды с учётом двух типов: video и image
+  const slides = data.banner.slides.map((slide) => {
+    if (slide.type === "video") {
+      return {
+        image: slide.video_cover_url ?? "",
+        mobileImage: slide.video_cover_url ?? "",
+        videoUrl: slide.video_url,
+        title: slide.title,
+        description: slide.description,
+      };
+    }
+
+    return {
+      image: slide.desktop_image_url ?? "",
+      mobileImage: slide.mobile_image_url ?? "",
+      title: slide.title,
+      description: slide.description,
+    };
+  });
+
+  const firstSlide = data.banner.slides[0];
 
   return (
     <>
       <HeroBanner
         slides={slides}
-        breadcrumbs={[{ label: "Haliotis", href: "/" }, { label: page.title }]}
+        breadcrumbs={[{ label: "Haliotis", href: "/" }, { label: data.title }]}
         height="h-[75vh]"
       >
         <section className="container px-5 py-6">
           <div className="max-w-3xl">
             <div className="mb-12">
               <h1 className="mb-3 text-[32px] font-bold leading-tight text-white lg:text-5xl">
-                {page.title}
+                {data.title}
               </h1>
               <div className="mb-6">
                 <svg
@@ -45,7 +107,14 @@ export default async function Contacts({
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
                 >
-                  <mask id="mask0_1_2763" maskUnits="userSpaceOnUse" x="0" y="0" width="157" height="7">
+                  <mask
+                    id="mask0_1_2763"
+                    maskUnits="userSpaceOnUse"
+                    x="0"
+                    y="0"
+                    width="157"
+                    height="7"
+                  >
                     <path d="M156.168 6.05303H0V0H156.168V6.05303Z" fill="white" />
                   </mask>
                   <g mask="url(#mask0_1_2763)">
@@ -58,9 +127,9 @@ export default async function Contacts({
                   </g>
                 </svg>
               </div>
-              {page.banner.slides[0]?.description && (
+              {firstSlide?.description && (
                 <p className="max-w-xl text-[16px] font-light text-white lg:text-lg">
-                  {page.banner.slides[0].description}
+                  {firstSlide.description}
                 </p>
               )}
             </div>
@@ -68,7 +137,8 @@ export default async function Contacts({
         </section>
       </HeroBanner>
 
-      <LocationsSection contacts={contacts} />
+      {/* Передаём diving_centers вместо несуществующего contacts */}
+      <LocationsSection contacts={data.diving_centers} />
 
       <section className="bg-[#f1f1f1] px-4 pb-12 md:px-[30px] md:pb-[50px]">
         <div
@@ -90,7 +160,8 @@ export default async function Contacts({
               color: "#fff",
             }}
           >
-            {page.center_label}
+            {/* system_data.center_label вместо page.center_label */}
+            {data.system_data.center_label}
           </h2>
         </div>
 

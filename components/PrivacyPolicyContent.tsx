@@ -119,11 +119,10 @@ interface PrivacyPolicyContentProps {
 
 export default function PrivacyPolicyContent({ data }: PrivacyPolicyContentProps) {
   // Используем данные из API
-  const tabs: any[] = data.content?.tabs || [];
-  
+  console.log("CLIENT DATA:", data);
+  const tabs: any[] = data.content?.tabs || [];  
   // Если нет tabs, показываем только body
-  const hasBody = data.content?.body;
-  const hasTabs = tabs.length > 0;
+  const hasBody = Boolean(data?.content && data.content.body);    const hasTabs = tabs.length > 0;
 
   // First tab is rendered separately on desktop (always visible, no accordion header)
   const [firstTab, ...restTabs] = tabs;
@@ -157,6 +156,7 @@ export default function PrivacyPolicyContent({ data }: PrivacyPolicyContentProps
       >
         {data.title}
       </h1>
+    
 
       <div className="h-[30px] xl:h-[50px]" />
 
@@ -164,6 +164,7 @@ export default function PrivacyPolicyContent({ data }: PrivacyPolicyContentProps
       <div className="hidden xl:flex xl:gap-[30px]">
         {/* Left: content */}
         <div className="flex-1 min-w-0">
+      
           {/* Body content если есть */}
           {hasBody && (
             <div
@@ -176,8 +177,7 @@ export default function PrivacyPolicyContent({ data }: PrivacyPolicyContentProps
                 opacity: 0.8,
                 marginBottom: hasTabs ? "20px" : "0",
               }}
-              dangerouslySetInnerHTML={{ __html: data.content!.body }}
-            />
+              dangerouslySetInnerHTML={{ __html: data.content?.body ?? "" }}            />
           )}
 
           {/* Tabs если есть */}
@@ -248,8 +248,7 @@ export default function PrivacyPolicyContent({ data }: PrivacyPolicyContentProps
               color: "#101010",
               marginBottom: hasTabs ? "20px" : "0",
             }}
-            dangerouslySetInnerHTML={{ __html: data.content!.body }}
-          />
+            dangerouslySetInnerHTML={{ __html: data.content?.body ?? "" }}          />
         )}
 
         {/* Tabs если есть */}
