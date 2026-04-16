@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -361,118 +361,99 @@ const DiveSiteCard = ({ site }: { site: DiveSite }) => {
   );
 };
 
-// ─── Sample data ──────────────────────────────────────────────────────────────
 
-const locationTabs: LocationTab[] = [
-  {
-    id: "berlengas",
-    label: "Berlengas",
-    sites: [
-      {
-        id: "baixa-berlengas",
-        name: "Baixa do Broeiro",
-        fishes: 3,
-        difficulty: 3,
-        maxDepth: "18 meters",
-        padiLevel: "PADI OWD (or equivalent)",
-        description:
-          "For many the best dive site in Portugal - This is one of the richest fish spots of the Natural Reserve of Berlengas. It is an advanced dive, frequently with currents. Sometimes can note be done due to the conditions of the sea, the experience of the divers and presence of fishermen in spot. When all conditions are good it is frequently amazing. The Reef comes from 40 meters of depth until 5 meters, in its higher point. The north wall drops to 25 meters, wherethere is a platform, then continuing until 40 meters. The spot is full of live. In the shallow areas there are lots of Sea-bream, feeding in the rock. The diving has a usual visibility of 10/15 meters.",
-      },
-      {
-        id: "parados-berlengas",
-        name: "Parados",
-        fishes: 3,
-        difficulty: 2,
-        maxDepth: "18 meters",
-        padiLevel: "PADI OWD (or equivalent)",
-        description:
-          "The Parados, located in the Estelas, are a site between 2 and 18 metres deep, usually a dive around a reef that comes to the surface. Triggerfish, Seabreams, and Cowbreams are very common. It's a place where there are plenty of Jewel Anemones. There is a well lined with Soft Coral. Sometimes it's a place where there can be some current, and where we can only dive when the sea is calm and windless.",
-      },
-    ],
-  },
-  {
-    id: "estelas",
-    label: "Estelas",
-    sites: [
-      {
-        id: "baixa-estelas",
-        name: "Baixa do Broeiro",
-        fishes: 3,
-        difficulty: 3,
-        maxDepth: "18 meters",
-        padiLevel: "PADI OWD (or equivalent)",
-        description:
-          "For many the best dive site in Portugal - This is one of the richest fish spots of the Natural Reserve of Berlengas. It is an advanced dive, frequently with currents. Sometimes can note be done due to the conditions of the sea, the experience of the divers and presence of fishermen in spot. When all conditions are good it is frequently amazing.",
-      },
-      {
-        id: "parados-estelas",
-        name: "Parados",
-        fishes: 3,
-        difficulty: 2,
-        maxDepth: "18 meters",
-        padiLevel: "PADI OWD (or equivalent)",
-        description:
-          "The Parados, located in the Estelas, are a site between 2 and 18 metres deep, usually a dive around a reef that comes to the surface. Triggerfish, Seabreams, and Cowbreams are very common.",
-      },
-    ],
-  },
-  {
-    id: "farilhoes",
-    label: "Farilhões",
-    sites: [
-      {
-        id: "farilhoes-main",
-        name: "Farilhões North",
-        fishes: 4,
-        difficulty: 4,
-        maxDepth: "30 meters",
-        padiLevel: "PADI AOW (or equivalent)",
-        description:
-          "Farilhões offers some of the most remote and pristine diving in the Berlengas archipelago. This site features dramatic underwater topography and frequent encounters with large groupers and barracuda.",
-      },
-    ],
-  },
-];
+
+type Region = { id: number; name: string; position: number };
+type Location = {
+  id: number;
+  region_id: number;
+  name: string;
+  description: string;
+  certification: string;
+  fish_level: number;
+  difficulty_level: number;
+  max_depth: string;
+  video_url: string;
+  video_cover: string;
+};
+
+type DiveSitesSectionProps = {
+  regions: Region[];
+  locations: Location[];
+};
+
+// ... (все SVG иконки остаются без изменений)
+
+function normalizeVideoUrl(url: string): string {
+  if (!url) return "";
+  const match = url.match(
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/
+  );
+  const id = match ? match[1] : url.length === 11 ? url : null;
+  if (!id) return "";
+  return `https://www.youtube.com/embed/${id}`;
+}
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
-const DiveSitesSection = () => {
-  const [activeTab, setActiveTab] = useState("estelas");
+const DiveSitesSection = ({ regions, locations }: DiveSitesSectionProps) => {
+  const uniqueRegions = regions
+    .sort((a, b) => a.position - b.position)
+    .filter((r, idx, arr) => arr.findIndex((x) => x.name === r.name) === idx);
+
+  const locationTabs = uniqueRegions
+    .map((region) => {
+      const regionIds = regions
+        .filter((r) => r.name === region.name)
+        .map((r) => r.id);
+      return {
+        id: String(region.id),
+        label: region.name,
+        sites: locations
+          .filter((loc) => regionIds.includes(loc.region_id))
+          .map(
+            (loc): DiveSite => ({
+              id: String(loc.id),
+              name: loc.name,
+              fishes: loc.fish_level,
+              difficulty: loc.difficulty_level,
+              maxDepth: `${parseFloat(loc.max_depth)} meters`,
+              padiLevel: loc.certification,
+              description: loc.description,
+              videoSrc: normalizeVideoUrl(loc.video_url),
+            })
+          ),
+      };
+    })
+    .filter((tab) => tab.sites.length > 0);
+
+  const [activeTab, setActiveTab] = useState("");
+
+  useEffect(() => {
+    if (locationTabs.length > 0 && !activeTab) {
+      setActiveTab(locationTabs[0].id);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [locationTabs.length]);
+
+  if (locationTabs.length === 0) return null;
+
   const currentLocation =
     locationTabs.find((t) => t.id === activeTab) ?? locationTabs[0];
 
   return (
     <section className="bg-white px-4 py-10 md:px-[30px] lg:px-[188px] md:py-[60px]">
-      {/* ── Header ───────────────────────────────────────── */}
+      {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-8 md:mb-10">
-        {/* Title */}
         <div>
-          <h2
-            style={{
-              fontFamily: "var(--font-family)",
-              fontWeight: 500,
-              fontSize: 42,
-              lineHeight: "130%",
-              color: "#000",
-            }}
-          >
+          <h2 style={{ fontFamily: "var(--font-family)", fontWeight: 500, fontSize: 42, lineHeight: "130%", color: "#000" }}>
             Dive Sites
           </h2>
-          <p
-            style={{
-              fontFamily: "var(--font-family)",
-              fontWeight: 400,
-              fontSize: 15,
-              lineHeight: "160%",
-              color: "#101010",
-              opacity: 0.8,
-            }}
-          >
+          <p style={{ fontFamily: "var(--font-family)", fontWeight: 400, fontSize: 15, lineHeight: "160%", color: "#101010", opacity: 0.8 }}>
             Explore the best dive sites
           </p>
         </div>
 
-        {/* Tab buttons */}
         <div className="flex items-center gap-2 flex-wrap">
           {locationTabs.map((tab) => {
             const isActive = tab.id === activeTab;
@@ -483,33 +464,8 @@ const DiveSitesSection = () => {
                 className="flex-1 lg:flex-none flex items-center justify-center gap-1 cursor-pointer"
                 style={
                   isActive
-                    ? {
-                        borderRadius: 8,
-                        padding: "10px 14px",
-                        height: 38,
-                        background: "#e84814",
-                        fontFamily: "var(--font-family)",
-                        fontWeight: 700,
-                        fontSize: 16,
-                        lineHeight: "120%",
-                        textTransform: "uppercase",
-                        color: "#fff",
-                        border: "none",
-                      }
-                    : {
-                        borderRadius: 8,
-                        padding: "10px 14px",
-                        height: 38,
-                        background: "#f1f1f1",
-                        fontFamily: "var(--font-family)",
-                        fontWeight: 400,
-                        fontSize: 16,
-                        lineHeight: "140%",
-                        textTransform: "uppercase",
-                        textAlign: "center" as const,
-                        color: "#000",
-                        border: "none",
-                      }
+                    ? { borderRadius: 8, padding: "10px 14px", height: 38, background: "#e84814", fontFamily: "var(--font-family)", fontWeight: 700, fontSize: 16, lineHeight: "120%", textTransform: "uppercase", color: "#fff", border: "none" }
+                    : { borderRadius: 8, padding: "10px 14px", height: 38, background: "#f1f1f1", fontFamily: "var(--font-family)", fontWeight: 400, fontSize: 16, lineHeight: "140%", textTransform: "uppercase", textAlign: "center" as const, color: "#000", border: "none" }
                 }
               >
                 <span>{tab.label}</span>
@@ -520,7 +476,7 @@ const DiveSitesSection = () => {
         </div>
       </div>
 
-      {/* ── Cards ────────────────────────────────────────── */}
+      {/* Cards */}
       <div className="flex flex-col gap-6">
         {currentLocation.sites.map((site) => (
           <DiveSiteCard key={site.id} site={site} />
@@ -529,5 +485,6 @@ const DiveSitesSection = () => {
     </section>
   );
 };
+
 
 export default DiveSitesSection;
