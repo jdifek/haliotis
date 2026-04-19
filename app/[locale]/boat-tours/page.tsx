@@ -7,6 +7,9 @@ import { ArticleCard } from "@/components/ArticleCard";
 import { ButtonWithIcon } from "@/components/buttons/ButtonWithIcon";
 import { Tabs } from "@/components/buttons/Tabs";
 import { LOCATION_COLORS } from "@/components/buttons/Tabs";
+import { useLocale } from "next-intl";
+import { useMenu } from "@/app/hooks/useMenu";
+import { createTermGetter } from "@/app/utils/terms";
 
 const tabs = [
   { id: "peniche", label: "Peniche" },
@@ -202,6 +205,10 @@ const DESCRIPTIONS: Record<string, string> = {
 };
 
 const BoatTours = () => {
+  const locale = useLocale();
+  const { terms } = useMenu(locale);
+  const t = createTermGetter(terms);
+
   const [activeTab, setActiveTab] = useState("peniche");
   const [isExpanded, setIsExpanded] = useState(false);
   const [triangleX, setTriangleX] = useState<number | null>(null);
@@ -396,7 +403,7 @@ const BoatTours = () => {
                     </span>
                   </div>
                   <ButtonWithIcon
-                    label="Book now"
+                    label={t("book_now", "Book now")}
                     icon={
                       <svg
                         width="44"

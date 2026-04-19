@@ -7,6 +7,9 @@ import { TripsSection } from "@/components/mainSections/TripsSection";
 import { DiveTrips } from "@/components/mainSections/DiveTrips";
 import { CentersSection } from "@/components/mainSections/CentersSection";
 import type { Metadata } from 'next';
+import { useMenu } from "@/hooks/useMenu";
+import { useLocale } from "next-intl";
+import { createTermGetter } from "@/utils/terms";
 
 async function getHomepageData() {
   try {
@@ -45,7 +48,7 @@ export default async function Home() {
 
   // Формируем locations из API данных
   const locations = [
-    { id: "all", label: "ALL" },
+    { id: "all", label: {t("all", "ALL")} },
     ...(homepageData.sliders?.diving_centers?.entities || []).map((center: any) => ({
       id: center.slug,
       label: center.name.toUpperCase(),

@@ -10,6 +10,7 @@ import FreediveSitesSection from "@/components/Freedive/DiveSitesSection";
 import { useMenu } from "@/app/hooks/useMenu";
 import { useLocale } from "next-intl";
 import { HeroBanner } from "@/components/HeroBanner";
+import { createTermGetter } from "@/app/utils/terms";
 type ApiSlide = {
   desktop_image_url: string;
   mobile_image_url: string;
@@ -70,6 +71,9 @@ const FALLBACK_COLOR = "#e84814";
 
 const Diving = ({ params }: { params: Promise<{ locale: string }> }) => {
   const locale = useLocale();
+  const { terms } = useMenu(locale);
+  const t = createTermGetter(terms);
+
   const [freediveData, setFreediveData] = useState<any | null>(
     null
   );
@@ -377,7 +381,7 @@ const Diving = ({ params }: { params: Promise<{ locale: string }> }) => {
                               </span>
                             </div>
                             <ButtonWithIcon
-                              label="Book now"
+                              label={t("book_now", "Book now")}
                               icon={
                                 <svg
                                   width="44"

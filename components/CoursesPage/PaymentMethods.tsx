@@ -3,12 +3,9 @@
 import React, { useState } from "react";
 import Card from "./Card";
 
-
-
 type Props = { paymentMethods: { id: number; name: string; images: string }[] };
-export const PaymentMethods = ({ paymentMethods }: Props) => {  const [isOpen, setIsOpen] = useState(false);
-
-
+export const PaymentMethods = ({ paymentMethods }: Props) => {
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
     <div className="mx-auto max-w-[1920px] bg-white pt-8 md:py-12 px-4 md:px-8 lg:px-[188px]">
@@ -40,16 +37,16 @@ export const PaymentMethods = ({ paymentMethods }: Props) => {  const [isOpen, s
 
       {/* Контент - на десктопе всегда видим, на мобилке по клику */}
       <div className={`${isOpen ? "block" : "hidden"} md:block`}>
-      <div className="grid grid-cols-2 gap-[23px] md:flex md:flex-wrap md:gap-[30px]">
-      {" "}
-      {paymentMethods.map((method) => (
-  <Card
-    key={method.id}
-    logo={method.images}
-    name={method.name}
-    alt={`${method.name} logo`}
-  />
-))}
+        <div className="grid grid-cols-2 gap-[23px] md:flex md:flex-wrap md:gap-[30px]">
+          {" "}
+          {paymentMethods.map((method) => (
+            <Card
+              key={method.id}
+              logo={method.images}
+              name={method.name}
+              alt={`${method.name} logo`}
+            />
+          ))}
         </div>
       </div>
     </div>

@@ -10,6 +10,7 @@ import DiveSitesSection from "@/components/DiveSitesSection";
 import { useMenu } from "@/app/hooks/useMenu";
 import { useLocale } from "next-intl";
 import { HeroBanner } from "@/components/HeroBanner";
+import { createTermGetter } from "@/app/utils/terms";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -87,6 +88,9 @@ const FALLBACK_COLOR = "#e84814";
 
 const Diving = () => {
   const locale = useLocale();
+  const { terms } = useMenu(locale);
+  const t = createTermGetter(terms);
+
   const { divingCenters, colorBySlug, loading } = useMenu(locale);
 
   const tabs = divingCenters.map((center) => ({
@@ -310,7 +314,12 @@ const Diving = () => {
                           transform: "translateX(-50%)",
                         }}
                       >
-                        <svg width="47" height="24" viewBox="0 0 47 24" fill="none">
+                        <svg
+                          width="47"
+                          height="24"
+                          viewBox="0 0 47 24"
+                          fill="none"
+                        >
                           <path
                             d="M23.3359 0L46.6705 23.3345H23.3359H0.00141412L23.3359 0Z"
                             fill={activeColor}
@@ -322,7 +331,9 @@ const Diving = () => {
                         <div
                           className="flex-1 text-[15px] leading-[160%] text-[#101010] space-y-4"
                           style={{ opacity: 0.8 }}
-                          dangerouslySetInnerHTML={{ __html: expandedCard.details }}
+                          dangerouslySetInnerHTML={{
+                            __html: expandedCard.details,
+                          }}
                         />
                         <div className="w-full lg:w-[469px] bg-[#f1f1f1] rounded-3xl p-4 flex flex-col items-center justify-center gap-4">
                           <h3 className="text-[28px] lg:text-[42px] font-medium leading-[1.3] text-center text-black">
@@ -333,7 +344,12 @@ const Diving = () => {
                               style={{ backgroundColor: activeColor }}
                               className="flex items-center gap-2 rounded-lg px-3 py-2"
                             >
-                              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                              <svg
+                                width="20"
+                                height="20"
+                                viewBox="0 0 20 20"
+                                fill="none"
+                              >
                                 <path
                                   fillRule="evenodd"
                                   clipRule="evenodd"
@@ -346,10 +362,19 @@ const Diving = () => {
                               </span>
                             </div>
                             <ButtonWithIcon
-                              label="Book now"
-                              icon={
-                                <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
-                                  <rect width="44" height="44" rx="22" fill="white" />
+label={t("book_now", "Book now")}                              icon={
+                                <svg
+                                  width="44"
+                                  height="44"
+                                  viewBox="0 0 44 44"
+                                  fill="none"
+                                >
+                                  <rect
+                                    width="44"
+                                    height="44"
+                                    rx="22"
+                                    fill="white"
+                                  />
                                   <path
                                     d="M27.9624 23.293C28.8861 22.3501 30.3835 22.3501 31.3072 23.293C32.2309 24.2358 32.2309 25.7642 31.3072 26.707L27.2341 30.8645C27.1332 30.9675 27.0021 31.1066 26.8434 31.2195L26.843 31.2191C26.7172 31.3088 26.5813 31.383 26.4381 31.4402C26.2583 31.5122 26.0727 31.5468 25.9326 31.5754L23.9487 31.9805C23.6275 32.046 23.2955 31.9435 23.0639 31.707C22.8322 31.4706 22.7317 31.1318 22.796 30.8039L23.1928 28.7789C23.2209 28.6358 23.2543 28.4461 23.3249 28.2625C23.3809 28.1164 23.4537 27.9777 23.5415 27.8492L23.6283 27.7332C23.718 27.6223 23.8136 27.5277 23.8893 27.4504L27.9624 23.293ZM29.9219 24.707C29.7634 24.5453 29.5063 24.5453 29.3478 24.707L25.2747 28.8645C25.2078 28.9328 25.175 28.9665 25.1519 28.9918C25.1497 28.9943 25.1498 28.9955 25.1496 28.9965C25.1418 29.0301 25.1325 29.0767 25.114 29.1711L25.0053 29.725L25.5484 29.6145C25.6408 29.5956 25.6865 29.5861 25.7194 29.5781C25.7227 29.5768 25.7234 29.5764 25.724 29.5758C25.7488 29.5522 25.7818 29.5187 25.8488 29.4504L29.9219 25.293C30.0803 25.1312 30.0803 24.8688 29.9219 24.707Z"
                                     fill="black"
@@ -405,7 +430,8 @@ const Diving = () => {
               region_id: loc.region_id,
               name: loc.name,
               description: loc.description,
-              certification: loc.certifications?.map((c) => c.title).join(", ") ?? "",
+              certification:
+                loc.certifications?.map((c) => c.title).join(", ") ?? "",
               fish_level: loc.fish_level,
               difficulty_level: loc.difficulty_level,
               max_depth: loc.max_depth,

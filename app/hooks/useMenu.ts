@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/set-state-in-effect */
 /**
  * useMenu — глобальный кэш меню
@@ -42,7 +43,43 @@ export type DivingCenter = {
   contact_youtube?: string;
 };
 
+export type Terms = {
+  more_info?: string;
+  show_more?: string;
+  all?: string;
+  visit_our_online_shop?: string;
+  book_now?: string;
+  information_legal?: string;
+  meios_de_pagamento?: string;
+  parceiros?: string;
+  show_more_courses?: string;
+  show_more_dives?: string;
+  show_on_map?: string;
+  reviews?: string;
+  make_sure_you_are_on_the_right_place?: string;
+  description?: string;
+  contact_us?: string;
+  next?: string;
+  prev?: string;
+  categories?: string;
+  booking_form?: string;
+  padi_advanced_open_water_diver?: string;
+  padi_underwater_naturalist_sesimbra?: string;
+  fishes?: string;
+  difficulty?: string;
+  maximum_depth?: string;
+  meters?: string;
+  padi_owd?: string;
+  find_more?: string;
+  respiratory_blends?: string;
+  calculate_price?: string;
+  total_price?: string;
+  all_categories?: string;
+  [key: string]: string | undefined; // для динамических ключей
+};
+
 export type MenuData = {
+  terms: Terms;
   data: {
     main: MenuItem[];
     footer: MenuItem[];
@@ -87,6 +124,8 @@ interface UseMenuResult {
   divingCenters: DivingCenter[];
   /** slug → color, для быстрого доступа в Tabs */
   colorBySlug: Record<string, string>;
+  /** Термины для интернационализации */
+  terms: Terms;
   loading: boolean;
   error: string | null;
 }
@@ -137,13 +176,16 @@ export function useMenu(locale: string): UseMenuResult {
     divingCenters.map((c) => [c.slug, c.color])
   );
 
+  const terms = menuData?.terms ?? {};
+
   console.log(`useMenu: Returning data for locale "${locale}"`, {
     menuData,
     divingCenters,
     colorBySlug,
+    terms,
     loading,
     error,
   });
 
-  return { menuData, divingCenters, colorBySlug, loading, error };
+  return { menuData, divingCenters, colorBySlug, terms, loading, error };
 }

@@ -3,6 +3,7 @@
 type Settings = {
   general: {
     site_name: string;
+    footer_logo: string;
     logo_alt: string;
     logo: string;
   };
@@ -21,6 +22,7 @@ export async function getSettings(): Promise<Settings> {
     next: { revalidate: 3600 }, // кэш на 1 час
   });
   const json = await res.json();
+  
   _cache = json.data;
   return _cache!;
 }

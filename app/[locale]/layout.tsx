@@ -96,7 +96,7 @@ export default async function RootLayout({
           />
           {children}
           <Footer
-            logoUrl={settings.general.logo}
+            logoUrl={settings.general.footer_logo}
             logoAlt={settings.general.logo_alt}
           />
         </NextIntlClientProvider>
