@@ -666,12 +666,18 @@ export const Header: React.FC<{
 
   return (
     <>
-      <header className="sticky top-0 z-50 p-5">
-        {(!isTransparentInitially || isScrolled) && (
-          <div className="absolute inset-0 bg-[#281d4d] -z-10" />
-        )}
-        <div className="absolute left-5 right-5 bottom-0 border-b border-[rgba(255,255,255,0.2)]" />
-        <div className="flex items-center justify-between gap-4">
+     <header className="sticky top-0 z-50">
+  {/* Фон на уровне header */}
+  {(!isTransparentInitially || isScrolled) && (
+    <div className="absolute inset-0 bg-[#281d4d] -z-10" />
+  )}
+  
+  <div className="relative px-5 pb-[clamp(8px,1vw,16px)]">
+    {/* Нижняя граница */}
+    <div className="absolute left-5 right-5 bottom-0 border-b border-[rgba(255,255,255,0.2)]" />
+    
+    {/* Контент */}
+    <div className="flex items-center justify-between gap-4 pt-[clamp(12px,2vw,20px)]">
           <div
             onClick={handleToMain}
             className="relative cursor-pointer flex-shrink-0 xl:hidden"
@@ -684,7 +690,6 @@ export const Header: React.FC<{
               className="h-[41px] w-auto"
             />
           </div>
-
           <div
             onClick={handleToMain}
             className="relative cursor-pointer flex-shrink-0 hidden xl:block"
@@ -700,7 +705,8 @@ export const Header: React.FC<{
           {/* Desktop Nav */}
           {/* Desktop Nav */}
           <nav className="relative hidden rounded-xl bg-black/10 px-[clamp(8px,1vw,16px)] py-[clamp(10px,0.9vw,16.5px)] xl:flex">
-            <div className="flex w-full items-center justify-center gap-[clamp(8px,1.4vw,28px)]">
+            <div className="flex w-full flex-wrap items-start content-start justify-center gap-x-[clamp(8px,1.4vw,28px)] gap-y-1">
+              {" "}
               {navItems.slice(0, -1).map((item) => (
                 <div key={item.id} className="relative">
                   <button
@@ -782,126 +788,311 @@ export const Header: React.FC<{
               ))}
             </div>
           </nav>
+          {/* Desktop Right Panel */}
+          <div className="hidden flex-shrink-0 rounded-xl bg-black/10 p-1 xl:flex">
+            <div className="flex items-center gap-[clamp(2px,0.4vw,8px)] px-[clamp(2px,0.3vw,8px)]">
+              {/* ЯЗЫ К — был и должен быть */}
+              <div className="relative">
+                <button
+                  ref={langButtonRef}
+                  onClick={() => {
+                    if (langButtonRef.current && !isLangMenuOpen) {
+                      setLangButtonWidth(langButtonRef.current.offsetWidth);
+                    }
+                    setIsLangMenuOpen(!isLangMenuOpen);
+                  }}
+                  className="flex items-center justify-center gap-[clamp(4px,0.4vw,8px)] rounded-lg border border-black/12 bg-white cursor-pointer hover:bg-gray-100 px-[clamp(8px,0.9vw,14px)] py-[clamp(6px,0.6vw,10px)] text-[clamp(12px,0.85vw,15px)] font-bold text-black"
+                >
+                  {selectedLang}
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    className={`transition-transform xl:h-6 xl:w-6 ${
+                      isLangMenuOpen ? "rotate-180" : ""
+                    }`}
+                  >
+                    <path
+                      d="M17.8534 9.85369L12.8537 14.8534C12.8073 14.8999 12.7522 14.9367 12.6915 14.9619C12.6308 14.9871 12.5657 15 12.5 15C12.4343 15 12.3692 14.9871 12.3085 14.9619C12.2478 14.9367 12.1927 14.8999 12.1463 14.8534L7.14663 9.85369C7.07663 9.78377 7.02895 9.69465 7.00963 9.59761C6.9903 9.50058 7.00021 9.39999 7.03808 9.30858C7.07595 9.21718 7.1401 9.13907 7.22239 9.08413C7.30468 9.0292 7.40142 8.99992 7.50036 9H17.4996C17.5986 8.99992 17.6953 9.0292 17.7776 9.08413C17.8599 9.13907 17.924 9.21718 17.9619 9.30858C17.9998 9.39999 18.0097 9.50058 17.9904 9.59761C17.971 9.69465 17.9234 9.78377 17.8534 9.85369Z"
+                      fill="black"
+                    />
+                  </svg>
+                </button>
+                {isLangMenuOpen && (
+                  <div
+                    ref={langRef}
+                    className="absolute left-0 top-full mt-2 flex flex-col rounded-[10px] border-2 border-white shadow-lg"
+                    style={{
+                      width: langButtonWidth ? `${langButtonWidth}px` : "75px",
+                      background: "rgba(0, 3, 38, 0.5)",
+                      backdropFilter: "blur(10px)",
+                    }}
+                  >
+                    {languages
+                      .filter((l) => l?.prefix)
+                      .map((lang, index) => (
+                        <button
+                          key={lang.prefix}
+                          onClick={() => {
+                            setSelectedLang(lang.prefix.toUpperCase());
+                            switchLocale(lang.prefix);
+                            setIsLangMenuOpen(false);
+                          }}
+                          className={`flex h-[40px] w-full cursor-pointer items-center justify-center text-[15px] font-semibold transition-colors
+                ${
+                  selectedLang === lang.prefix.toUpperCase()
+                    ? "text-[#e84814]"
+                    : "text-white hover:text-[#e84814]"
+                }
+                ${
+                  index === 0
+                    ? "rounded-t-[8px]"
+                    : index === languages.length - 1
+                    ? "rounded-b-[8px]"
+                    : ""
+                }`}
+                          style={{
+                            background:
+                              selectedLang === lang.prefix.toUpperCase()
+                                ? "#111d9e"
+                                : "transparent",
+                          }}
+                        >
+                          {lang.prefix.toUpperCase()}
+                        </button>
+                      ))}
+                  </div>
+                )}
+              </div>
 
-       {/* Desktop Right Panel */}
-<div className="hidden flex-shrink-0 rounded-xl bg-black/10 p-1 xl:flex">
-  <div className="flex items-center gap-[clamp(2px,0.4vw,8px)] px-[clamp(2px,0.3vw,8px)]">
-    
-    {/* ЯЗЫ К — был и должен быть */}
-    <div className="relative">
-      <button
-        ref={langButtonRef}
-        onClick={() => {
-          if (langButtonRef.current && !isLangMenuOpen) {
-            setLangButtonWidth(langButtonRef.current.offsetWidth);
-          }
-          setIsLangMenuOpen(!isLangMenuOpen);
-        }}
-        className="flex items-center justify-center gap-[clamp(4px,0.4vw,8px)] rounded-lg border border-black/12 bg-white cursor-pointer hover:bg-gray-100 px-[clamp(8px,0.9vw,14px)] py-[clamp(6px,0.6vw,10px)] text-[clamp(12px,0.85vw,15px)] font-bold text-black"
-      >
-        {selectedLang}
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className={`transition-transform xl:h-6 xl:w-6 ${isLangMenuOpen ? "rotate-180" : ""}`}>
-          <path d="M17.8534 9.85369L12.8537 14.8534C12.8073 14.8999 12.7522 14.9367 12.6915 14.9619C12.6308 14.9871 12.5657 15 12.5 15C12.4343 15 12.3692 14.9871 12.3085 14.9619C12.2478 14.9367 12.1927 14.8999 12.1463 14.8534L7.14663 9.85369C7.07663 9.78377 7.02895 9.69465 7.00963 9.59761C6.9903 9.50058 7.00021 9.39999 7.03808 9.30858C7.07595 9.21718 7.1401 9.13907 7.22239 9.08413C7.30468 9.0292 7.40142 8.99992 7.50036 9H17.4996C17.5986 8.99992 17.6953 9.0292 17.7776 9.08413C17.8599 9.13907 17.924 9.21718 17.9619 9.30858C17.9998 9.39999 18.0097 9.50058 17.9904 9.59761C17.971 9.69465 17.9234 9.78377 17.8534 9.85369Z" fill="black"/>
-        </svg>
-      </button>
-      {isLangMenuOpen && (
-        <div
-          ref={langRef}
-          className="absolute left-0 top-full mt-2 flex flex-col rounded-[10px] border-2 border-white shadow-lg"
-          style={{ width: langButtonWidth ? `${langButtonWidth}px` : "75px", background: "rgba(0, 3, 38, 0.5)", backdropFilter: "blur(10px)" }}
-        >
-          {languages.filter((l) => l?.prefix).map((lang, index) => (
-            <button
-              key={lang.prefix}
-              onClick={() => { setSelectedLang(lang.prefix.toUpperCase()); switchLocale(lang.prefix); setIsLangMenuOpen(false); }}
-              className={`flex h-[40px] w-full cursor-pointer items-center justify-center text-[15px] font-semibold transition-colors
-                ${selectedLang === lang.prefix.toUpperCase() ? "text-[#e84814]" : "text-white hover:text-[#e84814]"}
-                ${index === 0 ? "rounded-t-[8px]" : index === languages.length - 1 ? "rounded-b-[8px]" : ""}`}
-              style={{ background: selectedLang === lang.prefix.toUpperCase() ? "#111d9e" : "transparent" }}
-            >
-              {lang.prefix.toUpperCase()}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
+              {/* СОЦСЕТИ */}
+              <div
+                ref={socialRef}
+                className="flex items-center gap-[clamp(2px,0.4vw,8px)]"
+              >
+                {/* Facebook */}
+                <div className="relative">
+                  <button
+                    onClick={() =>
+                      setOpenSocial(
+                        openSocial === "facebook" ? null : "facebook"
+                      )
+                    }
+                    className="rounded-lg p-2 flex items-center gap-1 hover:bg-white/10 transition-all"
+                  >
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                      <path
+                        d="M9.99996 1.69995C5.41663 1.69995 1.66663 5.44162 1.66663 10.05C1.66663 14.2166 4.71663 17.675 8.69996 18.3V12.4666H6.58329V10.05H8.69996V8.20828C8.69996 6.11662 9.94163 4.96662 11.85 4.96662C12.7583 4.96662 13.7083 5.12495 13.7083 5.12495V7.18328H12.6583C11.625 7.18328 11.3 7.82495 11.3 8.4833V10.05H13.6166L13.2416 12.4666H11.3V18.3C13.2636 17.9898 15.0518 16.9879 16.3415 15.475C17.6313 13.9621 18.3378 12.038 18.3333 10.05C18.3333 5.44162 14.5833 1.69995 9.99996 1.69995Z"
+                        fill="white"
+                      />
+                    </svg>
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      className={`transition-transform ${
+                        openSocial === "facebook" ? "rotate-180" : ""
+                      }`}
+                    >
+                      <path
+                        d="M17.8534 9.85369L12.8537 14.8534C12.8073 14.8999 12.7522 14.9367 12.6915 14.9619C12.6308 14.9871 12.5657 15 12.5 15C12.4343 15 12.3692 14.9871 12.3085 14.9619C12.2478 14.9367 12.1927 14.8999 12.1463 14.8534L7.14663 9.85369C7.07663 9.78377 7.02895 9.69465 7.00963 9.59761C6.9903 9.50058 7.00021 9.39999 7.03808 9.30858C7.07595 9.21718 7.1401 9.13907 7.22239 9.08413C7.30468 9.0292 7.40142 8.99992 7.50036 9H17.4996C17.5986 8.99992 17.6953 9.0292 17.7776 9.08413C17.8599 9.13907 17.924 9.21718 17.9619 9.30858C17.9998 9.39999 18.0097 9.50058 17.9904 9.59761C17.971 9.69465 17.9234 9.78377 17.8534 9.85369Z"
+                        fill="white"
+                      />
+                    </svg>
+                  </button>
+                  {openSocial === "facebook" && (
+                    <div
+                      className="absolute right-0 top-full mt-2 flex flex-col rounded-[10px] border-2 border-white shadow-lg overflow-hidden z-50"
+                      style={{
+                        minWidth: "180px",
+                        background: "rgba(0, 3, 38, 0.5)",
+                        backdropFilter: "blur(10px)",
+                      }}
+                    >
+                      {centersData.map((center, index) => {
+                        const dc = menuData?.diving_centers.find(
+                          (c) => c.slug === center.id
+                        );
+                        if (!dc?.contact_facebook) return null;
+                        return (
+                          <a
+                            key={center.id}
+                            href={dc.contact_facebook}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={() => setOpenSocial(null)}
+                            className={`flex h-[44px] items-center gap-[10px] px-[14px] text-white transition-all hover:bg-[#111d9e] ${
+                              index === 0 ? "rounded-t-[8px]" : ""
+                            } ${
+                              index === centersData.length - 1
+                                ? "rounded-b-[8px]"
+                                : ""
+                            }`}
+                          >
+                            <span
+                              className="w-2 h-2 rounded-full flex-shrink-0"
+                              style={{ background: center.color }}
+                            />
+                            <span className="text-[14px] font-medium">
+                              {center.label}
+                            </span>
+                          </a>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
 
-    {/* СОЦСЕТИ */}
-    <div ref={socialRef} className="flex items-center gap-[clamp(2px,0.4vw,8px)]">
+                {/* YouTube */}
+                <div className="relative">
+                  <button
+                    onClick={() =>
+                      setOpenSocial(openSocial === "youtube" ? null : "youtube")
+                    }
+                    className="flex items-center gap-1 rounded-lg p-2 hover:bg-white/10 transition-all"
+                  >
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                      <path
+                        d="M19.582 5.186C19.352 4.322 18.674 3.644 17.81 3.414C16.254 3 10 3 10 3C10 3 3.746 3 2.19 3.414C1.326 3.644 0.648 4.322 0.418 5.186C0 6.742 0 10 0 10C0 10 0 13.258 0.418 14.814C0.648 15.678 1.326 16.356 2.19 16.586C3.746 17 10 17 10 17C10 17 16.254 17 17.81 16.586C18.674 16.356 19.352 15.678 19.582 14.814C20 13.258 20 10 20 10C20 10 20 6.742 19.582 5.186ZM8 13V7L13 10L8 13Z"
+                        fill="white"
+                      />
+                    </svg>
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      className={`transition-transform ${
+                        openSocial === "youtube" ? "rotate-180" : ""
+                      }`}
+                    >
+                      <path
+                        d="M17.8534 9.85369L12.8537 14.8534C12.8073 14.8999 12.7522 14.9367 12.6915 14.9619C12.6308 14.9871 12.5657 15 12.5 15C12.4343 15 12.3692 14.9871 12.3085 14.9619C12.2478 14.9367 12.1927 14.8999 12.1463 14.8534L7.14663 9.85369C7.07663 9.78377 7.02895 9.69465 7.00963 9.59761C6.9903 9.50058 7.00021 9.39999 7.03808 9.30858C7.07595 9.21718 7.1401 9.13907 7.22239 9.08413C7.30468 9.0292 7.40142 8.99992 7.50036 9H17.4996C17.5986 8.99992 17.6953 9.0292 17.7776 9.08413C17.8599 9.13907 17.924 9.21718 17.9619 9.30858C17.9998 9.39999 18.0097 9.50058 17.9904 9.59761C17.971 9.69465 17.9234 9.78377 17.8534 9.85369Z"
+                        fill="white"
+                      />
+                    </svg>
+                  </button>
+                  {openSocial === "youtube" && (
+                    <div
+                      className="absolute right-0 top-full mt-2 flex flex-col rounded-[10px] border-2 border-white shadow-lg overflow-hidden z-50"
+                      style={{
+                        minWidth: "180px",
+                        background: "rgba(0, 3, 38, 0.5)",
+                        backdropFilter: "blur(10px)",
+                      }}
+                    >
+                      {centersData.map((center, index) => {
+                        const dc = menuData?.diving_centers.find(
+                          (c) => c.slug === center.id
+                        );
+                        if (!dc?.contact_youtube) return null;
+                        return (
+                          <a
+                            key={center.id}
+                            href={dc.contact_youtube}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={() => setOpenSocial(null)}
+                            className={`flex h-[44px] items-center gap-[10px] px-[14px] text-white transition-all hover:bg-[#111d9e] ${
+                              index === 0 ? "rounded-t-[8px]" : ""
+                            } ${
+                              index === centersData.length - 1
+                                ? "rounded-b-[8px]"
+                                : ""
+                            }`}
+                          >
+                            <span
+                              className="w-2 h-2 rounded-full flex-shrink-0"
+                              style={{ background: center.color }}
+                            />
+                            <span className="text-[14px] font-medium">
+                              {center.label}
+                            </span>
+                          </a>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
 
-      {/* Facebook */}
-      <div className="relative">
-        <button onClick={() => setOpenSocial(openSocial === "facebook" ? null : "facebook")} className="rounded-lg p-2 flex items-center gap-1 hover:bg-white/10 transition-all">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M9.99996 1.69995C5.41663 1.69995 1.66663 5.44162 1.66663 10.05C1.66663 14.2166 4.71663 17.675 8.69996 18.3V12.4666H6.58329V10.05H8.69996V8.20828C8.69996 6.11662 9.94163 4.96662 11.85 4.96662C12.7583 4.96662 13.7083 5.12495 13.7083 5.12495V7.18328H12.6583C11.625 7.18328 11.3 7.82495 11.3 8.4833V10.05H13.6166L13.2416 12.4666H11.3V18.3C13.2636 17.9898 15.0518 16.9879 16.3415 15.475C17.6313 13.9621 18.3378 12.038 18.3333 10.05C18.3333 5.44162 14.5833 1.69995 9.99996 1.69995Z" fill="white"/></svg>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className={`transition-transform ${openSocial === "facebook" ? "rotate-180" : ""}`}><path d="M17.8534 9.85369L12.8537 14.8534C12.8073 14.8999 12.7522 14.9367 12.6915 14.9619C12.6308 14.9871 12.5657 15 12.5 15C12.4343 15 12.3692 14.9871 12.3085 14.9619C12.2478 14.9367 12.1927 14.8999 12.1463 14.8534L7.14663 9.85369C7.07663 9.78377 7.02895 9.69465 7.00963 9.59761C6.9903 9.50058 7.00021 9.39999 7.03808 9.30858C7.07595 9.21718 7.1401 9.13907 7.22239 9.08413C7.30468 9.0292 7.40142 8.99992 7.50036 9H17.4996C17.5986 8.99992 17.6953 9.0292 17.7776 9.08413C17.8599 9.13907 17.924 9.21718 17.9619 9.30858C17.9998 9.39999 18.0097 9.50058 17.9904 9.59761C17.971 9.69465 17.9234 9.78377 17.8534 9.85369Z" fill="white"/></svg>
-        </button>
-        {openSocial === "facebook" && (
-          <div className="absolute right-0 top-full mt-2 flex flex-col rounded-[10px] border-2 border-white shadow-lg overflow-hidden z-50" style={{ minWidth: "180px", background: "rgba(0, 3, 38, 0.5)", backdropFilter: "blur(10px)" }}>
-            {centersData.map((center, index) => {
-              const dc = menuData?.diving_centers.find(c => c.slug === center.id);
-              if (!dc?.contact_facebook) return null;
-              return (
-                <a key={center.id} href={dc.contact_facebook} target="_blank" rel="noopener noreferrer" onClick={() => setOpenSocial(null)}
-                  className={`flex h-[44px] items-center gap-[10px] px-[14px] text-white transition-all hover:bg-[#111d9e] ${index === 0 ? "rounded-t-[8px]" : ""} ${index === centersData.length - 1 ? "rounded-b-[8px]" : ""}`}>
-                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: center.color }} />
-                  <span className="text-[14px] font-medium">{center.label}</span>
-                </a>
-              );
-            })}
+                {/* Tripadvisor */}
+                <div className="relative">
+                  <button
+                    onClick={() =>
+                      setOpenSocial(
+                        openSocial === "instagram" ? null : "instagram"
+                      )
+                    }
+                    className="rounded-lg p-2 flex items-center gap-1 hover:bg-white/10 transition-all"
+                  >
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                      <path
+                        d="M10 1.802C12.67 1.802 12.987 1.812 14.041 1.86C16.751 1.986 18.013 3.27 18.139 5.959C18.188 7.013 18.197 7.33 18.197 10C18.197 12.671 18.187 12.987 18.139 14.041C18.012 16.728 16.754 18.014 14.041 18.14C12.987 18.188 12.671 18.198 10 18.198C7.33 18.198 7.013 18.188 5.96 18.14C3.241 18.013 1.988 16.725 1.862 14.04C1.813 12.987 1.803 12.67 1.803 10C1.803 7.33 1.814 7.013 1.862 5.96C1.989 3.27 3.247 1.986 5.96 1.86C7.014 1.812 7.33 1.802 10 1.802ZM10 0C7.284 0 6.944 0.012 5.878 0.06C2.246 0.227 0.228 2.242 0.061 5.877C0.012 6.944 0 7.284 0 10C0 12.716 0.012 13.056 0.06 14.122C0.227 17.754 2.242 19.772 5.877 19.939C6.944 19.988 7.284 20 10 20C12.716 20 13.056 19.988 14.122 19.94C17.751 19.773 19.775 17.757 19.938 14.123C19.988 13.056 20 12.716 20 10C20 7.284 19.988 6.944 19.94 5.878C19.777 2.249 17.758 0.228 14.123 0.061C13.056 0.012 12.716 0 10 0ZM10 4.865C7.164 4.865 4.865 7.164 4.865 10C4.865 12.836 7.164 15.136 10 15.136C12.836 15.136 15.135 12.837 15.135 10C15.135 7.164 12.836 4.865 10 4.865ZM10 13.333C8.159 13.333 6.667 11.842 6.667 10C6.667 8.159 8.159 6.667 10 6.667C11.841 6.667 13.333 8.159 13.333 10C13.333 11.842 11.841 13.333 10 13.333ZM15.338 3.462C14.675 3.462 14.139 3.998 14.139 4.661C14.139 5.324 14.675 5.86 15.338 5.86C16.001 5.86 16.537 5.324 16.537 4.661C16.537 3.998 16.001 3.462 15.338 3.462Z"
+                        fill="white"
+                      />
+                    </svg>
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      className={`transition-transform ${
+                        openSocial === "instagram" ? "rotate-180" : ""
+                      }`}
+                    >
+                      <path
+                        d="M17.8534 9.85369L12.8537 14.8534C12.8073 14.8999 12.7522 14.9367 12.6915 14.9619C12.6308 14.9871 12.5657 15 12.5 15C12.4343 15 12.3692 14.9871 12.3085 14.9619C12.2478 14.9367 12.1927 14.8999 12.1463 14.8534L7.14663 9.85369C7.07663 9.78377 7.02895 9.69465 7.00963 9.59761C6.9903 9.50058 7.00021 9.39999 7.03808 9.30858C7.07595 9.21718 7.1401 9.13907 7.22239 9.08413C7.30468 9.0292 7.40142 8.99992 7.50036 9H17.4996C17.5986 8.99992 17.6953 9.0292 17.7776 9.08413C17.8599 9.13907 17.924 9.21718 17.9619 9.30858C17.9998 9.39999 18.0097 9.50058 17.9904 9.59761C17.971 9.69465 17.9234 9.78377 17.8534 9.85369Z"
+                        fill="white"
+                      />
+                    </svg>
+                  </button>
+                  {openSocial === "instagram" && (
+                    <div
+                      className="absolute right-0 top-full mt-2 flex flex-col rounded-[10px] border-2 border-white shadow-lg overflow-hidden z-50"
+                      style={{
+                        minWidth: "180px",
+                        background: "rgba(0, 3, 38, 0.5)",
+                        backdropFilter: "blur(10px)",
+                      }}
+                    >
+                      {centersData.map((center, index) => {
+                        const dc = menuData?.diving_centers.find(
+                          (c) => c.slug === center.id
+                        );
+                        if (!dc?.contact_tripadvisor) return null;
+                        return (
+                          <a
+                            key={center.id}
+                            href={dc.contact_tripadvisor}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={() => setOpenSocial(null)}
+                            className={`flex h-[44px] items-center gap-[10px] px-[14px] text-white transition-all hover:bg-[#111d9e] ${
+                              index === 0 ? "rounded-t-[8px]" : ""
+                            } ${
+                              index === centersData.length - 1
+                                ? "rounded-b-[8px]"
+                                : ""
+                            }`}
+                          >
+                            <span
+                              className="w-2 h-2 rounded-full flex-shrink-0"
+                              style={{ background: center.color }}
+                            />
+                            <span className="text-[14px] font-medium">
+                              {center.label}
+                            </span>
+                          </a>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
-        )}
-      </div>
-
-      {/* YouTube */}
-      <div className="relative">
-        <button onClick={() => setOpenSocial(openSocial === "youtube" ? null : "youtube")} className="flex items-center gap-1 rounded-lg p-2 hover:bg-white/10 transition-all">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M19.582 5.186C19.352 4.322 18.674 3.644 17.81 3.414C16.254 3 10 3 10 3C10 3 3.746 3 2.19 3.414C1.326 3.644 0.648 4.322 0.418 5.186C0 6.742 0 10 0 10C0 10 0 13.258 0.418 14.814C0.648 15.678 1.326 16.356 2.19 16.586C3.746 17 10 17 10 17C10 17 16.254 17 17.81 16.586C18.674 16.356 19.352 15.678 19.582 14.814C20 13.258 20 10 20 10C20 10 20 6.742 19.582 5.186ZM8 13V7L13 10L8 13Z" fill="white"/></svg>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className={`transition-transform ${openSocial === "youtube" ? "rotate-180" : ""}`}><path d="M17.8534 9.85369L12.8537 14.8534C12.8073 14.8999 12.7522 14.9367 12.6915 14.9619C12.6308 14.9871 12.5657 15 12.5 15C12.4343 15 12.3692 14.9871 12.3085 14.9619C12.2478 14.9367 12.1927 14.8999 12.1463 14.8534L7.14663 9.85369C7.07663 9.78377 7.02895 9.69465 7.00963 9.59761C6.9903 9.50058 7.00021 9.39999 7.03808 9.30858C7.07595 9.21718 7.1401 9.13907 7.22239 9.08413C7.30468 9.0292 7.40142 8.99992 7.50036 9H17.4996C17.5986 8.99992 17.6953 9.0292 17.7776 9.08413C17.8599 9.13907 17.924 9.21718 17.9619 9.30858C17.9998 9.39999 18.0097 9.50058 17.9904 9.59761C17.971 9.69465 17.9234 9.78377 17.8534 9.85369Z" fill="white"/></svg>
-        </button>
-        {openSocial === "youtube" && (
-          <div className="absolute right-0 top-full mt-2 flex flex-col rounded-[10px] border-2 border-white shadow-lg overflow-hidden z-50" style={{ minWidth: "180px", background: "rgba(0, 3, 38, 0.5)", backdropFilter: "blur(10px)" }}>
-            {centersData.map((center, index) => {
-              const dc = menuData?.diving_centers.find(c => c.slug === center.id);
-              if (!dc?.contact_youtube) return null;
-              return (
-                <a key={center.id} href={dc.contact_youtube} target="_blank" rel="noopener noreferrer" onClick={() => setOpenSocial(null)}
-                  className={`flex h-[44px] items-center gap-[10px] px-[14px] text-white transition-all hover:bg-[#111d9e] ${index === 0 ? "rounded-t-[8px]" : ""} ${index === centersData.length - 1 ? "rounded-b-[8px]" : ""}`}>
-                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: center.color }} />
-                  <span className="text-[14px] font-medium">{center.label}</span>
-                </a>
-              );
-            })}
-          </div>
-        )}
-      </div>
-
-      {/* Tripadvisor */}
-      <div className="relative">
-        <button onClick={() => setOpenSocial(openSocial === "instagram" ? null : "instagram")} className="rounded-lg p-2 flex items-center gap-1 hover:bg-white/10 transition-all">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 1.802C12.67 1.802 12.987 1.812 14.041 1.86C16.751 1.986 18.013 3.27 18.139 5.959C18.188 7.013 18.197 7.33 18.197 10C18.197 12.671 18.187 12.987 18.139 14.041C18.012 16.728 16.754 18.014 14.041 18.14C12.987 18.188 12.671 18.198 10 18.198C7.33 18.198 7.013 18.188 5.96 18.14C3.241 18.013 1.988 16.725 1.862 14.04C1.813 12.987 1.803 12.67 1.803 10C1.803 7.33 1.814 7.013 1.862 5.96C1.989 3.27 3.247 1.986 5.96 1.86C7.014 1.812 7.33 1.802 10 1.802ZM10 0C7.284 0 6.944 0.012 5.878 0.06C2.246 0.227 0.228 2.242 0.061 5.877C0.012 6.944 0 7.284 0 10C0 12.716 0.012 13.056 0.06 14.122C0.227 17.754 2.242 19.772 5.877 19.939C6.944 19.988 7.284 20 10 20C12.716 20 13.056 19.988 14.122 19.94C17.751 19.773 19.775 17.757 19.938 14.123C19.988 13.056 20 12.716 20 10C20 7.284 19.988 6.944 19.94 5.878C19.777 2.249 17.758 0.228 14.123 0.061C13.056 0.012 12.716 0 10 0ZM10 4.865C7.164 4.865 4.865 7.164 4.865 10C4.865 12.836 7.164 15.136 10 15.136C12.836 15.136 15.135 12.837 15.135 10C15.135 7.164 12.836 4.865 10 4.865ZM10 13.333C8.159 13.333 6.667 11.842 6.667 10C6.667 8.159 8.159 6.667 10 6.667C11.841 6.667 13.333 8.159 13.333 10C13.333 11.842 11.841 13.333 10 13.333ZM15.338 3.462C14.675 3.462 14.139 3.998 14.139 4.661C14.139 5.324 14.675 5.86 15.338 5.86C16.001 5.86 16.537 5.324 16.537 4.661C16.537 3.998 16.001 3.462 15.338 3.462Z" fill="white"/></svg>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className={`transition-transform ${openSocial === "instagram" ? "rotate-180" : ""}`}><path d="M17.8534 9.85369L12.8537 14.8534C12.8073 14.8999 12.7522 14.9367 12.6915 14.9619C12.6308 14.9871 12.5657 15 12.5 15C12.4343 15 12.3692 14.9871 12.3085 14.9619C12.2478 14.9367 12.1927 14.8999 12.1463 14.8534L7.14663 9.85369C7.07663 9.78377 7.02895 9.69465 7.00963 9.59761C6.9903 9.50058 7.00021 9.39999 7.03808 9.30858C7.07595 9.21718 7.1401 9.13907 7.22239 9.08413C7.30468 9.0292 7.40142 8.99992 7.50036 9H17.4996C17.5986 8.99992 17.6953 9.0292 17.7776 9.08413C17.8599 9.13907 17.924 9.21718 17.9619 9.30858C17.9998 9.39999 18.0097 9.50058 17.9904 9.59761C17.971 9.69465 17.9234 9.78377 17.8534 9.85369Z" fill="white"/></svg>
-        </button>
-        {openSocial === "instagram" && (
-          <div className="absolute right-0 top-full mt-2 flex flex-col rounded-[10px] border-2 border-white shadow-lg overflow-hidden z-50" style={{ minWidth: "180px", background: "rgba(0, 3, 38, 0.5)", backdropFilter: "blur(10px)" }}>
-            {centersData.map((center, index) => {
-              const dc = menuData?.diving_centers.find(c => c.slug === center.id);
-              if (!dc?.contact_tripadvisor) return null;
-              return (
-                <a key={center.id} href={dc.contact_tripadvisor} target="_blank" rel="noopener noreferrer" onClick={() => setOpenSocial(null)}
-                  className={`flex h-[44px] items-center gap-[10px] px-[14px] text-white transition-all hover:bg-[#111d9e] ${index === 0 ? "rounded-t-[8px]" : ""} ${index === centersData.length - 1 ? "rounded-b-[8px]" : ""}`}>
-                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: center.color }} />
-                  <span className="text-[14px] font-medium">{center.label}</span>
-                </a>
-              );
-            })}
-          </div>
-        )}
-      </div>
-
-    </div>
-  </div>
-</div>
-
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -926,6 +1117,7 @@ export const Header: React.FC<{
               </svg>
             )}
           </button>
+        </div>
         </div>
       </header>
 
@@ -1016,117 +1208,318 @@ export const Header: React.FC<{
             </nav>
 
             <div className="mt-auto p-6">
-  <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4">
+                {/* Язык */}
+                <div className="relative">
+                  <button
+                    ref={langButtonRef}
+                    onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
+                    className="flex items-center justify-center gap-2 rounded-lg bg-white px-4 py-2 text-black"
+                  >
+                    {selectedLang}
+                    <svg
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      className={`transition-transform ${
+                        isLangMenuOpen ? "rotate-180" : ""
+                      }`}
+                    >
+                      <path
+                        d="M17.8534 9.85369L12.8537 14.8534C12.8073 14.8999 12.7522 14.9367 12.6915 14.9619C12.6308 14.9871 12.5657 15 12.5 15C12.4343 15 12.3692 14.9871 12.3085 14.9619C12.2478 14.9367 12.1927 14.8999 12.1463 14.8534L7.14663 9.85369C7.07663 9.78377 7.02895 9.69465 7.00963 9.59761C6.9903 9.50058 7.00021 9.39999 7.03808 9.30858C7.07595 9.21718 7.1401 9.13907 7.22239 9.08413C7.30468 9.0292 7.40142 8.99992 7.50036 9H17.4996C17.5986 8.99992 17.6953 9.0292 17.7776 9.08413C17.8599 9.13907 17.924 9.21718 17.9619 9.30858C17.9998 9.39999 18.0097 9.50058 17.9904 9.59761C17.971 9.69465 17.9234 9.78377 17.8534 9.85369Z"
+                        fill="black"
+                      />
+                    </svg>
+                  </button>
+                  {isLangMenuOpen && (
+                    <div
+                      ref={langRef}
+                      className="absolute bottom-full left-0 mb-2 flex flex-col rounded-[10px] border-2 border-white"
+                      style={{
+                        width: "75px",
+                        background: "rgba(0, 3, 38, 0.5)",
+                        backdropFilter: "blur(10px)",
+                      }}
+                    >
+                      {languages
+                        .filter((l) => l?.prefix)
+                        .map((lang, index) => (
+                          <button
+                            key={lang.prefix}
+                            onClick={() => {
+                              setSelectedLang(lang.prefix.toUpperCase());
+                              switchLocale(lang.prefix);
+                              setIsLangMenuOpen(false);
+                            }}
+                            className={`flex h-[40px] w-[71px] items-center justify-center text-[15px] font-semibold transition-colors
+                ${
+                  selectedLang === lang.prefix.toUpperCase()
+                    ? "text-[#e84814]"
+                    : "text-white hover:text-[#e84814]"
+                }
+                ${
+                  index === 0
+                    ? "rounded-t-[8px]"
+                    : index === languages.length - 1
+                    ? "rounded-b-[8px]"
+                    : ""
+                }`}
+                            style={{
+                              background:
+                                selectedLang === lang.prefix.toUpperCase()
+                                  ? "#111d9e"
+                                  : "transparent",
+                            }}
+                          >
+                            {lang.prefix.toUpperCase()}
+                          </button>
+                        ))}
+                    </div>
+                  )}
+                </div>
 
-    {/* Язык */}
-    <div className="relative">
-      <button
-        ref={langButtonRef}
-        onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
-        className="flex items-center justify-center gap-2 rounded-lg bg-white px-4 py-2 text-black"
-      >
-        {selectedLang}
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className={`transition-transform ${isLangMenuOpen ? "rotate-180" : ""}`}>
-          <path d="M17.8534 9.85369L12.8537 14.8534C12.8073 14.8999 12.7522 14.9367 12.6915 14.9619C12.6308 14.9871 12.5657 15 12.5 15C12.4343 15 12.3692 14.9871 12.3085 14.9619C12.2478 14.9367 12.1927 14.8999 12.1463 14.8534L7.14663 9.85369C7.07663 9.78377 7.02895 9.69465 7.00963 9.59761C6.9903 9.50058 7.00021 9.39999 7.03808 9.30858C7.07595 9.21718 7.1401 9.13907 7.22239 9.08413C7.30468 9.0292 7.40142 8.99992 7.50036 9H17.4996C17.5986 8.99992 17.6953 9.0292 17.7776 9.08413C17.8599 9.13907 17.924 9.21718 17.9619 9.30858C17.9998 9.39999 18.0097 9.50058 17.9904 9.59761C17.971 9.69465 17.9234 9.78377 17.8534 9.85369Z" fill="black"/>
-        </svg>
-      </button>
-      {isLangMenuOpen && (
-        <div
-          ref={langRef}
-          className="absolute bottom-full left-0 mb-2 flex flex-col rounded-[10px] border-2 border-white"
-          style={{ width: "75px", background: "rgba(0, 3, 38, 0.5)", backdropFilter: "blur(10px)" }}
-        >
-          {languages.filter((l) => l?.prefix).map((lang, index) => (
-            <button
-              key={lang.prefix}
-              onClick={() => { setSelectedLang(lang.prefix.toUpperCase()); switchLocale(lang.prefix); setIsLangMenuOpen(false); }}
-              className={`flex h-[40px] w-[71px] items-center justify-center text-[15px] font-semibold transition-colors
-                ${selectedLang === lang.prefix.toUpperCase() ? "text-[#e84814]" : "text-white hover:text-[#e84814]"}
-                ${index === 0 ? "rounded-t-[8px]" : index === languages.length - 1 ? "rounded-b-[8px]" : ""}`}
-              style={{ background: selectedLang === lang.prefix.toUpperCase() ? "#111d9e" : "transparent" }}
-            >
-              {lang.prefix.toUpperCase()}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
+                {/* Соцсети мобильные — дропдаун вверх */}
+                <div className="flex items-center gap-2">
+                  {/* Facebook */}
+                  <div className="relative">
+                    <button
+                      onClick={() =>
+                        setOpenSocial(
+                          openSocial === "facebook" ? null : "facebook"
+                        )
+                      }
+                      className="rounded-lg p-2 flex items-center gap-1"
+                    >
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 20 20"
+                        fill="none"
+                      >
+                        <path
+                          d="M9.99996 1.69995C5.41663 1.69995 1.66663 5.44162 1.66663 10.05C1.66663 14.2166 4.71663 17.675 8.69996 18.3V12.4666H6.58329V10.05H8.69996V8.20828C8.69996 6.11662 9.94163 4.96662 11.85 4.96662C12.7583 4.96662 13.7083 5.12495 13.7083 5.12495V7.18328H12.6583C11.625 7.18328 11.3 7.82495 11.3 8.4833V10.05H13.6166L13.2416 12.4666H11.3V18.3C13.2636 17.9898 15.0518 16.9879 16.3415 15.475C17.6313 13.9621 18.3378 12.038 18.3333 10.05C18.3333 5.44162 14.5833 1.69995 9.99996 1.69995Z"
+                          fill="white"
+                        />
+                      </svg>
+                      <svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        className={`transition-transform ${
+                          openSocial === "facebook" ? "rotate-180" : ""
+                        }`}
+                      >
+                        <path
+                          d="M17.8534 9.85369L12.8537 14.8534C12.8073 14.8999 12.7522 14.9367 12.6915 14.9619C12.6308 14.9871 12.5657 15 12.5 15C12.4343 15 12.3692 14.9871 12.3085 14.9619C12.2478 14.9367 12.1927 14.8999 12.1463 14.8534L7.14663 9.85369C7.07663 9.78377 7.02895 9.69465 7.00963 9.59761C6.9903 9.50058 7.00021 9.39999 7.03808 9.30858C7.07595 9.21718 7.1401 9.13907 7.22239 9.08413C7.30468 9.0292 7.40142 8.99992 7.50036 9H17.4996C17.5986 8.99992 17.6953 9.0292 17.7776 9.08413C17.8599 9.13907 17.924 9.21718 17.9619 9.30858C17.9998 9.39999 18.0097 9.50058 17.9904 9.59761C17.971 9.69465 17.9234 9.78377 17.8534 9.85369Z"
+                          fill="white"
+                        />
+                      </svg>
+                    </button>
+                    {openSocial === "facebook" && (
+                      <div
+                        className="absolute bottom-full left-0 mb-2 flex flex-col rounded-[10px] border-2 border-white overflow-hidden z-50"
+                        style={{
+                          minWidth: "180px",
+                          background: "rgba(0, 3, 38, 0.5)",
+                          backdropFilter: "blur(10px)",
+                        }}
+                      >
+                        {centersData.map((center, index) => {
+                          const dc = menuData?.diving_centers.find(
+                            (c) => c.slug === center.id
+                          );
+                          if (!dc?.contact_facebook) return null;
+                          return (
+                            <a
+                              key={center.id}
+                              href={dc.contact_facebook}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={() => setOpenSocial(null)}
+                              className={`flex h-[44px] items-center gap-[10px] px-[14px] text-white transition-all hover:bg-[#111d9e] ${
+                                index === 0 ? "rounded-t-[8px]" : ""
+                              } ${
+                                index === centersData.length - 1
+                                  ? "rounded-b-[8px]"
+                                  : ""
+                              }`}
+                            >
+                              <span
+                                className="w-2 h-2 rounded-full flex-shrink-0"
+                                style={{ background: center.color }}
+                              />
+                              <span className="text-[14px] font-medium">
+                                {center.label}
+                              </span>
+                            </a>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
 
-    {/* Соцсети мобильные — дропдаун вверх */}
-    <div className="flex items-center gap-2">
+                  {/* YouTube */}
+                  <div className="relative">
+                    <button
+                      onClick={() =>
+                        setOpenSocial(
+                          openSocial === "youtube" ? null : "youtube"
+                        )
+                      }
+                      className="rounded-lg p-2 flex items-center gap-1"
+                    >
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 20 20"
+                        fill="none"
+                      >
+                        <path
+                          d="M19.582 5.186C19.352 4.322 18.674 3.644 17.81 3.414C16.254 3 10 3 10 3C10 3 3.746 3 2.19 3.414C1.326 3.644 0.648 4.322 0.418 5.186C0 6.742 0 10 0 10C0 10 0 13.258 0.418 14.814C0.648 15.678 1.326 16.356 2.19 16.586C3.746 17 10 17 10 17C10 17 16.254 17 17.81 16.586C18.674 16.356 19.352 15.678 19.582 14.814C20 13.258 20 10 20 10C20 10 20 6.742 19.582 5.186ZM8 13V7L13 10L8 13Z"
+                          fill="white"
+                        />
+                      </svg>
+                      <svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        className={`transition-transform ${
+                          openSocial === "youtube" ? "rotate-180" : ""
+                        }`}
+                      >
+                        <path
+                          d="M17.8534 9.85369L12.8537 14.8534C12.8073 14.8999 12.7522 14.9367 12.6915 14.9619C12.6308 14.9871 12.5657 15 12.5 15C12.4343 15 12.3692 14.9871 12.3085 14.9619C12.2478 14.9367 12.1927 14.8999 12.1463 14.8534L7.14663 9.85369C7.07663 9.78377 7.02895 9.69465 7.00963 9.59761C6.9903 9.50058 7.00021 9.39999 7.03808 9.30858C7.07595 9.21718 7.1401 9.13907 7.22239 9.08413C7.30468 9.0292 7.40142 8.99992 7.50036 9H17.4996C17.5986 8.99992 17.6953 9.0292 17.7776 9.08413C17.8599 9.13907 17.924 9.21718 17.9619 9.30858C17.9998 9.39999 18.0097 9.50058 17.9904 9.59761C17.971 9.69465 17.9234 9.78377 17.8534 9.85369Z"
+                          fill="white"
+                        />
+                      </svg>
+                    </button>
+                    {openSocial === "youtube" && (
+                      <div
+                        className="absolute bottom-full left-0 mb-2 flex flex-col rounded-[10px] border-2 border-white overflow-hidden z-50"
+                        style={{
+                          minWidth: "180px",
+                          background: "rgba(0, 3, 38, 0.5)",
+                          backdropFilter: "blur(10px)",
+                        }}
+                      >
+                        {centersData.map((center, index) => {
+                          const dc = menuData?.diving_centers.find(
+                            (c) => c.slug === center.id
+                          );
+                          if (!dc?.contact_youtube) return null;
+                          return (
+                            <a
+                              key={center.id}
+                              href={dc.contact_youtube}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={() => setOpenSocial(null)}
+                              className={`flex h-[44px] items-center gap-[10px] px-[14px] text-white transition-all hover:bg-[#111d9e] ${
+                                index === 0 ? "rounded-t-[8px]" : ""
+                              } ${
+                                index === centersData.length - 1
+                                  ? "rounded-b-[8px]"
+                                  : ""
+                              }`}
+                            >
+                              <span
+                                className="w-2 h-2 rounded-full flex-shrink-0"
+                                style={{ background: center.color }}
+                              />
+                              <span className="text-[14px] font-medium">
+                                {center.label}
+                              </span>
+                            </a>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
 
-      {/* Facebook */}
-      <div className="relative">
-        <button onClick={() => setOpenSocial(openSocial === "facebook" ? null : "facebook")} className="rounded-lg p-2 flex items-center gap-1">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M9.99996 1.69995C5.41663 1.69995 1.66663 5.44162 1.66663 10.05C1.66663 14.2166 4.71663 17.675 8.69996 18.3V12.4666H6.58329V10.05H8.69996V8.20828C8.69996 6.11662 9.94163 4.96662 11.85 4.96662C12.7583 4.96662 13.7083 5.12495 13.7083 5.12495V7.18328H12.6583C11.625 7.18328 11.3 7.82495 11.3 8.4833V10.05H13.6166L13.2416 12.4666H11.3V18.3C13.2636 17.9898 15.0518 16.9879 16.3415 15.475C17.6313 13.9621 18.3378 12.038 18.3333 10.05C18.3333 5.44162 14.5833 1.69995 9.99996 1.69995Z" fill="white"/></svg>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className={`transition-transform ${openSocial === "facebook" ? "rotate-180" : ""}`}><path d="M17.8534 9.85369L12.8537 14.8534C12.8073 14.8999 12.7522 14.9367 12.6915 14.9619C12.6308 14.9871 12.5657 15 12.5 15C12.4343 15 12.3692 14.9871 12.3085 14.9619C12.2478 14.9367 12.1927 14.8999 12.1463 14.8534L7.14663 9.85369C7.07663 9.78377 7.02895 9.69465 7.00963 9.59761C6.9903 9.50058 7.00021 9.39999 7.03808 9.30858C7.07595 9.21718 7.1401 9.13907 7.22239 9.08413C7.30468 9.0292 7.40142 8.99992 7.50036 9H17.4996C17.5986 8.99992 17.6953 9.0292 17.7776 9.08413C17.8599 9.13907 17.924 9.21718 17.9619 9.30858C17.9998 9.39999 18.0097 9.50058 17.9904 9.59761C17.971 9.69465 17.9234 9.78377 17.8534 9.85369Z" fill="white"/></svg>
-        </button>
-        {openSocial === "facebook" && (
-          <div className="absolute bottom-full left-0 mb-2 flex flex-col rounded-[10px] border-2 border-white overflow-hidden z-50" style={{ minWidth: "180px", background: "rgba(0, 3, 38, 0.5)", backdropFilter: "blur(10px)" }}>
-            {centersData.map((center, index) => {
-              const dc = menuData?.diving_centers.find(c => c.slug === center.id);
-              if (!dc?.contact_facebook) return null;
-              return (
-                <a key={center.id} href={dc.contact_facebook} target="_blank" rel="noopener noreferrer" onClick={() => setOpenSocial(null)}
-                  className={`flex h-[44px] items-center gap-[10px] px-[14px] text-white transition-all hover:bg-[#111d9e] ${index === 0 ? "rounded-t-[8px]" : ""} ${index === centersData.length - 1 ? "rounded-b-[8px]" : ""}`}>
-                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: center.color }} />
-                  <span className="text-[14px] font-medium">{center.label}</span>
-                </a>
-              );
-            })}
-          </div>
-        )}
-      </div>
-
-      {/* YouTube */}
-      <div className="relative">
-        <button onClick={() => setOpenSocial(openSocial === "youtube" ? null : "youtube")} className="rounded-lg p-2 flex items-center gap-1">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M19.582 5.186C19.352 4.322 18.674 3.644 17.81 3.414C16.254 3 10 3 10 3C10 3 3.746 3 2.19 3.414C1.326 3.644 0.648 4.322 0.418 5.186C0 6.742 0 10 0 10C0 10 0 13.258 0.418 14.814C0.648 15.678 1.326 16.356 2.19 16.586C3.746 17 10 17 10 17C10 17 16.254 17 17.81 16.586C18.674 16.356 19.352 15.678 19.582 14.814C20 13.258 20 10 20 10C20 10 20 6.742 19.582 5.186ZM8 13V7L13 10L8 13Z" fill="white"/></svg>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className={`transition-transform ${openSocial === "youtube" ? "rotate-180" : ""}`}><path d="M17.8534 9.85369L12.8537 14.8534C12.8073 14.8999 12.7522 14.9367 12.6915 14.9619C12.6308 14.9871 12.5657 15 12.5 15C12.4343 15 12.3692 14.9871 12.3085 14.9619C12.2478 14.9367 12.1927 14.8999 12.1463 14.8534L7.14663 9.85369C7.07663 9.78377 7.02895 9.69465 7.00963 9.59761C6.9903 9.50058 7.00021 9.39999 7.03808 9.30858C7.07595 9.21718 7.1401 9.13907 7.22239 9.08413C7.30468 9.0292 7.40142 8.99992 7.50036 9H17.4996C17.5986 8.99992 17.6953 9.0292 17.7776 9.08413C17.8599 9.13907 17.924 9.21718 17.9619 9.30858C17.9998 9.39999 18.0097 9.50058 17.9904 9.59761C17.971 9.69465 17.9234 9.78377 17.8534 9.85369Z" fill="white"/></svg>
-        </button>
-        {openSocial === "youtube" && (
-          <div className="absolute bottom-full left-0 mb-2 flex flex-col rounded-[10px] border-2 border-white overflow-hidden z-50" style={{ minWidth: "180px", background: "rgba(0, 3, 38, 0.5)", backdropFilter: "blur(10px)" }}>
-            {centersData.map((center, index) => {
-              const dc = menuData?.diving_centers.find(c => c.slug === center.id);
-              if (!dc?.contact_youtube) return null;
-              return (
-                <a key={center.id} href={dc.contact_youtube} target="_blank" rel="noopener noreferrer" onClick={() => setOpenSocial(null)}
-                  className={`flex h-[44px] items-center gap-[10px] px-[14px] text-white transition-all hover:bg-[#111d9e] ${index === 0 ? "rounded-t-[8px]" : ""} ${index === centersData.length - 1 ? "rounded-b-[8px]" : ""}`}>
-                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: center.color }} />
-                  <span className="text-[14px] font-medium">{center.label}</span>
-                </a>
-              );
-            })}
-          </div>
-        )}
-      </div>
-
-      {/* Tripadvisor */}
-      <div className="relative">
-        <button onClick={() => setOpenSocial(openSocial === "instagram" ? null : "instagram")} className="rounded-lg p-2 flex items-center gap-1">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 1.802C12.67 1.802 12.987 1.812 14.041 1.86C16.751 1.986 18.013 3.27 18.139 5.959C18.188 7.013 18.197 7.33 18.197 10C18.197 12.671 18.187 12.987 18.139 14.041C18.012 16.728 16.754 18.014 14.041 18.14C12.987 18.188 12.671 18.198 10 18.198C7.33 18.198 7.013 18.188 5.96 18.14C3.241 18.013 1.988 16.725 1.862 14.04C1.813 12.987 1.803 12.67 1.803 10C1.803 7.33 1.814 7.013 1.862 5.96C1.989 3.27 3.247 1.986 5.96 1.86C7.014 1.812 7.33 1.802 10 1.802ZM10 0C7.284 0 6.944 0.012 5.878 0.06C2.246 0.227 0.228 2.242 0.061 5.877C0.012 6.944 0 7.284 0 10C0 12.716 0.012 13.056 0.06 14.122C0.227 17.754 2.242 19.772 5.877 19.939C6.944 19.988 7.284 20 10 20C12.716 20 13.056 19.988 14.122 19.94C17.751 19.773 19.775 17.757 19.938 14.123C19.988 13.056 20 12.716 20 10C20 7.284 19.988 6.944 19.94 5.878C19.777 2.249 17.758 0.228 14.123 0.061C13.056 0.012 12.716 0 10 0ZM10 4.865C7.164 4.865 4.865 7.164 4.865 10C4.865 12.836 7.164 15.136 10 15.136C12.836 15.136 15.135 12.837 15.135 10C15.135 7.164 12.836 4.865 10 4.865ZM10 13.333C8.159 13.333 6.667 11.842 6.667 10C6.667 8.159 8.159 6.667 10 6.667C11.841 6.667 13.333 8.159 13.333 10C13.333 11.842 11.841 13.333 10 13.333ZM15.338 3.462C14.675 3.462 14.139 3.998 14.139 4.661C14.139 5.324 14.675 5.86 15.338 5.86C16.001 5.86 16.537 5.324 16.537 4.661C16.537 3.998 16.001 3.462 15.338 3.462Z" fill="white"/></svg>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className={`transition-transform ${openSocial === "instagram" ? "rotate-180" : ""}`}><path d="M17.8534 9.85369L12.8537 14.8534C12.8073 14.8999 12.7522 14.9367 12.6915 14.9619C12.6308 14.9871 12.5657 15 12.5 15C12.4343 15 12.3692 14.9871 12.3085 14.9619C12.2478 14.9367 12.1927 14.8999 12.1463 14.8534L7.14663 9.85369C7.07663 9.78377 7.02895 9.69465 7.00963 9.59761C6.9903 9.50058 7.00021 9.39999 7.03808 9.30858C7.07595 9.21718 7.1401 9.13907 7.22239 9.08413C7.30468 9.0292 7.40142 8.99992 7.50036 9H17.4996C17.5986 8.99992 17.6953 9.0292 17.7776 9.08413C17.8599 9.13907 17.924 9.21718 17.9619 9.30858C17.9998 9.39999 18.0097 9.50058 17.9904 9.59761C17.971 9.69465 17.9234 9.78377 17.8534 9.85369Z" fill="white"/></svg>
-        </button>
-        {openSocial === "instagram" && (
-          <div className="absolute bottom-full left-0 mb-2 flex flex-col rounded-[10px] border-2 border-white overflow-hidden z-50" style={{ minWidth: "180px", background: "rgba(0, 3, 38, 0.5)", backdropFilter: "blur(10px)" }}>
-            {centersData.map((center, index) => {
-              const dc = menuData?.diving_centers.find(c => c.slug === center.id);
-              if (!dc?.contact_tripadvisor) return null;
-              return (
-                <a key={center.id} href={dc.contact_tripadvisor} target="_blank" rel="noopener noreferrer" onClick={() => setOpenSocial(null)}
-                  className={`flex h-[44px] items-center gap-[10px] px-[14px] text-white transition-all hover:bg-[#111d9e] ${index === 0 ? "rounded-t-[8px]" : ""} ${index === centersData.length - 1 ? "rounded-b-[8px]" : ""}`}>
-                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: center.color }} />
-                  <span className="text-[14px] font-medium">{center.label}</span>
-                </a>
-              );
-            })}
-          </div>
-        )}
-      </div>
-
-    </div>
-  </div>
-</div>
+                  {/* Tripadvisor */}
+                  <div className="relative">
+                    <button
+                      onClick={() =>
+                        setOpenSocial(
+                          openSocial === "instagram" ? null : "instagram"
+                        )
+                      }
+                      className="rounded-lg p-2 flex items-center gap-1"
+                    >
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 20 20"
+                        fill="none"
+                      >
+                        <path
+                          d="M10 1.802C12.67 1.802 12.987 1.812 14.041 1.86C16.751 1.986 18.013 3.27 18.139 5.959C18.188 7.013 18.197 7.33 18.197 10C18.197 12.671 18.187 12.987 18.139 14.041C18.012 16.728 16.754 18.014 14.041 18.14C12.987 18.188 12.671 18.198 10 18.198C7.33 18.198 7.013 18.188 5.96 18.14C3.241 18.013 1.988 16.725 1.862 14.04C1.813 12.987 1.803 12.67 1.803 10C1.803 7.33 1.814 7.013 1.862 5.96C1.989 3.27 3.247 1.986 5.96 1.86C7.014 1.812 7.33 1.802 10 1.802ZM10 0C7.284 0 6.944 0.012 5.878 0.06C2.246 0.227 0.228 2.242 0.061 5.877C0.012 6.944 0 7.284 0 10C0 12.716 0.012 13.056 0.06 14.122C0.227 17.754 2.242 19.772 5.877 19.939C6.944 19.988 7.284 20 10 20C12.716 20 13.056 19.988 14.122 19.94C17.751 19.773 19.775 17.757 19.938 14.123C19.988 13.056 20 12.716 20 10C20 7.284 19.988 6.944 19.94 5.878C19.777 2.249 17.758 0.228 14.123 0.061C13.056 0.012 12.716 0 10 0ZM10 4.865C7.164 4.865 4.865 7.164 4.865 10C4.865 12.836 7.164 15.136 10 15.136C12.836 15.136 15.135 12.837 15.135 10C15.135 7.164 12.836 4.865 10 4.865ZM10 13.333C8.159 13.333 6.667 11.842 6.667 10C6.667 8.159 8.159 6.667 10 6.667C11.841 6.667 13.333 8.159 13.333 10C13.333 11.842 11.841 13.333 10 13.333ZM15.338 3.462C14.675 3.462 14.139 3.998 14.139 4.661C14.139 5.324 14.675 5.86 15.338 5.86C16.001 5.86 16.537 5.324 16.537 4.661C16.537 3.998 16.001 3.462 15.338 3.462Z"
+                          fill="white"
+                        />
+                      </svg>
+                      <svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        className={`transition-transform ${
+                          openSocial === "instagram" ? "rotate-180" : ""
+                        }`}
+                      >
+                        <path
+                          d="M17.8534 9.85369L12.8537 14.8534C12.8073 14.8999 12.7522 14.9367 12.6915 14.9619C12.6308 14.9871 12.5657 15 12.5 15C12.4343 15 12.3692 14.9871 12.3085 14.9619C12.2478 14.9367 12.1927 14.8999 12.1463 14.8534L7.14663 9.85369C7.07663 9.78377 7.02895 9.69465 7.00963 9.59761C6.9903 9.50058 7.00021 9.39999 7.03808 9.30858C7.07595 9.21718 7.1401 9.13907 7.22239 9.08413C7.30468 9.0292 7.40142 8.99992 7.50036 9H17.4996C17.5986 8.99992 17.6953 9.0292 17.7776 9.08413C17.8599 9.13907 17.924 9.21718 17.9619 9.30858C17.9998 9.39999 18.0097 9.50058 17.9904 9.59761C17.971 9.69465 17.9234 9.78377 17.8534 9.85369Z"
+                          fill="white"
+                        />
+                      </svg>
+                    </button>
+                    {openSocial === "instagram" && (
+                      <div
+                        className="absolute bottom-full left-0 mb-2 flex flex-col rounded-[10px] border-2 border-white overflow-hidden z-50"
+                        style={{
+                          minWidth: "180px",
+                          background: "rgba(0, 3, 38, 0.5)",
+                          backdropFilter: "blur(10px)",
+                        }}
+                      >
+                        {centersData.map((center, index) => {
+                          const dc = menuData?.diving_centers.find(
+                            (c) => c.slug === center.id
+                          );
+                          if (!dc?.contact_tripadvisor) return null;
+                          return (
+                            <a
+                              key={center.id}
+                              href={dc.contact_tripadvisor}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={() => setOpenSocial(null)}
+                              className={`flex h-[44px] items-center gap-[10px] px-[14px] text-white transition-all hover:bg-[#111d9e] ${
+                                index === 0 ? "rounded-t-[8px]" : ""
+                              } ${
+                                index === centersData.length - 1
+                                  ? "rounded-b-[8px]"
+                                  : ""
+                              }`}
+                            >
+                              <span
+                                className="w-2 h-2 rounded-full flex-shrink-0"
+                                style={{ background: center.color }}
+                              />
+                              <span className="text-[14px] font-medium">
+                                {center.label}
+                              </span>
+                            </a>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}
