@@ -1,20 +1,36 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { notFound } from 'next/navigation';
-import Image from "next/image";
 import { HeroSection } from "@/components/HeroSection";
 import { CoursesSection } from "@/components/mainSections/CoursesSection";
 import { TripsSection } from "@/components/mainSections/TripsSection";
 import { DiveTrips } from "@/components/mainSections/DiveTrips";
 import { CentersSection } from "@/components/mainSections/CentersSection";
 import type { Metadata } from 'next';
-import { useMenu } from "@/hooks/useMenu";
-import { useLocale } from "next-intl";
-import { createTermGetter } from "@/utils/terms";
+import { createTermGetter } from '../utils/terms';
+
+// Функция для получения terms напрямую (для Server Component)
+async function getTerms(locale: string) {
+  try {
+    const res = await fetch(`https://cp.haliotis.space/api/v1/menu/${locale}`, {
+      next: { revalidate: 3600 }, // кеш на 1 час
+    });
+    
+    if (!res.ok) {
+      return {}; // возвращаем пустой объект если ошибка
+    }
+    
+    const data = await res.json();
+    return data.data?.terms || {};
+  } catch (error) {
+    console.error('Error fetching terms:', error);
+    return {};
+  }
+}
 
 async function getHomepageData() {
   try {
     const res = await fetch('https://cp.haliotis.space/api/v1/pages/homepage', {
-      next: { revalidate: 3600 }, // кеш на 1 час
+      next: { revalidate: 3600 },
     });
     
     if (!res.ok) {
@@ -39,23 +55,27 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function Home() {
-  const homepageData = await getHomepageData();
+export default async function Home({ params }: { params: { locale: string } }) {
+  // Получаем terms на сервере
+  const terms = await getTerms(params.locale);
+  const t = createTermGetter(terms);
   
+  const homepageData = await getHomepageData();
+
   if (!homepageData) {
     notFound();
   }
 
   // Формируем locations из API данных
   const locations = [
-    { id: "all", label: {t("all", "ALL")} },
+    { id: "all", label: t("all", "ALL") },
     ...(homepageData.sliders?.diving_centers?.entities || []).map((center: any) => ({
       id: center.slug,
       label: center.name.toUpperCase(),
     }))
   ];
 
-  // Формируем courseCards из API
+  // Остальной код остается без изменений...
   const courseCards = (homepageData.sliders?.courses?.diving_centers || []).flatMap((center: any) =>
     (center.courses || []).map((course: any) => ({
       image: course.image_url || "/Rectangle 8.png",
@@ -68,7 +88,6 @@ export default async function Home() {
     }))
   );
 
-  // Формируем centerCards из API
   const centerCardsData = (homepageData.sliders?.diving_centers?.entities || []).map((center: any) => ({
     image: center.icon_url || "/CTABackgroundImage.png",
     title: center.name,
@@ -77,7 +96,6 @@ export default async function Home() {
     location: center.slug,
   }));
 
-  // Формируем tripCards из dive_trips
   const tripCards = (homepageData.sliders?.dive_trip?.entities || []).flatMap((center: any) =>
     (center.dive_trips || []).map((trip: any) => ({
       image: center.icon_url || "/image 6.png",
@@ -87,11 +105,10 @@ export default async function Home() {
       link: `/dive-trips/${trip.slug || trip.id}`,
       location: center.slug,
       details: trip.description ? `<p>${trip.description}</p>` : `<p>${center.small_description || ""}</p>`,
-      equipmentPrice: "€ 30.00", // можно добавить в API если нужно
+      equipmentPrice: "€ 30.00",
     }))
   );
 
-  // Формируем diveTripsCards из API
   const diveTripsCards = (homepageData.sliders?.diving_centers?.entities || []).map((center: any, index: number) => ({
     image: center.icon_url || "/CTABackgroundImage.png",
     location: center.name,
@@ -99,7 +116,6 @@ export default async function Home() {
     description: center.small_description || "",
   }));
 
-  // Для heroSlides - используем данные страницы или дефолтные
   const heroSlides = [
     {
       title: homepageData.sliders?.diving_centers?.title || "Find the Experience",
@@ -108,7 +124,6 @@ export default async function Home() {
     }
   ];
 
-  // Партнеры для Equipment секции
   const partners = (homepageData.sliders?.equipment?.equipment_brands || [])
     .sort((a: any, b: any) => (a.position || 0) - (b.position || 0))
     .map((brand: any) => ({
@@ -119,13 +134,9 @@ export default async function Home() {
   return (
     <main className="-mt-[97px]">
       <HeroSection heroSlides={heroSlides} />
-      
       <CentersSection centerCards={centerCardsData} />
-
       <CoursesSection locations={locations} courseCards={courseCards} />
-      
       <TripsSection locations={locations} tripCards={tripCards} />
-      
       <DiveTrips 
         diveTripsCards={diveTripsCards} 
         equipmentData={{

@@ -188,6 +188,9 @@ export const CenterInfoSection = ({ tabs }: Props) => {
         );
 
       case "facilities":
+        if (!tabs.diving_center_facilities?.entities) {
+          return <p>No facilities information available</p>;
+        }
         return (
           <div className="flex flex-col gap-6">
             <p className="text-[15px] font-medium leading-[160%] text-[#111]">
@@ -264,6 +267,9 @@ export const CenterInfoSection = ({ tabs }: Props) => {
           </div>
         );
       case "boats":
+        if (!tabs.diving_center_boats?.entities) {
+          return <p>No boats information available</p>;
+        }
         return (
           <div className="flex gap-8">
             {tabs.diving_center_history.entities.map((item) => (
@@ -316,6 +322,9 @@ export const CenterInfoSection = ({ tabs }: Props) => {
         );
 
       case "history":
+        if (!tabs.diving_center_history?.entities) {
+          return <p>No history information available</p>;
+        }
         return (
           <div className="flex  gap-8">
             {/* Peniche */}
