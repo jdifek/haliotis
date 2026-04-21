@@ -8,6 +8,7 @@ type Props = {
   courseCards: {
     image: string;
     title: string;
+    slug?: string;
     price: number;
     duration: string;
     requestBased: boolean;
@@ -39,6 +40,8 @@ export const RecommendedCoursesSection: React.FC<Props> = ({
         <div className="grid grid-cols-2 gap-[10px] sm:gap-[15px] md:grid-cols-3 md:gap-[20px] lg:gap-[30px] xl:grid-cols-4">
           {courseCards.map((card, index) => (
             <CourseCard
+            slug={card.slug}
+
               key={index}
               image={card.image}
               title={card.title}
@@ -54,6 +57,8 @@ export const RecommendedCoursesSection: React.FC<Props> = ({
         {/* Кнопка "Show more courses" */}
         <div className="flex justify-center">
           <BlackActionButton
+                    href="/cursos"
+
             className="md:w-[280px]"
             label="Show more courses"
             icon={

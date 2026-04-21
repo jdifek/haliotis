@@ -583,6 +583,8 @@ console.log(resp, 'resp');
                   const price = formatPrice(course.price);
                   return (
                     <CourseCard
+                    slug={course.slug}
+
                       key={course.id}
                       image={course.image ?? "/Rectangle 8.png"}
                       title={course.name}

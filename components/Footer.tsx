@@ -61,6 +61,7 @@ export const Footer: React.FC<{ logoUrl: string; logoAlt: string }> = ({
               {menuData?.terms.footer_left_text}
             </p>
             <ButtonWithIcon
+            href="/contacts"
               width="160px"
               label="Contact Us"
               textColor="text-black"

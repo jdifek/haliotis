@@ -137,6 +137,7 @@ export const SimpleTripsSection: React.FC<Props> = ({
       </div>
       <div className="flex justify-center ">
         <BlackActionButton
+        href="/diving"
           className="md:w-[280px] mt-[30px]"
           label=" Show more dives"
           icon={

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { BookingFormModal } from "./Modals/BookingFormModal";
 
 type CourseCardProps = {
@@ -10,6 +11,7 @@ type CourseCardProps = {
   duration: string;
   requestBased?: boolean;
   badge?: string;
+  slug?: string;
   onBookClick?: () => void;
 };
 
@@ -20,12 +22,23 @@ export const CourseCard: React.FC<CourseCardProps> = ({
   duration,
   requestBased = false,
   badge,
+  slug,
 }) => {
   const [isBookingOpen, setIsBookingOpen] = useState(false);
+  const router = useRouter();
+
+  const handleCardClick = () => {
+    if (slug) {
+      router.push(`/cursos/${slug}`);
+    }
+  };
 
   return (
     <>
-      <div className="w-full rounded-3xl bg-white p-2">
+      <div
+        className="w-full rounded-3xl bg-white p-2 cursor-pointer"
+        onClick={handleCardClick}
+      >
         {/* Image Container */}
         <div className="relative w-full overflow-hidden rounded-2xl">
           <img src={image} alt={title} className="h-full w-full object-cover" />
@@ -43,7 +56,7 @@ export const CourseCard: React.FC<CourseCardProps> = ({
           <div className="absolute bottom-3 left-3 flex flex-col md:flex-row items-start md:items-center gap-0.5 md:gap-1 rounded-lg bg-black/50 p-0.5">
             {/* Duration */}
             <div className="flex items-center gap-1 rounded-lg bg-black/50 p-1 lg:px-2 lg:py-1.5 xl:px-3 xl:py-2">
-            <svg
+              <svg
                 width="20"
                 className="w-[10px] h-[10px] lg:w-[14px] lg:h-[14px] xl:w-[20px] xl:h-[20px]"
                 height="20"
@@ -59,15 +72,15 @@ export const CourseCard: React.FC<CourseCardProps> = ({
                 />
               </svg>
               <span className="whitespace-nowrap text-[10px] lg:text-[12px] xl:text-[15px] leading-[160%] text-[#f1f1f1]">
-              {duration}
+                {duration}
               </span>
             </div>
 
             {/* Request Based */}
             <div className="flex items-center gap-1 rounded-lg bg-black/50 p-1 lg:px-2 lg:py-1.5 xl:px-3 xl:py-2">
-            <svg
-    className="w-[10px] h-[10px] lg:w-[14px] lg:h-[14px] xl:w-[20px] xl:h-[20px]"
-    width="19"
+              <svg
+                className="w-[10px] h-[10px] lg:w-[14px] lg:h-[14px] xl:w-[20px] xl:h-[20px]"
+                width="19"
                 height="20"
                 viewBox="0 0 19 20"
                 fill="none"
@@ -79,7 +92,7 @@ export const CourseCard: React.FC<CourseCardProps> = ({
                 />
               </svg>
               <span className="whitespace-nowrap text-[10px] lg:text-[12px] xl:text-[15px] leading-[160%] text-[#f1f1f1]">
-              {requestBased ? "Request based" : "Fixed schedule"}
+                {requestBased ? "Request based" : "Fixed schedule"}
               </span>
             </div>
           </div>
@@ -111,7 +124,10 @@ export const CourseCard: React.FC<CourseCardProps> = ({
 
             {/* Book Button */}
             <button
-              onClick={() => setIsBookingOpen(true)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsBookingOpen(true);
+              }}
               className="flex items-center justify-between whitespace-nowrap cursor-pointer w-full md:w-[160px] rounded-full bg-[#e84814] py-0.5 pl-[14px] md:pl-4 pr-0.5 transition-all hover:bg-[#d63f0f]"
             >
               <span className="text-[15px] font-bold leading-[120%] text-white">

@@ -1,6 +1,5 @@
 "use client";
 
-import { HeroSection } from "@/components/Diving/HeroSection";
 import { ArticleCard } from "@/components/ArticleCard";
 import { Pagination } from "@/components/Pagination";
 import { Tabs } from "@/components/buttons/Tabs";

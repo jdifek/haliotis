@@ -18,6 +18,7 @@ type Props = {
   }[];
   courseCards: {
     image: string;
+    slug: string;
     title: string;
     price: number;
     duration: string;
@@ -218,6 +219,7 @@ export const CoursesSection: React.FC<Props> = ({ locations, courseCards }) => {
                 <SwiperSlide key={index}>
                   <CourseCard
                     image={card.image}
+                    slug={card.slug}
                     title={card.title}
                     price={card.price}
                     duration={card.duration}

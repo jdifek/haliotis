@@ -15,6 +15,7 @@ type Props = {
   className?: string;
   courseCards: {
     image: string;
+    slug: string;
     title: string;
     price: number;
     duration: string;
@@ -103,6 +104,7 @@ export const SimpleCoursesSection: React.FC<Props> = ({
             {courseCards.map((card, index) => (
               <SwiperSlide key={index}>
                 <CourseCard
+                  slug={card.slug}
                   image={card.image}
                   title={card.title}
                   price={card.price}
@@ -131,6 +133,7 @@ export const SimpleCoursesSection: React.FC<Props> = ({
         {/* Кнопка "Show more courses" */}
         <div className="flex justify-center ">
           <BlackActionButton
+            href="/cursos"
             className="md:w-[280px]"
             label=" Show more courses"
             icon={

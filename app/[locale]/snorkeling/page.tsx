@@ -343,6 +343,7 @@ const Courses = () => {
               {courses.map((course) => (
                 <CourseCard
                   key={course.id}
+                  
                   image={course.image}
                   title={course.title}
                   price={course.price}
