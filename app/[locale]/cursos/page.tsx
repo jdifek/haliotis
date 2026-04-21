@@ -119,7 +119,6 @@ function formatPrice(price: unknown[]): number | null {
 
 const Courses = () => {
   const locale = useLocale();
-  const pathname = usePathname();
   const { divingCenters, loading: menuLoading } = useMenu(locale);
 
   // ── UI state ──
@@ -159,6 +158,7 @@ const Courses = () => {
     centerSlug,
     locale
   );
+console.log(courses, 'courses');
 
   // ── Fetch courses when center / category / page changes ──
   const loadCourses = useCallback(async () => {
@@ -175,6 +175,7 @@ const Courses = () => {
         page: currentPage,
         attachCategory: true,
       });
+console.log(resp, 'resp');
 
       setCourses(resp.data);
 

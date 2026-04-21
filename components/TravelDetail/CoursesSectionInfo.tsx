@@ -105,7 +105,7 @@ export default function CoursesSectionInfo() {
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
                   className={`flex-shrink-0 transition-transform duration-300 ${
-                    openIndex === index ? 'rotate-0' : 'rotate-90'
+                    openIndex === index ? "rotate-0" : "rotate-90"
                   }`}
                 >
                   <path
@@ -127,25 +127,6 @@ export default function CoursesSectionInfo() {
               </div>
             </div>
           ))}
-        </div>
-
-        {/* Contact Section */}
-        <div className="">
-          <h2 className="font-medium text-[20px] md:text-[24px] leading-[140%] text-[#111] mb-3">
-            Haliotis near you
-          </h2>
-          <p className="text-[14px] md:text-[15px] leading-[160%]">
-            <a
-              href="#"
-              className="text-[#e84814] underline decoration-skip-ink-none"
-            >
-              Contact us
-            </a>
-            <span className="text-[#101010] opacity-80">
-              {" "}
-              for more information or to enrol a course.
-            </span>
-          </p>
         </div>
       </div>
     </section>

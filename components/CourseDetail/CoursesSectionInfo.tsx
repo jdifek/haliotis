@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 
 type Props = {
   body?: string;
@@ -9,7 +9,12 @@ type Props = {
   contactAddress?: string | null;
 };
 
-export default function CoursesSectionInfo({ body, tabs, contactPhone, contactAddress }: Props) {
+export default function CoursesSectionInfo({
+  body,
+  tabs,
+  contactPhone,
+  contactAddress,
+}: Props) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   const toggleAccordion = (index: number) => {
@@ -66,7 +71,7 @@ export default function CoursesSectionInfo({ body, tabs, contactPhone, contactAd
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
                       className={`flex-shrink-0 transition-transform duration-300 ${
-                        openIndex === index ? 'rotate-0' : 'rotate-90'
+                        openIndex === index ? "rotate-0" : "rotate-90"
                       }`}
                     >
                       <path
@@ -77,7 +82,7 @@ export default function CoursesSectionInfo({ body, tabs, contactPhone, contactAd
                   </button>
                   <div
                     className={`overflow-hidden transition-all duration-300 ${
-                      openIndex === index ? 'max-h-[500px]' : 'max-h-0'
+                      openIndex === index ? "max-h-[500px]" : "max-h-0"
                     }`}
                   >
                     <div className="pb-2">
@@ -91,31 +96,6 @@ export default function CoursesSectionInfo({ body, tabs, contactPhone, contactAd
               ))}
             </div>
           </>
-        )}
-
-        {/* Contact Section */}
-        {(contactPhone || contactAddress) && (
-          <div className="mt-6">
-            <h2 className="font-medium text-[20px] md:text-[24px] leading-[140%] text-[#111] mb-3">
-              Haliotis near you
-            </h2>
-            <p className="text-[14px] md:text-[15px] leading-[160%]">
-              <a href="#" className="text-[#e84814] underline decoration-skip-ink-none">
-                Contact us
-              </a>
-              <span className="text-[#101010] opacity-80"> for more information or to enrol a course.</span>
-            </p>
-            {contactPhone && (
-              <p className="text-[14px] md:text-[15px] leading-[160%] text-[#101010] opacity-80 mt-2">
-                Phone: {contactPhone}
-              </p>
-            )}
-            {contactAddress && (
-              <p className="text-[14px] md:text-[15px] leading-[160%] text-[#101010] opacity-80 mt-1">
-                Address: {contactAddress}
-              </p>
-            )}
-          </div>
         )}
       </div>
     </section>

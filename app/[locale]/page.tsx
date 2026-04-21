@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { notFound } from 'next/navigation';
+import { notFound } from "next/navigation";
 import { HeroSection } from "@/components/HeroSection";
 import { CoursesSection } from "@/components/mainSections/CoursesSection";
 import { TripsSection } from "@/components/mainSections/TripsSection";
 import { DiveTrips } from "@/components/mainSections/DiveTrips";
 import { CentersSection } from "@/components/mainSections/CentersSection";
-import type { Metadata } from 'next';
-import { createTermGetter } from '../utils/terms';
+import type { Metadata } from "next";
+import { createTermGetter } from "../utils/terms";
 
 // Функция для получения terms напрямую (для Server Component)
 async function getTerms(locale: string) {
@@ -14,53 +14,62 @@ async function getTerms(locale: string) {
     const res = await fetch(`https://cp.haliotis.space/api/v1/menu/${locale}`, {
       next: { revalidate: 3600 }, // кеш на 1 час
     });
-    
+
     if (!res.ok) {
       return {}; // возвращаем пустой объект если ошибка
     }
-    
+
     const data = await res.json();
     return data.data?.terms || {};
   } catch (error) {
-    console.error('Error fetching terms:', error);
+    console.error("Error fetching terms:", error);
     return {};
   }
 }
 
-async function getHomepageData() {
+async function getHomepageData(lang: string) {
   try {
-    const res = await fetch('https://cp.haliotis.space/api/v1/pages/homepage', {
+    const res = await fetch(`https://cp.haliotis.space/api/v1/pages/homepage?lang=${lang}`, {
       next: { revalidate: 3600 },
     });
-    
+
     if (!res.ok) {
-      throw new Error('Failed to fetch homepage data');
+      throw new Error("Failed to fetch homepage data");
     }
-    
+
     const data = await res.json();
     return data.data;
   } catch (error) {
-    console.error('Error fetching homepage:', error);
+    console.error("Error fetching homepage:", error);
     return null;
   }
 }
+type Props = {
+  params: Promise<{ slug: string; locale: string }>;
+};
 
-export async function generateMetadata(): Promise<Metadata> {
-  const homepageData = await getHomepageData();
-  
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+
+  const homepageData = await getHomepageData(locale);
+
   return {
-    title: homepageData?.title || 'Haliotis Diving Center',
-    description: homepageData?.seo?.meta_description || 'Professional diving courses and equipment for all skill levels',
-    keywords: homepageData?.seo?.meta_keywords || 'diving, courses, equipment, PADI',
+    title: homepageData?.title || "Haliotis Diving Center",
+    description:
+      homepageData?.seo?.meta_description ||
+      "Professional diving courses and equipment for all skill levels",
+    keywords:
+      homepageData?.seo?.meta_keywords || "diving, courses, equipment, PADI",
   };
 }
 
-export default async function Home({ params }: { params: { locale: string } }) {
-  // Получаем terms на сервере
-  const terms = await getTerms(params.locale);
+export default async function Home({ params }: Props) {
+  const { locale } = await params;
+
+  const terms = await getTerms(locale);
   const t = createTermGetter(terms);
-  
-  const homepageData = await getHomepageData();
+
+  const homepageData = await getHomepageData(locale);
 
   if (!homepageData) {
     notFound();
@@ -69,14 +78,18 @@ export default async function Home({ params }: { params: { locale: string } }) {
   // Формируем locations из API данных
   const locations = [
     { id: "all", label: t("all", "ALL") },
-    ...(homepageData.sliders?.diving_centers?.entities || []).map((center: any) => ({
-      id: center.slug,
-      label: center.name.toUpperCase(),
-    }))
+    ...(homepageData.sliders?.diving_centers?.entities || []).map(
+      (center: any) => ({
+        id: center.slug,
+        label: center.name.toUpperCase(),
+      })
+    ),
   ];
 
   // Остальной код остается без изменений...
-  const courseCards = (homepageData.sliders?.courses?.diving_centers || []).flatMap((center: any) =>
+  const courseCards = (
+    homepageData.sliders?.courses?.diving_centers || []
+  ).flatMap((center: any) =>
     (center.courses || []).map((course: any) => ({
       image: course.image_url || "/Rectangle 8.png",
       title: course.name,
@@ -88,7 +101,9 @@ export default async function Home({ params }: { params: { locale: string } }) {
     }))
   );
 
-  const centerCardsData = (homepageData.sliders?.diving_centers?.entities || []).map((center: any) => ({
+  const centerCardsData = (
+    homepageData.sliders?.diving_centers?.entities || []
+  ).map((center: any) => ({
     image: center.icon_url || "/CTABackgroundImage.png",
     title: center.name,
     description: center.small_description || "",
@@ -96,33 +111,38 @@ export default async function Home({ params }: { params: { locale: string } }) {
     location: center.slug,
   }));
 
-  const tripCards = (homepageData.sliders?.dive_trip?.entities || []).flatMap((center: any) =>
-    (center.dive_trips || []).map((trip: any) => ({
-      image: center.icon_url || "/image 6.png",
-      price: parseFloat(trip.price?.amount || 0),
-      title: center.name,
-      description: trip.description || center.small_description || "",
-      link: `/dive-trips/${trip.slug || trip.id}`,
-      location: center.slug,
-      details: trip.description ? `<p>${trip.description}</p>` : `<p>${center.small_description || ""}</p>`,
-      equipmentPrice: "€ 30.00",
-    }))
+  const tripCards = (homepageData.sliders?.dive_trip?.entities || []).flatMap(
+    (center: any) =>
+      (center.dive_trips || []).map((trip: any) => ({
+        image: center.icon_url || "/image 6.png",
+        price: parseFloat(trip.price?.amount || 0),
+        title: center.name,
+        description: trip.description || center.small_description || "",
+        link: `/dive-trips/${trip.slug || trip.id}`,
+        location: center.slug,
+        details: trip.description
+          ? `<p>${trip.description}</p>`
+          : `<p>${center.small_description || ""}</p>`,
+        equipmentPrice: "€ 30.00",
+      }))
   );
 
-  const diveTripsCards = (homepageData.sliders?.diving_centers?.entities || []).map((center: any, index: number) => ({
+  const diveTripsCards = (
+    homepageData.sliders?.diving_centers?.entities || []
+  ).map((center: any, index: number) => ({
     image: center.icon_url || "/CTABackgroundImage.png",
     location: center.name,
     locationNumber: String(center.id || index + 1),
     description: center.small_description || "",
   }));
+  console.log(homepageData, "homepageData");
 
-  const heroSlides = [
-    {
-      title: homepageData.sliders?.diving_centers?.title || "Find the Experience",
-      description: homepageData.sliders?.diving_centers?.subtitle || "The Haliotis Diving Center is a PADI Gold Palm IDC center that has been diving in Portugal since 2004. PADI courses and dive shop.",
-      image: homepageData.banner || "/bg.png",
-    }
-  ];
+  const heroSlides = (homepageData.banner?.slides || []).map((slide: any) => ({
+    title: slide.title || "Find the Experience",
+    description: slide.description || "The Haliotis Diving Center...",
+    desktopImage: slide.desktop_image_url || "/bg.png",
+    mobileImage: slide.mobile_image_url || slide.desktop_image_url || "/bg.png",
+  }));
 
   const partners = (homepageData.sliders?.equipment?.equipment_brands || [])
     .sort((a: any, b: any) => (a.position || 0) - (b.position || 0))
@@ -137,11 +157,15 @@ export default async function Home({ params }: { params: { locale: string } }) {
       <CentersSection centerCards={centerCardsData} />
       <CoursesSection locations={locations} courseCards={courseCards} />
       <TripsSection locations={locations} tripCards={tripCards} />
-      <DiveTrips 
-        diveTripsCards={diveTripsCards} 
+      <DiveTrips
+        diveTripsCards={diveTripsCards}
         equipmentData={{
-          title: homepageData.sliders?.equipment?.title || "Gear Up with Exclusive Dive Offers",
-          subtitle: homepageData.sliders?.equipment?.subtitle || "Discover premium equipment at unbeatable prices — limited-time deals for divers.",
+          title:
+            homepageData.sliders?.equipment?.title ||
+            "Gear Up with Exclusive Dive Offers",
+          subtitle:
+            homepageData.sliders?.equipment?.subtitle ||
+            "Discover premium equipment at unbeatable prices — limited-time deals for divers.",
           partners: partners,
         }}
       />

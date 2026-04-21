@@ -14,10 +14,10 @@ type Props = {
   heroSlides: {
     title: string;
     description: string;
-    image: string;
+    desktopImage: string;
+    mobileImage: string;
   }[];
 };
-
 export const HeroSection: React.FC<Props> = ({ heroSlides }) => {
   const [heroCurrentSlide, setHeroCurrentSlide] = useState(0);
   const heroSwiperRef = useRef<SwiperType | null>(null);
@@ -42,13 +42,27 @@ export const HeroSection: React.FC<Props> = ({ heroSlides }) => {
           {heroSlides.map((slide, index) => (
             <SwiperSlide key={index} className="h-full">
               <div className="relative h-full w-full">
-                <Image
-                  src={slide.image}
-                  alt={`Background ${index + 1}`}
-                  fill
-                  className="object-cover"
-                  priority={index === 0}
-                />
+                {/* Десктоп */}
+             {/* Десктоп */}
+<Image
+  src={slide.desktopImage}
+  alt={`Background ${index + 1}`}
+  fill
+  quality={100}
+  sizes="100vw"
+  className="object-cover hidden lg:block"
+  priority={index === 0}
+/>
+{/* Мобилка */}
+<Image
+  src={slide.mobileImage}
+  alt={`Background ${index + 1}`}
+  fill
+  quality={100}
+  sizes="100vw"
+  className="object-cover lg:hidden"
+  priority={index === 0}
+/>
               </div>
             </SwiperSlide>
           ))}
