@@ -667,7 +667,7 @@ function SpecializedMaintenanceSection({
 
       {/* Mobile */}
       <div className="flex flex-col gap-4 lg:hidden">
-      <FilterList options={maintenanceFilterOptions} selected={selectedCategoryId ?? ""} onSelect={setSelectedCategoryId} activeTabId={activeTabId} />
+      <FilterList options={maintenanceFilterOptions} maxWidth={'395px'}  selected={selectedCategoryId ?? ""} onSelect={setSelectedCategoryId} activeTabId={activeTabId} />
 
         <div
           style={{
@@ -697,8 +697,8 @@ function SpecializedMaintenanceSection({
       </div>
 
       {/* Desktop */}
-      <div className="hidden lg:flex gap-6 items-start">
-      <FilterList options={maintenanceFilterOptions} selected={selectedCategoryId ?? ""} onSelect={setSelectedCategoryId} activeTabId={activeTabId} />
+      <div className="hidden lg:flex gap-20 items-start">
+      <FilterList options={maintenanceFilterOptions} selected={selectedCategoryId ?? ""} onSelect={setSelectedCategoryId} activeTabId={activeTabId}  maxWidth={'395px'} />
 
         <div
           className="flex-1 min-w-0"
