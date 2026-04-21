@@ -12,6 +12,7 @@ import { ButtonWithIcon } from "../buttons/ButtonWithIcon";
 type Props = {
   diveTripsCards: {
     image: string;
+    slug: string;
     location: string;
     locationNumber: string;
     description: string;
@@ -151,6 +152,8 @@ export const DiveTrips: React.FC<Props> = ({ diveTripsCards, equipmentData }) =>
               </p>
 
               <ButtonWithIcon
+        href={`/centros/${diveTripsCards[diveTripsCurrentSlide].slug}`}
+
                 width="164px"
                 label="Find More"
                 textColor="text-black"

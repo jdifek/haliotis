@@ -85,6 +85,7 @@ export default async function Contacts({
   });
 
   const firstSlide = data.banner.slides[0];
+console.log(data.diving_centers, 'data.diving_centers');
 
   return (
     <>

@@ -106,6 +106,7 @@ export default async function Home({ params }: Props) {
   ).map((center: any) => ({
     image: center.icon_url || "/CTABackgroundImage.png",
     title: center.name,
+    slug: center.slug,
     description: center.small_description || "",
     buttonColor: center.color || "#f49519",
     location: center.slug,
@@ -132,6 +133,7 @@ export default async function Home({ params }: Props) {
   ).map((center: any, index: number) => ({
     image: center.icon_url || "/CTABackgroundImage.png",
     location: center.name,
+    slug: center.slug,
     locationNumber: String(center.id || index + 1),
     description: center.small_description || "",
   }));

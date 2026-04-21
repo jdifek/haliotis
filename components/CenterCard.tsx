@@ -4,6 +4,7 @@ type CenterCardProps = {
   image: string;
   title: string;
   description: string;
+  slug: string;
   buttonColor: string;
   onMoreInfoClick: () => void;
   className?: string; // <- добавить
@@ -15,6 +16,7 @@ export const CenterCard: React.FC<CenterCardProps> = ({
   description,
   buttonColor,
   onMoreInfoClick,
+  slug,
   className = "", // <- добавить
 }) => {
   return (
@@ -47,6 +49,7 @@ export const CenterCard: React.FC<CenterCardProps> = ({
           {/* Bottom Button */}
           <div className="flex justify-between items-center">
             <ButtonWithIcon
+            href={`/centros/${slug}`}
               label="More Info"
               onClick={onMoreInfoClick}
               className={`!bg-[${buttonColor}] hover:opacity-90`}

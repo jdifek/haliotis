@@ -6,14 +6,6 @@ import { BlackActionButton } from "./buttons/BlackActionButton";
 import { ButtonWithIcon } from "./buttons/ButtonWithIcon";
 import Image from "next/image";
 
-const LOCATION_COLORS: Record<string, string> = {
-  peniche: "#f49519",
-  sesimbra: "#a0c52e",
-  madeira: "#e52924",
-  "santa-maria": "#fed402",
-  faial: "#1b5ba7",
-  "sao-vicente": "#7acbe2",
-};
 
 const LocationPinSvg = () => (
   <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -115,6 +107,7 @@ type Location = {
   id: string;
   name: string;
   address: any;
+  slug: any;
   email: any;
   phone1: string;
   phone2?: string;
@@ -283,6 +276,8 @@ function LocationCard({ location }: { location: Location }) {
           }
         />
         <ButtonWithIcon
+        href={`/centros/${location.slug}`}
+
           label="Find More"
           textColor="text-black"
           className="!w-full md:!w-[50%] bg-[#f1f1f1]!"
@@ -316,6 +311,7 @@ type ApiContact = {
   contacts: {
     phone: string;
     email: string;
+    slug: string;
     fax: string | null;
     address: string;
     tripadvisor: string;
@@ -342,6 +338,7 @@ export default function LocationsSection({
               location={{
                 id: loc.name.toLowerCase().replace(" ", "-"),
                 name: loc.name,
+                slug: loc.slug,
                 address: [loc.contacts.address], // или разбить строку
                 phone1: phones[0] ?? "",
                 phone2: phones[1] ?? "",

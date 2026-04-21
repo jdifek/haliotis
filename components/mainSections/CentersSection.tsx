@@ -15,6 +15,7 @@ type Props = {
     title: string;
     description: string;
     buttonColor: string;
+    slug: string;
     location: string;
   }[];
 };
@@ -70,6 +71,7 @@ export const CentersSection: React.FC<Props> = ({ centerCards }) => {
               <CenterCard
               className="!max-w-none"
                 image={card.image}
+                slug={card.slug}
                 title={card.title}
                 description={card.description}
                 buttonColor={card.buttonColor}
@@ -107,6 +109,8 @@ export const CentersSection: React.FC<Props> = ({ centerCards }) => {
               className="!max-w-none"
                 image={card.image}
                 title={card.title}
+                slug={card.slug}
+
                 description={card.description}
                 buttonColor={card.buttonColor}
                 onMoreInfoClick={() => console.log("More info clicked")}
@@ -133,7 +137,8 @@ export const CentersSection: React.FC<Props> = ({ centerCards }) => {
            className="!max-w-none "
             key={index}
               
-            image={card.image}
+            image={card.image}                slug={card.slug}
+
             title={card.title}
             description={card.description}
             buttonColor={card.buttonColor}
