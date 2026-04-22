@@ -54,17 +54,6 @@ type ApiLocation = {
   video_cover: string;
 };
 
-type FreediveApiData = {
-  page: {
-    title: string;
-    seo: { meta_description: string; meta_keywords: string };
-    banner: { slides: ApiSlide[] };
-  };
-  dive_trip_types: ApiTripType[];
-  regions: ApiRegion[];
-  locations: ApiLocation[];
-};
-
 const CARDS_PER_PAGE = 6;
 const FALLBACK_COLOR = "#e84814";
 // ─── Component ───────────────────────────────────────────────────────────────

@@ -18,6 +18,446 @@ type Language = {
   icon: string;
 };
 
+const MobileDynamicDropdown = ({
+  item,
+  centersData,
+  coursesData,
+  selectedCenter,
+  setSelectedCenter,
+  setMobileOpenDropdown,
+  setIsMenuOpen,
+  router,
+}: {
+  item: any;
+  centersData: any[];
+  coursesData: any[];
+  selectedCenter: string;
+  setSelectedCenter: (v: string) => void;
+  setMobileOpenDropdown: (value: string | null) => void;
+  setIsMenuOpen: (value: boolean) => void;
+  router: any;
+}) => {
+  const children = item.children || [];
+  const raw = item.rawItem || {};
+
+  const isCenters = children.some(
+    (child: any) => child.link_type === "dive_center"
+  );
+  const isCourses = children.length >= 5 && raw.menu_layout === "list";
+
+  // ==================== CENTERS MOBILE ====================
+  if (isCenters) {
+    console.log("centersData в дропдауне:", centersData.map(c => ({ id: c.id, url: c.url })));
+
+    return (
+      <div
+        className="absolute rounded-lg -left-3.5 -top-2 z-10 w-[calc(100%_+_28px)] overflow-hidden rounded-t-lg"
+        style={{ background: "#fff" }}
+      >
+        {/* Заголовок с кнопкой назад */}
+        <button
+          onClick={() => setMobileOpenDropdown(null)}
+          className="flex h-[42px] w-full items-center justify-between px-[14px] py-[10px]"
+        >
+          <span className="text-[15px] font-normal uppercase leading-[120%] text-black">
+            {item.label}
+          </span>
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            className="rotate-180"
+          >
+            <path
+              d="M17.8534 9.85369L12.8537 14.8534C12.8073 14.8999 12.7522 14.9367 12.6915 14.9619C12.6308 14.9871 12.5657 15 12.5 15C12.4343 15 12.3692 14.9871 12.3085 14.9619C12.2478 14.9367 12.1927 14.8999 12.1463 14.8534L7.14663 9.85369C7.07663 9.78377 7.02895 9.69465 7.00963 9.59761C6.9903 9.50058 7.00021 9.39999 7.03808 9.30858C7.07595 9.21718 7.1401 9.13907 7.22239 9.08413C7.30468 9.0292 7.40142 8.99992 7.50036 9H17.4996C17.5986 8.99992 17.6953 9.0292 17.7776 9.08413C17.8599 9.13907 17.924 9.21718 17.9619 9.30858C17.9998 9.39999 18.0097 9.50058 17.9904 9.59761C17.971 9.69465 17.9234 9.78377 17.8534 9.85369Z"
+              fill="black"
+            />
+          </svg>
+        </button>
+
+        <div className="flex flex-col bg-[#1a1a3e] border-2 border-white rounded-lg">
+          {centersData.map((center, index) => (
+            <button
+              key={center.id}
+              onClick={() => {
+                console.log("CLICK центр", center.id, center.url);
+                setSelectedCenter(center.id);
+                if (center.new_tab) {
+                  window.open(center.url, "_blank");
+                } else {
+                  console.log("router.push →", center.url);
+                  router.push(center.url);
+                }
+                setMobileOpenDropdown(null);
+                setIsMenuOpen(false);
+              }}
+              className={`flex h-[52px] items-center cursor-pointer justify-between px-[14px] transition-all hover:bg-[#111d9e]
+                ${selectedCenter === center.id ? "bg-[#111d9e]" : ""}
+                ${index === centersData.length - 1 ? "rounded-b-lg" : ""}`}
+            >
+              {/* Название с цветом из API */}
+              <span
+                className="text-[15px] font-semibold uppercase leading-[160%]"
+                style={{ color: center.color }}
+              >
+                {center.label}
+              </span>
+
+              {/* Картинка + стрелка */}
+              <div className="flex items-center gap-2">
+                {center.image && (
+                  <div className="h-[36px] w-[52px] overflow-hidden rounded-[6px] flex-shrink-0">
+                    <Image
+                      src={center.image}
+                      alt={center.label}
+                      width={52}
+                      height={36}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                )}
+                {selectedCenter === center.id && (
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M9.8537 6.14663L14.8534 11.1463C14.8999 11.1927 14.9367 11.2478 14.9619 11.3085C14.9871 11.3692 15 11.4343 15 11.5C15 11.5657 14.9871 11.6308 14.9619 11.6915C14.9367 11.7522 14.8999 11.8073 14.8534 11.8537L9.8537 16.8534C9.78377 16.9234 9.69465 16.971 9.59762 16.9904C9.50058 17.0097 9.39999 16.9998 9.30859 16.9619C9.21718 16.924 9.13907 16.8599 9.08414 16.7776C9.0292 16.6953 8.99992 16.5986 9 16.4996L9 6.50036C8.99992 6.40142 9.0292 6.30468 9.08414 6.22239C9.13907 6.1401 9.21718 6.07595 9.30859 6.03808C9.39999 6.00021 9.50058 5.99031 9.59761 6.00963C9.69465 6.02895 9.78377 6.07663 9.8537 6.14663Z"
+                      fill={center.color}
+                    />
+                  </svg>
+                )}
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // ==================== COURSES MOBILE ====================
+  if (isCourses) {
+    return (
+      <div
+        className="absolute -left-3.5 -top-2 z-10 w-[calc(100%_+_28px)] overflow-hidden rounded-lg"
+        style={{ background: "#fff", maxHeight: "600px", overflowY: "auto" }}
+      >
+        {/* Заголовок с кнопкой назад */}
+        <button
+          onClick={() => setMobileOpenDropdown(null)}
+          className="flex h-[42px] w-full items-center justify-between px-[14px] py-[10px]"
+        >
+          <span className="text-[15px] font-normal uppercase leading-[120%] text-black">
+            {item.label}
+          </span>
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            className="rotate-180"
+          >
+            <path
+              d="M17.8534 9.85369L12.8537 14.8534C12.8073 14.8999 12.7522 14.9367 12.6915 14.9619C12.6308 14.9871 12.5657 15 12.5 15C12.4343 15 12.3692 14.9871 12.3085 14.9619C12.2478 14.9367 12.1927 14.8999 12.1463 14.8534L7.14663 9.85369C7.07663 9.78377 7.02895 9.69465 7.00963 9.59761C6.9903 9.50058 7.00021 9.39999 7.03808 9.30858C7.07595 9.21718 7.1401 9.13907 7.22239 9.08413C7.30468 9.0292 7.40142 8.99992 7.50036 9H17.4996C17.5986 8.99992 17.6953 9.0292 17.7776 9.08413C17.8599 9.13907 17.924 9.21718 17.9619 9.30858C17.9998 9.39999 18.0097 9.50058 17.9904 9.59761C17.971 9.69465 17.9234 9.78377 17.8534 9.85369Z"
+              fill="black"
+            />
+          </svg>
+        </button>
+
+        <div className="bg-[#1a1a3e] border-2 border-white rounded-lg p-[10px] pb-[20px]">
+          {coursesData.some((c) => c.image) ? (
+            // Если есть хоть одна картинка — сетка с картинками
+            <div className="grid grid-cols-3 gap-[10px]">
+              {coursesData.map((course) => {
+                const content = (
+                  <div className="flex flex-col items-center gap-[5px] rounded-[20px] px-0 pb-[5px] pt-[10px]">
+                    <div className="h-[80px] w-[80px] overflow-hidden rounded-[16px] bg-white/10">
+                      {course.image ? (
+                        <Image
+                          src={course.image}
+                          alt={course.label}
+                          width={80}
+                          height={80}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="h-full w-full flex items-center justify-center">
+                          <svg
+                            width="32"
+                            height="32"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                          >
+                            <path
+                              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"
+                              fill="rgba(255,255,255,0.3)"
+                            />
+                          </svg>
+                        </div>
+                      )}
+                    </div>
+                    <span className="text-center text-[14px] font-normal leading-[140%] text-white">
+                      {course.label}
+                    </span>
+                  </div>
+                );
+
+                return course.new_tab ? (
+                  <a
+                    key={course.id}
+                    href={course.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => {
+                      setMobileOpenDropdown(null);
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    {content}
+                  </a>
+                ) : (
+                  <Link
+                    key={course.id}
+                    href={course.url}
+                    onClick={() => {
+                      setMobileOpenDropdown(null);
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    {content}
+                  </Link>
+                );
+              })}
+            </div>
+          ) : (
+            // Если картинок нет — простой список
+            <div className="flex flex-col gap-1">
+              {coursesData.map((course) => {
+                const content = (
+                  <div className="flex h-[44px] items-center px-[14px] rounded-lg hover:bg-[#111d9e] transition-all">
+                    <span className="text-[15px] font-normal text-white uppercase">
+                      {course.label}
+                    </span>
+                  </div>
+                );
+
+                return course.new_tab ? (
+                  <a
+                    key={course.id}
+                    href={course.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => {
+                      setMobileOpenDropdown(null);
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    {content}
+                  </a>
+                ) : (
+                  <Link
+                    key={course.id}
+                    href={course.url}
+                    onClick={() => {
+                      setMobileOpenDropdown(null);
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    {content}
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  return null;
+};
+const DynamicDropdown = ({
+  item,
+  centersData,
+  coursesData,
+  selectedCenter,
+  setSelectedCenter,
+  dropdownRef,
+  coursesRef,
+  setOpenDropdown,
+  router,
+}: {
+  item: any;
+  centersData: any[];
+  coursesData: any[];
+  selectedCenter: string;
+  setSelectedCenter: (v: string) => void;
+  dropdownRef: any;
+  coursesRef: any;
+  setOpenDropdown: (value: string | null) => void;
+  router: any;
+}) => {
+  const children = item.children || [];
+  const raw = item.rawItem || {};
+
+  const isCenters = children.some(
+    (child: any) => child.link_type === "dive_center"
+  );
+  const isCourses = children.length >= 5 && raw.menu_layout === "list";
+
+  // ==================== CENTERS DESKTOP ====================
+  if (isCenters) {
+    return (
+      <div
+        ref={dropdownRef}
+        className="absolute -left-2 top-4 z-50 mt-2 flex flex-col gap-0 rounded-tr-[10px] rounded-b-[10px] border-2 border-white p-0"
+        style={{
+          width: "280px",
+          background: "rgba(0, 3, 38, 0.5)",
+          backdropFilter: "blur(10px)",
+          boxShadow: "0 4px 4px 0 rgba(0,0,0,0.25)",
+        }}
+      >
+        {centersData.map((center, index) => (
+          <button
+            key={center.id}
+            onClick={() => {
+              setSelectedCenter(center.id);
+              if (center.new_tab) {
+                window.open(center.url, "_blank");
+              } else {
+                router.push(center.url);
+              }
+              setOpenDropdown(null);
+            }}
+            className={`flex h-[44px] cursor-pointer items-center justify-between px-[14px] transition-all hover:bg-[#111d9e]
+              ${selectedCenter === center.id ? "bg-[#111d9e]" : ""}
+              ${index === 0 ? "rounded-t-[8px]" : ""}
+              ${index === centersData.length - 1 ? "rounded-b-[8px]" : ""}`}
+          >
+            {/* Левая часть — цвет с API */}
+            <span
+              className="text-[15px] font-semibold uppercase leading-[160%]"
+              style={{
+                fontFamily: "var(--font-family)",
+                color: center.color,
+              }}
+            >
+              {center.label}
+            </span>
+
+            {/* Правая часть — картинка + стрелка */}
+            <div className="flex items-center gap-2">
+              {center.image && (
+                <div className="h-[32px] w-[48px] overflow-hidden rounded-[6px] flex-shrink-0">
+                  <Image
+                    src={center.image}
+                    alt={center.label}
+                    width={48}
+                    height={32}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              )}
+              {selectedCenter === center.id ? (
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M9.8537 6.14663L14.8534 11.1463C14.8999 11.1927 14.9367 11.2478 14.9619 11.3085C14.9871 11.3692 15 11.4343 15 11.5C15 11.5657 14.9871 11.6308 14.9619 11.6915C14.9367 11.7522 14.8999 11.8073 14.8534 11.8537L9.8537 16.8534C9.78377 16.9234 9.69465 16.971 9.59762 16.9904C9.50058 17.0097 9.39999 16.9998 9.30859 16.9619C9.21718 16.924 9.13907 16.8599 9.08414 16.7776C9.0292 16.6953 8.99992 16.5986 9 16.4996L9 6.50036C8.99992 6.40142 9.0292 6.30468 9.08414 6.22239C9.13907 6.1401 9.21718 6.07595 9.30859 6.03808C9.39999 6.00021 9.50058 5.99031 9.59761 6.00963C9.69465 6.02895 9.78377 6.07663 9.8537 6.14663Z"
+                    fill={center.color}
+                  />
+                </svg>
+              ) : (
+                <svg width="24" height="25" viewBox="0 0 24 25" fill="none">
+                  <path
+                    d="M4.94092 0.139404C5.33371 0.595553 5.84055 1.62189 6.09396 2.44549C6.43607 3.31977 6.55011 5.10635 6.34737 6.42411C6.29669 6.72821 6.23334 7.04498 6.15731 7.34908C6.15731 7.14635 6.14464 6.72821 6.14464 6.41144C6.10663 4.27008 5.80253 2.12872 4.94092 0.139404Z"
+                    fill="#F49519"
+                  />
+                </svg>
+              )}
+            </div>
+          </button>
+        ))}
+      </div>
+    );
+  }
+
+  // ==================== COURSES DESKTOP ====================
+  if (isCourses) {
+    return (
+      <div
+        ref={coursesRef}
+        className="absolute left-0 top-9 z-50 mt-2 rounded-[10px] border-2 border-white p-6"
+        style={{
+          minWidth: "560px",
+          maxWidth: "92vw",
+          background: "rgba(0, 3, 38, 0.5)",
+          backdropFilter: "blur(10px)",
+          boxShadow: "0 4px 4px 0 rgba(0,0,0,0.25)",
+        }}
+      >
+        <div className="grid grid-cols-3 gap-4">
+          {coursesData.map((course) => {
+            const content = (
+              <div className="flex flex-col items-center gap-3 rounded-2xl border-2 border-transparent p-3 transition-all hover:border-white hover:bg-[#111d9e]/80 cursor-pointer">
+                {course.image ? (
+                  <div className="h-[78px] w-[78px] overflow-hidden rounded-xl bg-black/30">
+                    <Image
+                      src={course.image}
+                      alt={course.label}
+                      width={78}
+                      height={78}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                ) : (
+                  // Плейсхолдер если нет картинки
+                  <div className="h-[78px] w-[78px] rounded-xl bg-white/10 flex items-center justify-center">
+                    <svg
+                      width="32"
+                      height="32"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                    >
+                      <path
+                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"
+                        fill="rgba(255,255,255,0.3)"
+                      />
+                    </svg>
+                  </div>
+                )}
+                <span className="text-center text-sm font-semibold leading-tight text-white px-1">
+                  {course.label}
+                </span>
+              </div>
+            );
+
+            // new_tab — открываем по-разному
+            return course.new_tab ? (
+              <a
+                key={course.id}
+                href={course.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setOpenDropdown(null)}
+              >
+                {content}
+              </a>
+            ) : (
+              <Link
+                key={course.id}
+                href={course.url}
+                onClick={() => setOpenDropdown(null)}
+              >
+                {content}
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  return null;
+};
+
 export const Header: React.FC<{
   locale: string;
   logoUrl: string;
@@ -155,6 +595,7 @@ export const Header: React.FC<{
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      if (isMenuOpen) return;
       const target = event.target as Node;
 
       const isInsideDropdown =
@@ -188,7 +629,7 @@ export const Header: React.FC<{
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  }, [isMenuOpen]);
   // Добавляем после centersData
   const currentCenter =
     menuData?.diving_centers.find((c) => c.slug === selectedCenter) ??
@@ -240,429 +681,7 @@ export const Header: React.FC<{
     label: string;
     icon: React.ReactNode;
   }[];
-  const MobileDynamicDropdown = ({
-    item,
-    centersData,
-    coursesData,
-    setMobileOpenDropdown,
-    setIsMenuOpen,
-  }: {
-    item: any;
-    centersData: any[];
-    coursesData: any[];
-    setMobileOpenDropdown: (value: string | null) => void;
-    setIsMenuOpen: (value: boolean) => void;
-  }) => {
-    const children = item.children || [];
-    const raw = item.rawItem || {};
-
-    const isCenters = children.some(
-      (child: any) => child.link_type === "dive_center"
-    );
-    const isCourses = children.length >= 5 && raw.menu_layout === "list";
-
-    // ==================== CENTERS MOBILE ====================
-    if (isCenters) {
-      return (
-        <div
-          className="absolute rounded-lg -left-3.5 -top-2 z-10 w-[calc(100%_+_28px)] overflow-hidden rounded-t-lg"
-          style={{ background: "#fff" }}
-        >
-          {/* Заголовок с кнопкой назад */}
-          <button
-            onClick={() => setMobileOpenDropdown(null)}
-            className="flex h-[42px] w-full items-center justify-between px-[14px] py-[10px]"
-          >
-            <span className="text-[15px] font-normal uppercase leading-[120%] text-black">
-              {item.label}
-            </span>
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              className="rotate-180"
-            >
-              <path
-                d="M17.8534 9.85369L12.8537 14.8534C12.8073 14.8999 12.7522 14.9367 12.6915 14.9619C12.6308 14.9871 12.5657 15 12.5 15C12.4343 15 12.3692 14.9871 12.3085 14.9619C12.2478 14.9367 12.1927 14.8999 12.1463 14.8534L7.14663 9.85369C7.07663 9.78377 7.02895 9.69465 7.00963 9.59761C6.9903 9.50058 7.00021 9.39999 7.03808 9.30858C7.07595 9.21718 7.1401 9.13907 7.22239 9.08413C7.30468 9.0292 7.40142 8.99992 7.50036 9H17.4996C17.5986 8.99992 17.6953 9.0292 17.7776 9.08413C17.8599 9.13907 17.924 9.21718 17.9619 9.30858C17.9998 9.39999 18.0097 9.50058 17.9904 9.59761C17.971 9.69465 17.9234 9.78377 17.8534 9.85369Z"
-                fill="black"
-              />
-            </svg>
-          </button>
-
-          <div className="flex flex-col bg-[#1a1a3e] border-2 border-white rounded-lg">
-            {centersData.map((center, index) => (
-              <button
-                key={center.id}
-                onClick={() => {
-                  setSelectedCenter(center.id);
-                  if (center.new_tab) {
-                    window.open(center.url, "_blank");
-                  } else {
-                    router.push(center.url);
-                  }
-                  setIsMenuOpen(false);
-                  setMobileOpenDropdown(null);
-                }}
-                className={`flex h-[52px] items-center cursor-pointer justify-between px-[14px] transition-all hover:bg-[#111d9e]
-                  ${selectedCenter === center.id ? "bg-[#111d9e]" : ""}
-                  ${index === centersData.length - 1 ? "rounded-b-lg" : ""}`}
-              >
-                {/* Название с цветом из API */}
-                <span
-                  className="text-[15px] font-semibold uppercase leading-[160%]"
-                  style={{ color: center.color }}
-                >
-                  {center.label}
-                </span>
-
-                {/* Картинка + стрелка */}
-                <div className="flex items-center gap-2">
-                  {center.image && (
-                    <div className="h-[36px] w-[52px] overflow-hidden rounded-[6px] flex-shrink-0">
-                      <Image
-                        src={center.image}
-                        alt={center.label}
-                        width={52}
-                        height={36}
-                        className="h-full w-full object-cover"
-                      />
-                    </div>
-                  )}
-                  {selectedCenter === center.id && (
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                      <path
-                        d="M9.8537 6.14663L14.8534 11.1463C14.8999 11.1927 14.9367 11.2478 14.9619 11.3085C14.9871 11.3692 15 11.4343 15 11.5C15 11.5657 14.9871 11.6308 14.9619 11.6915C14.9367 11.7522 14.8999 11.8073 14.8534 11.8537L9.8537 16.8534C9.78377 16.9234 9.69465 16.971 9.59762 16.9904C9.50058 17.0097 9.39999 16.9998 9.30859 16.9619C9.21718 16.924 9.13907 16.8599 9.08414 16.7776C9.0292 16.6953 8.99992 16.5986 9 16.4996L9 6.50036C8.99992 6.40142 9.0292 6.30468 9.08414 6.22239C9.13907 6.1401 9.21718 6.07595 9.30859 6.03808C9.39999 6.00021 9.50058 5.99031 9.59761 6.00963C9.69465 6.02895 9.78377 6.07663 9.8537 6.14663Z"
-                        fill={center.color}
-                      />
-                    </svg>
-                  )}
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-      );
-    }
-
-    // ==================== COURSES MOBILE ====================
-    if (isCourses) {
-      return (
-        <div
-          className="absolute -left-3.5 -top-2 z-10 w-[calc(100%_+_28px)] overflow-hidden rounded-lg"
-          style={{ background: "#fff", maxHeight: "600px", overflowY: "auto" }}
-        >
-          {/* Заголовок с кнопкой назад */}
-          <button
-            onClick={() => setMobileOpenDropdown(null)}
-            className="flex h-[42px] w-full items-center justify-between px-[14px] py-[10px]"
-          >
-            <span className="text-[15px] font-normal uppercase leading-[120%] text-black">
-              {item.label}
-            </span>
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              className="rotate-180"
-            >
-              <path
-                d="M17.8534 9.85369L12.8537 14.8534C12.8073 14.8999 12.7522 14.9367 12.6915 14.9619C12.6308 14.9871 12.5657 15 12.5 15C12.4343 15 12.3692 14.9871 12.3085 14.9619C12.2478 14.9367 12.1927 14.8999 12.1463 14.8534L7.14663 9.85369C7.07663 9.78377 7.02895 9.69465 7.00963 9.59761C6.9903 9.50058 7.00021 9.39999 7.03808 9.30858C7.07595 9.21718 7.1401 9.13907 7.22239 9.08413C7.30468 9.0292 7.40142 8.99992 7.50036 9H17.4996C17.5986 8.99992 17.6953 9.0292 17.7776 9.08413C17.8599 9.13907 17.924 9.21718 17.9619 9.30858C17.9998 9.39999 18.0097 9.50058 17.9904 9.59761C17.971 9.69465 17.9234 9.78377 17.8534 9.85369Z"
-                fill="black"
-              />
-            </svg>
-          </button>
-
-          <div className="bg-[#1a1a3e] border-2 border-white rounded-lg p-[10px] pb-[20px]">
-            {coursesData.some((c) => c.image) ? (
-              // Если есть хоть одна картинка — сетка с картинками
-              <div className="grid grid-cols-3 gap-[10px]">
-                {coursesData.map((course) => {
-                  const content = (
-                    <div className="flex flex-col items-center gap-[5px] rounded-[20px] px-0 pb-[5px] pt-[10px]">
-                      <div className="h-[80px] w-[80px] overflow-hidden rounded-[16px] bg-white/10">
-                        {course.image ? (
-                          <Image
-                            src={course.image}
-                            alt={course.label}
-                            width={80}
-                            height={80}
-                            className="h-full w-full object-cover"
-                          />
-                        ) : (
-                          <div className="h-full w-full flex items-center justify-center">
-                            <svg
-                              width="32"
-                              height="32"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                            >
-                              <path
-                                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"
-                                fill="rgba(255,255,255,0.3)"
-                              />
-                            </svg>
-                          </div>
-                        )}
-                      </div>
-                      <span className="text-center text-[14px] font-normal leading-[140%] text-white">
-                        {course.label}
-                      </span>
-                    </div>
-                  );
-
-                  return course.new_tab ? (
-                    <a
-                      key={course.id}
-                      href={course.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() => {
-                        setMobileOpenDropdown(null);
-                        setIsMenuOpen(false);
-                      }}
-                    >
-                      {content}
-                    </a>
-                  ) : (
-                    <Link
-                      key={course.id}
-                      href={course.url}
-                      onClick={() => {
-                        setMobileOpenDropdown(null);
-                        setIsMenuOpen(false);
-                      }}
-                    >
-                      {content}
-                    </Link>
-                  );
-                })}
-              </div>
-            ) : (
-              // Если картинок нет — простой список
-              <div className="flex flex-col gap-1">
-                {coursesData.map((course) => {
-                  const content = (
-                    <div className="flex h-[44px] items-center px-[14px] rounded-lg hover:bg-[#111d9e] transition-all">
-                      <span className="text-[15px] font-normal text-white uppercase">
-                        {course.label}
-                      </span>
-                    </div>
-                  );
-
-                  return course.new_tab ? (
-                    <a
-                      key={course.id}
-                      href={course.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() => {
-                        setMobileOpenDropdown(null);
-                        setIsMenuOpen(false);
-                      }}
-                    >
-                      {content}
-                    </a>
-                  ) : (
-                    <Link
-                      key={course.id}
-                      href={course.url}
-                      onClick={() => {
-                        setMobileOpenDropdown(null);
-                        setIsMenuOpen(false);
-                      }}
-                    >
-                      {content}
-                    </Link>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        </div>
-      );
-    }
-
-    return null;
-  };
-  const DynamicDropdown = ({
-    item,
-    centersData,
-    coursesData,
-    dropdownRef,
-    coursesRef,
-    setOpenDropdown,
-  }: {
-    item: any;
-    centersData: any[];
-    coursesData: any[];
-    dropdownRef: any;
-    coursesRef: any;
-    setOpenDropdown: (value: string | null) => void;
-  }) => {
-    const children = item.children || [];
-    const raw = item.rawItem || {};
-
-    const isCenters = children.some(
-      (child: any) => child.link_type === "dive_center"
-    );
-    const isCourses = children.length >= 5 && raw.menu_layout === "list";
-
-    // ==================== CENTERS DESKTOP ====================
-    if (isCenters) {
-      return (
-        <div
-          ref={dropdownRef}
-          className="absolute -left-2 top-4 z-50 mt-2 flex flex-col gap-0 rounded-tr-[10px] rounded-b-[10px] border-2 border-white p-0"
-          style={{
-            width: "280px",
-            background: "rgba(0, 3, 38, 0.5)",
-            backdropFilter: "blur(10px)",
-            boxShadow: "0 4px 4px 0 rgba(0,0,0,0.25)",
-          }}
-        >
-          {centersData.map((center, index) => (
-            <button
-              key={center.id}
-              onClick={() => {
-                setSelectedCenter(center.id);
-                if (center.new_tab) {
-                  window.open(center.url, "_blank");
-                } else {
-                  router.push(center.url);
-                }
-                setOpenDropdown(null);
-              }}
-              className={`flex h-[44px] cursor-pointer items-center justify-between px-[14px] transition-all hover:bg-[#111d9e]
-                ${selectedCenter === center.id ? "bg-[#111d9e]" : ""}
-                ${index === 0 ? "rounded-t-[8px]" : ""}
-                ${index === centersData.length - 1 ? "rounded-b-[8px]" : ""}`}
-            >
-              {/* Левая часть — цвет с API */}
-              <span
-                className="text-[15px] font-semibold uppercase leading-[160%]"
-                style={{
-                  fontFamily: "var(--font-family)",
-                  color: center.color,
-                }}
-              >
-                {center.label}
-              </span>
-
-              {/* Правая часть — картинка + стрелка */}
-              <div className="flex items-center gap-2">
-                {center.image && (
-                  <div className="h-[32px] w-[48px] overflow-hidden rounded-[6px] flex-shrink-0">
-                    <Image
-                      src={center.image}
-                      alt={center.label}
-                      width={48}
-                      height={32}
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                )}
-                {selectedCenter === center.id ? (
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                    <path
-                      d="M9.8537 6.14663L14.8534 11.1463C14.8999 11.1927 14.9367 11.2478 14.9619 11.3085C14.9871 11.3692 15 11.4343 15 11.5C15 11.5657 14.9871 11.6308 14.9619 11.6915C14.9367 11.7522 14.8999 11.8073 14.8534 11.8537L9.8537 16.8534C9.78377 16.9234 9.69465 16.971 9.59762 16.9904C9.50058 17.0097 9.39999 16.9998 9.30859 16.9619C9.21718 16.924 9.13907 16.8599 9.08414 16.7776C9.0292 16.6953 8.99992 16.5986 9 16.4996L9 6.50036C8.99992 6.40142 9.0292 6.30468 9.08414 6.22239C9.13907 6.1401 9.21718 6.07595 9.30859 6.03808C9.39999 6.00021 9.50058 5.99031 9.59761 6.00963C9.69465 6.02895 9.78377 6.07663 9.8537 6.14663Z"
-                      fill={center.color}
-                    />
-                  </svg>
-                ) : (
-                  <svg width="24" height="25" viewBox="0 0 24 25" fill="none">
-                    <path
-                      d="M4.94092 0.139404C5.33371 0.595553 5.84055 1.62189 6.09396 2.44549C6.43607 3.31977 6.55011 5.10635 6.34737 6.42411C6.29669 6.72821 6.23334 7.04498 6.15731 7.34908C6.15731 7.14635 6.14464 6.72821 6.14464 6.41144C6.10663 4.27008 5.80253 2.12872 4.94092 0.139404Z"
-                      fill="#F49519"
-                    />
-                  </svg>
-                )}
-              </div>
-            </button>
-          ))}
-        </div>
-      );
-    }
-
-    // ==================== COURSES DESKTOP ====================
-    if (isCourses) {
-      return (
-        <div
-          ref={coursesRef}
-          className="absolute left-0 top-9 z-50 mt-2 rounded-[10px] border-2 border-white p-6"
-          style={{
-            minWidth: "560px",
-            maxWidth: "92vw",
-            background: "rgba(0, 3, 38, 0.5)",
-            backdropFilter: "blur(10px)",
-            boxShadow: "0 4px 4px 0 rgba(0,0,0,0.25)",
-          }}
-        >
-          <div className="grid grid-cols-3 gap-4">
-            {coursesData.map((course) => {
-              const content = (
-                <div className="flex flex-col items-center gap-3 rounded-2xl border-2 border-transparent p-3 transition-all hover:border-white hover:bg-[#111d9e]/80 cursor-pointer">
-                  {course.image ? (
-                    <div className="h-[78px] w-[78px] overflow-hidden rounded-xl bg-black/30">
-                      <Image
-                        src={course.image}
-                        alt={course.label}
-                        width={78}
-                        height={78}
-                        className="h-full w-full object-cover"
-                      />
-                    </div>
-                  ) : (
-                    // Плейсхолдер если нет картинки
-                    <div className="h-[78px] w-[78px] rounded-xl bg-white/10 flex items-center justify-center">
-                      <svg
-                        width="32"
-                        height="32"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                      >
-                        <path
-                          d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"
-                          fill="rgba(255,255,255,0.3)"
-                        />
-                      </svg>
-                    </div>
-                  )}
-                  <span className="text-center text-sm font-semibold leading-tight text-white px-1">
-                    {course.label}
-                  </span>
-                </div>
-              );
-
-              // new_tab — открываем по-разному
-              return course.new_tab ? (
-                <a
-                  key={course.id}
-                  href={course.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => setOpenDropdown(null)}
-                >
-                  {content}
-                </a>
-              ) : (
-                <Link
-                  key={course.id}
-                  href={course.url}
-                  onClick={() => setOpenDropdown(null)}
-                >
-                  {content}
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      );
-    }
-
-    return null;
-  };
+ 
 
   return (
     <>
@@ -775,14 +794,17 @@ export const Header: React.FC<{
 
                   {/* Универсальный дропдаун без хардкода */}
                   {item.hasDropdown && openDropdown === item.id && (
-                    <DynamicDropdown
-                      item={item}
-                      centersData={centersData}
-                      coursesData={coursesData}
-                      dropdownRef={dropdownRef}
-                      coursesRef={coursesRef}
-                      setOpenDropdown={setOpenDropdown}
-                    />
+                   <DynamicDropdown
+  item={item}
+  centersData={centersData}
+  coursesData={coursesData}
+  selectedCenter={selectedCenter}        // ← добавить
+  setSelectedCenter={setSelectedCenter}  // ← добавить
+  dropdownRef={dropdownRef}
+  coursesRef={coursesRef}
+  setOpenDropdown={setOpenDropdown}
+  router={router}                        // ← добавить
+/>
                   )}
                 </div>
               ))}
@@ -946,7 +968,7 @@ export const Header: React.FC<{
                 </div>
 
                 {/* YouTube */}
-                <div className="relative">
+                {/* <div className="relative">
                   <button
                     onClick={() =>
                       setOpenSocial(openSocial === "youtube" ? null : "youtube")
@@ -1015,7 +1037,7 @@ export const Header: React.FC<{
                       })}
                     </div>
                   )}
-                </div>
+                </div> */}
 
                 {/* Tripadvisor */}
                 <div className="relative">
@@ -1168,6 +1190,7 @@ export const Header: React.FC<{
                       } else {
                         setActiveNav(item.id);
                         setIsMenuOpen(false);
+                        if (item.href) router.push(item.href);
                       }
                     }}
                     className={`flex w-full items-center justify-between uppercase text-[15px] font-normal leading-[120%] ${
@@ -1195,13 +1218,16 @@ export const Header: React.FC<{
 
                   {/* Универсальный мобильный дропдаун */}
                   {item.hasDropdown && mobileOpenDropdown === item.id && (
-                    <MobileDynamicDropdown
-                      item={item}
-                      centersData={centersData}
-                      coursesData={coursesData}
-                      setMobileOpenDropdown={setMobileOpenDropdown}
-                      setIsMenuOpen={setIsMenuOpen}
-                    />
+                <MobileDynamicDropdown
+  item={item}
+  centersData={centersData}
+  coursesData={coursesData}
+  selectedCenter={selectedCenter}        // ← добавить
+  setSelectedCenter={setSelectedCenter}  // ← добавить
+  setMobileOpenDropdown={setMobileOpenDropdown}
+  setIsMenuOpen={setIsMenuOpen}
+  router={router}                        // ← добавить
+/>
                   )}
                 </div>
               ))}

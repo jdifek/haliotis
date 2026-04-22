@@ -1,5 +1,14 @@
+'use client'
+import { useState } from "react";
 import { ButtonWithIcon } from "./buttons/ButtonWithIcon";
+import { BookingFormModal } from "./Modals/BookingFormModal";
+import { createPortal } from "react-dom";
 
+export const ModalPortal = ({ children }: { children: React.ReactNode }) => {
+  if (typeof window === "undefined") return null;
+
+  return createPortal(children, document.body);
+};
 type ArticleCardProps = {
   image: string;
   price: number;
@@ -31,6 +40,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
   duration,
   borderColor = "#f49519",
 }) => {
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
   return (
     <div className="relative">
       <div
@@ -66,7 +76,10 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
           <ButtonWithIcon
             className="absolute lg:hidden -top-5 right-4"
             label="Book now"
-            onClick={onBookClick}
+            onClick={(e) => {
+              e.stopPropagation(); // важно!
+              setIsBookingOpen(true);
+            }}
             icon={
               <svg
                 width="44"
@@ -159,8 +172,10 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
                   <ButtonWithIcon
                     className="flex-1"
                     label="Book Now"
-                    onClick={onBookClick}
-                    icon={
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsBookingOpen(true); // ✅ открывает
+                    }}                    icon={
                       <svg
                         width="44"
                         height="44"
@@ -200,7 +215,10 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
           <ButtonWithIcon
             className="absolute hidden lg:flex lg:bottom-20 lg:right-4 rounded-2xl"
             label="Book now"
-            onClick={onBookClick}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsBookingOpen(true); // ✅ открывает
+            }}
             icon={
               <svg
                 width="44"
@@ -219,6 +237,14 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
           />
         </div>
       </div>
+      <ModalPortal>
+  <BookingFormModal
+    isOpen={isBookingOpen}
+    onClose={() => setIsBookingOpen(false)}
+    courseTitle={title}
+    pricePerPerson={price}
+  />
+</ModalPortal>
     </div>
   );
 };

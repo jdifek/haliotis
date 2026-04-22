@@ -4,8 +4,8 @@ import Link from "next/link";
 type ButtonWithIconProps = {
   label: string;
   icon: React.ReactNode;
-  onClick?: () => void;
-  href?: string;
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+    href?: string;
   width?: string;
   height?: string;
   textColor?: string;
