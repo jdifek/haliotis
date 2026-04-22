@@ -10,6 +10,7 @@ import { Breadcrumbs } from "./Breadcrumbs";
 
 type Slide = {
   image: string;
+  mobileImage?: string; // ← добавить
   title?: string;
   description?: string;
 };
@@ -62,28 +63,44 @@ export function HeroBanner({
           >
             {slides.map((slide, index) => (
               <SwiperSlide key={index} className="h-full">
-                <div className="relative h-full w-full">
-                  <Image
-                    src={slide.image}
-                    alt={slide.title ?? `Slide ${index + 1}`}
-                    fill
-                    className="object-cover"
-                    priority={index === 0}
-                  />
-                </div>
+               <div className="relative h-full w-full">
+  {/* десктоп */}
+  <Image
+    src={slide.image}
+    alt={slide.title ?? `Slide ${index + 1}`}
+    fill
+    className="object-cover hidden md:block"
+    priority={index === 0}
+  />
+  {/* мобайл */}
+  <Image
+    src={slide.mobileImage || slide.image}
+    alt={slide.title ?? `Slide ${index + 1}`}
+    fill
+    className="object-cover md:hidden"
+    priority={index === 0}
+  />
+</div>
               </SwiperSlide>
             ))}
           </Swiper>
         ) : (
           <div className="relative h-full w-full">
-            <Image
-              src={slides[0].image}
-              alt={slides[0].title ?? "Banner"}
-              fill
-              className="object-cover"
-              priority
-            />
-          </div>
+          <Image
+            src={slides[0].image}
+            alt={slides[0].title ?? "Banner"}
+            fill
+            className="object-cover hidden md:block"
+            priority
+          />
+          <Image
+            src={slides[0].mobileImage || slides[0].image}
+            alt={slides[0].title ?? "Banner"}
+            fill
+            className="object-cover md:hidden"
+            priority
+          />
+        </div>
         )}
       </div>
 
