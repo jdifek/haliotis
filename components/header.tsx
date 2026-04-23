@@ -494,10 +494,10 @@ export const Header: React.FC<{
   const transparentRoutes = [
     "/",
     "/another-page",
-    "/courses",
+    "/cursos",
     "/diving",
     "/boat-tours",
-    "/contacts",
+    "/contactos",
     "/snorkeling",
     "/dolphin-watching",
   ];
