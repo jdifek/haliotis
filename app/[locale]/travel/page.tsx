@@ -18,6 +18,7 @@ type Props = {
 export default async function Travel({ params }: Props) {
   const { locale } = await params;
   const data = await getTravelsData(locale);
+console.log(data, 'data');
 
   const tripCards = data.data.map((trip: any) => ({
     locationId: trip.slug || trip.id.toString(),

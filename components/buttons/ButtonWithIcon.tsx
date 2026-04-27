@@ -5,7 +5,7 @@ type ButtonWithIconProps = {
   label: string;
   icon: React.ReactNode;
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
-    href?: string;
+  href?: string;
   width?: string;
   height?: string;
   textColor?: string;
@@ -13,6 +13,7 @@ type ButtonWithIconProps = {
   style?: React.CSSProperties;
   bgColor?: string;
   iconBgColor?: string;
+  [key: string]: unknown;
 };
 
 export const ButtonWithIcon: React.FC<ButtonWithIconProps> = ({
@@ -27,6 +28,7 @@ export const ButtonWithIcon: React.FC<ButtonWithIconProps> = ({
   className = "",
   bgColor,
   iconBgColor,
+  ...rest
 }) => {
   const inner = (
     <>
@@ -66,6 +68,7 @@ export const ButtonWithIcon: React.FC<ButtonWithIconProps> = ({
       onClick={onClick}
       className={sharedClassName}
       style={sharedStyle}
+      {...rest}
     >
       {inner}
     </button>

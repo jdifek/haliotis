@@ -74,6 +74,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
           }}
         >
           <ButtonWithIcon
+           data-book
             className="absolute lg:hidden -top-5 right-4"
             label="Book now"
             onClick={(e) => {
@@ -170,6 +171,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
                   </div>
 
                   <ButtonWithIcon
+                  data-book
                     className="flex-1"
                     label="Book Now"
                     onClick={(e) => {
@@ -213,6 +215,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
         <div className="flex justify-between">
           <div></div>
           <ButtonWithIcon
+          data-book
             className="absolute hidden lg:flex lg:bottom-20 lg:right-4 rounded-2xl"
             label="Book now"
             onClick={(e) => {

@@ -314,6 +314,7 @@ export const DiveTrips: React.FC<Props> = ({ diveTripsCards, equipmentData }) =>
 
               <div className="flex justify-center mt-auto">
                 <ButtonWithIcon
+                href="https://shop.haliotis.pt/"
                   width="237px"
                   label="Visit our Online Shop"
                   textColor="text-black"

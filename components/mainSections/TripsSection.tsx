@@ -320,6 +320,12 @@ export const TripsSection: React.FC<Props> = ({ locations, tripCards }) => {
                       </div>
 
                       <ButtonWithIcon
+                      onClick={() => {
+                        // Находим кнопку Book now внутри активной карточки и кликаем по ней
+                        const activeCard = cardRefs.current[expandedCardId!];
+                        const bookBtn = activeCard?.querySelector<HTMLButtonElement>('button[data-book]');
+                        bookBtn?.click();
+                      }}
                         className="w-full"
                         label="Book now"
                         icon={
