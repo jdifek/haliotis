@@ -28,7 +28,7 @@ console.log(data, 'data');
     price: parseFloat(trip.price.amount),
     title: trip.name,
     description: trip.summary.replace(/<[^>]*>/g, ''),
-    link: `/trip/${trip.slug || trip.id}`,
+    link: `/travel/${trip.slug || trip.id}`,
   }));
 
   const bannerSlides = data.attachPage?.banner?.slides?.length
