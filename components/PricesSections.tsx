@@ -396,7 +396,8 @@ const fish = TAB_FISH[activeTabId ?? ""];
         />
       </section>
 
-      <section className="relative overflow-hidden bg-[#f1f1f1] px-4 pb-12 pt-8 md:px-[30px] lg:px-[188px] md:pb-[50px] md:pt-[46px]">
+      <section className="relative overflow-hidden bg-[#f1f1f1] px-4 pb-12 pt-8 md:px-[30px] lg:px-[188px] md:pb-[50px] md:pt-[46px]"
+>
         {/* Mobile tab selector */}
         <div className="md:hidden mb-4 flex flex-col gap-2">
           <button
@@ -470,7 +471,7 @@ const fish = TAB_FISH[activeTabId ?? ""];
         {loading ? (
   <>
     {/* Desktop skeleton */}
-    <div className="hidden lg:flex gap-20 items-start">
+    <div className="hidden lg:flex  gap-20 items-start">
       <div className="flex flex-col gap-2 w-[395px] flex-shrink-0">
         {Array.from({ length: 6 }).map((_, i) => (
           <div
@@ -550,53 +551,55 @@ const fish = TAB_FISH[activeTabId ?? ""];
       </div>
     </div>
 
-    {/* Desktop: side by side */}
-    <div className="hidden lg:flex gap-20 items-start">
-      <FilterList
-        options={filterOptions}
-        selected={selectedCategoryId ?? ""}
-        onSelect={setSelectedCategoryId}
-        maxWidth="395px"
-        activeTabId={activeTabId ?? ""}
-      />
-      <div className="flex-1 relative min-w-0" style={{ maxWidth: "757px" }}>
-        {fish && (
-          <div
-            className="hidden lg:block absolute pointer-events-none select-none"
-            style={{ zIndex: 0, right: "-285px", top: "-20px", opacity: 0.6 }}
-          >
-            {fish}
-          </div>
-        )}
+   {/* Desktop: side by side */}
+<div className="hidden lg:flex justify-center w-full">
+  <div className="flex gap-20 items-start">
+    <FilterList
+      options={filterOptions}
+      selected={selectedCategoryId ?? ""}
+      onSelect={setSelectedCategoryId}
+      maxWidth="395px"
+      activeTabId={activeTabId ?? ""}
+    />
+    <div className="flex-1 relative min-w-0" style={{ maxWidth: "757px" }}>
+      {fish && (
         <div
+          className="hidden lg:block absolute pointer-events-none select-none"
+          style={{ zIndex: 0, right: "-285px", top: "-20px", opacity: 0.6 }}
+        >
+          {fish}
+        </div>
+      )}
+      <div
+        style={{
+          background: "#fff",
+          borderRadius: "24px",
+          padding: "10px 15px",
+          position: "relative",
+          zIndex: 1,
+        }}
+      >
+        <h2
+          className="mb-3"
           style={{
-            background: "#fff",
-            borderRadius: "24px",
-            padding: "10px 15px",
-            position: "relative",
-            zIndex: 1,
+            fontFamily: "var(--font-family)",
+            fontWeight: 500,
+            fontSize: "24px",
+            lineHeight: "140%",
+            color: "#111",
           }}
         >
-          <h2
-            className="mb-3"
-            style={{
-              fontFamily: "var(--font-family)",
-              fontWeight: 500,
-              fontSize: "24px",
-              lineHeight: "140%",
-              color: "#111",
-            }}
-          >
-            {activeCategoryName}
-          </h2>
-          <div className="flex flex-col gap-2">
-            {activeServices.map((s) => (
-              <PriceRow key={s.id} item={{ name: s.name, description: s.description, price: `€ ${s.price}` }} />
-            ))}
-          </div>
+          {activeCategoryName}
+        </h2>
+        <div className="flex flex-col gap-2">
+          {activeServices.map((s) => (
+            <PriceRow key={s.id} item={{ name: s.name, description: s.description, price: `€ ${s.price}` }} />
+          ))}
         </div>
       </div>
     </div>
+  </div>
+</div>
   </div>
 )}
       </section>
@@ -659,7 +662,6 @@ function SpecializedMaintenanceSection({
   lineHeight: "160%",
   color: "#101010",
   opacity: 0.8,
-  maxWidth: "760px",
 }}>
   {pricesData?.page.specialized_maintenance.description}
 </p>
@@ -697,7 +699,7 @@ function SpecializedMaintenanceSection({
       </div>
 
       {/* Desktop */}
-      <div className="hidden lg:flex gap-20 items-start">
+      <div className="hidden lg:flex gap-20 items-start justify-center">
       <FilterList options={maintenanceFilterOptions} selected={selectedCategoryId ?? ""} onSelect={setSelectedCategoryId} activeTabId={activeTabId}  maxWidth={'395px'} />
 
         <div

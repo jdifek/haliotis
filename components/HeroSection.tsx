@@ -45,7 +45,8 @@ export const HeroSection: React.FC<Props> = ({ heroSlides }) => {
                 {/* Десктоп */}
              {/* Десктоп */}
 <Image
-  src={slide.desktopImage}
+key={`desktop-${index}`} 
+ src={`${slide.desktopImage}?slide=${index}`}
   alt={`Background ${index + 1}`}
   fill
   quality={100}
@@ -55,7 +56,8 @@ export const HeroSection: React.FC<Props> = ({ heroSlides }) => {
 />
 {/* Мобилка */}
 <Image
-  src={slide.mobileImage}
+key={`mobile-${index}`} 
+ src={`${slide.mobileImage}?slide=${index}`}
   alt={`Background ${index + 1}`}
   fill
   quality={100}

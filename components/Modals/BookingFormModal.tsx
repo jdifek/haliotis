@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import type { Swiper as SwiperType } from "swiper";
@@ -75,36 +75,16 @@ const ChevronDown = ({ className = "" }: { className?: string }) => (
     width="11"
     height="7"
     viewBox="0 0 11 7"
-    fill="none"
+    fill="currentColor"
     className={className}
   >
     <path
-      d="M1 1L5.5 6L10 1"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      d="M5.5 7L0.9375 1.625C0.71875 1.375 0.90625 1 1.21875 1H9.75C10.0625 1 10.25 1.375 10.0312 1.625L5.5 7Z"
     />
   </svg>
 );
 
-const CalendarIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-    <path
-      d="M6.5 1v3M13.5 1v3M1.5 7h17M2.5 3h15a1 1 0 011 1v13a1 1 0 01-1 1h-15a1 1 0 01-1-1V4a1 1 0 011-1z"
-      stroke="white"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-    />
-    <path
-      d="M13.5 12l-2 2-2-2"
-      stroke="white"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
+
 
 const PersonIcon = () => (
   <svg
@@ -570,12 +550,14 @@ const ParticipantBlock = ({
   onToggleEquip,
   onToggleExpand,
   onToggleEquipSection,
+  onCloseCalendar,
 }: {
   p: Participant;
   onChange: (id: number, field: string, val: string) => void;
   onToggleEquip: (pid: number, eid: number) => void;
   onToggleExpand: (id: number) => void;
   onToggleEquipSection: (id: number) => void;
+  onCloseCalendar: () => void;
 }) => {
   const swiperRef = useRef<SwiperType | null>(null);
   const [isBeginning, setIsBeginning] = useState(true);
@@ -586,7 +568,7 @@ const ParticipantBlock = ({
       {/* Header - только на мобилке */}
       <button
         onClick={() => onToggleExpand(p.id)}
-        className="flex lg:hidden w-full items-center justify-between px-4 py-3 cursor-pointer"
+        className="flex 3xl:hidden w-full items-center justify-between px-4 py-3 cursor-pointer"
       >
         <span
           className="text-[15px] font-semibold text-[#111] leading-[160%]"
@@ -605,10 +587,10 @@ const ParticipantBlock = ({
       <div
         className={`${
           p.isExpanded ? "block" : "hidden"
-        } lg:block px-4 pb-4 pt-2 flex flex-col gap-2`}
+        } 3xl:block px-4 pb-4 pt-2 flex flex-col gap-2`}
       >
         {/* Desktop заголовок */}
-        <div className="hidden lg:block mb-2">
+        <div className="hidden 3xl:block mb-2">
             <span
             className="text-[15px] font-semibold text-[#111] leading-[160%]"
             style={{ fontFamily: "Inter", textAlign: "center" }}
@@ -633,10 +615,27 @@ const ParticipantBlock = ({
           />
           <input
             className={inputCls}
-            placeholder="Date of Birth *"
+            placeholder="Date of Birth"
             type="date"
             value={p.dateOfBirth}
             onChange={(e) => onChange(p.id, "dateOfBirth", e.target.value)}
+            onFocus={() => {
+              // Закрываем основной календарь при фокусе на поле даты рождения
+              onCloseCalendar();
+              // Закрываем все остальные нативные календари
+              document.querySelectorAll('input[type="date"]').forEach(el => {
+                if (el !== document.activeElement) {
+                  (el as HTMLInputElement).blur();
+                }
+              });
+            }}
+            onBlur={(e) => {
+              const input = e.target as HTMLInputElement;
+              if (input.value === "") {
+                input.valueAsDate = null;
+                onChange(p.id, "dateOfBirth", "");
+              }
+            }}
           />
         </div>
         {/* Row 2: Gender / Phone / Email */}
@@ -721,7 +720,7 @@ const ParticipantBlock = ({
         {/* Equipment section header - только на мобилке */}
         <button
           onClick={() => onToggleEquipSection(p.id)}
-          className="flex lg:hidden w-full items-center justify-between cursor-pointer mt-2"
+          className="flex 3xl:hidden w-full items-center justify-between cursor-pointer mt-2"
         >
           <span className="text-[15px] font-bold text-[#111] text-start">
             Additional Equipment for Participant{" "}
@@ -735,7 +734,7 @@ const ParticipantBlock = ({
         </button>
 
         {/* Desktop заголовок оборудования */}
-        <div className="hidden lg:block mt-3 mb-2">
+        <div className="hidden 3xl:block mt-3 mb-2">
           <span className="text-[15px] font-bold text-[#111] text-start">
             Additional Equipment for Participant{" "}
             <span className="text-[#e84814]">{p.id}</span>
@@ -744,10 +743,10 @@ const ParticipantBlock = ({
 
         {/* Desktop: Swiper, Mobile: обычная сетка с аккордеоном */}
         <div
-          className={`${p.isEquipmentExpanded ? "block" : "hidden"} lg:block`}
+          className={`${p.isEquipmentExpanded ? "block" : "hidden"} 3xl:block`}
         >
           {/* Mobile Grid */}
-          <div className="flex lg:hidden flex-wrap gap-3 mt-4">
+          <div className="flex 3xl:hidden flex-wrap gap-3 mt-4">
             {p.equipment.map((item) => (
               <div
                 key={item.id}
@@ -799,7 +798,7 @@ const ParticipantBlock = ({
           </div>
 
           {/* Desktop Swiper */}
-          <div className="hidden lg:block relative px-16 mt-4">
+          <div className="hidden 3xl:block relative px-16 mt-4">
             <Swiper
               modules={[Navigation]}
               spaceBetween={12}
@@ -997,6 +996,28 @@ export const BookingFormModal: React.FC<Props> = ({
   const [privacy, setPrivacy] = useState(false);
   const [terms, setTerms] = useState(false);
 
+  // Закрываем календарь при клике вне его области
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      const calendarElement = document.querySelector('[data-calendar="date-picker"]');
+      
+      if (showCalendar && calendarElement && !calendarElement.contains(target)) {
+        const button = document.querySelector('[data-calendar-button="date-picker"]');
+        if (button && !button.contains(target)) {
+          setShowCalendar(false);
+        }
+      }
+    };
+
+    if (showCalendar) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+  }, [showCalendar]);
+
   const formatDate = (d: Date | null) => {
     if (!d) return "22/09/2025";
     return `${String(d.getDate()).padStart(2, "0")}/${String(
@@ -1065,7 +1086,7 @@ export const BookingFormModal: React.FC<Props> = ({
         <div className="min-h-full flex items-start justify-center">
           {/* Modal wrapper */}
           <div
-            className="relative w-full mx-4 md:mx-8 my-4 md:my-8 lg:mx-[188px] overflow-hidden"
+            className="relative w-full mx-4 md:mx-8 my-4 md:my-8 3xl:mx-[188px] overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* ── HEADER ── */}
@@ -1158,7 +1179,7 @@ export const BookingFormModal: React.FC<Props> = ({
 
               {/* ── MAIN CONTENT AREA ── */}
               <div className="pb-8">
-                <div className="flex flex-col lg:flex-row gap-4 items-start">
+                <div className="flex flex-col 3xl:flex-row gap-4 items-start">
                   {/* ── LEFT: Form ── */}
                   <div className="flex-1 min-w-0 flex flex-col gap-3">
                     {/* Location + Date + Participants - отдельные блоки */}
@@ -1193,6 +1214,7 @@ export const BookingFormModal: React.FC<Props> = ({
                           Choose Date
                         </span>
                         <button
+                          data-calendar-button="date-picker"
                           onClick={() => setShowCalendar((v) => !v)}
                           className={`flex items-center justify-between px-3 py-2 rounded-[10px] border text-[15px] w-full cursor-pointer transition-colors ${
                             showCalendar || selectedDate
@@ -1221,7 +1243,7 @@ export const BookingFormModal: React.FC<Props> = ({
                           </span>
                         </button>
                         {showCalendar && (
-                          <div className="absolute top-full left-0 right-0 z-30 mt-1 shadow-xl rounded-2xl">
+                          <div data-calendar="date-picker" className="absolute top-full left-0 right-0 z-30 mt-1 shadow-xl rounded-2xl">
                             <CustomCalendar
                               selected={selectedDate}
                               onSelect={setSelectedDate}
@@ -1255,7 +1277,7 @@ export const BookingFormModal: React.FC<Props> = ({
                     </div>
 
                     {/* Additional Information — mobile только */}
-                    <div className="lg:hidden bg-white rounded-2xl p-4 flex flex-col gap-3">
+                    <div className="3xl:hidden bg-white rounded-2xl p-4 flex flex-col gap-3">
                         <span
                         className="text-[15px] font-semibold text-[#111] leading-[160%]"
                         style={{ fontFamily: "Inter" }}
@@ -1289,11 +1311,12 @@ export const BookingFormModal: React.FC<Props> = ({
                         onToggleEquip={toggleEquip}
                         onToggleExpand={toggleExpand}
                         onToggleEquipSection={toggleEquipSection}
+                        onCloseCalendar={() => setShowCalendar(false)}
                       />
                     ))}
 
                     {/* Mobile reservation summary */}
-                    <div className="lg:hidden">
+                    <div className="3xl:hidden">
                       <ReservationSummary
                         courseTitle={courseTitle}
                         participants={participants}
@@ -1304,7 +1327,7 @@ export const BookingFormModal: React.FC<Props> = ({
                   </div>
 
                   {/* ── RIGHT: desktop only sidebar ── */}
-                  <div className="hidden lg:flex flex-col gap-3 w-[427px] flex-shrink-0 sticky top-4">
+                  <div className="hidden 3xl:flex flex-col gap-3 w-[427px] flex-shrink-0 sticky top-4">
                     {/* Additional info */}
                     <div className="bg-white rounded-2xl p-4 flex flex-col gap-3">
                       <span className="text-[14px] font-medium text-[#111]">

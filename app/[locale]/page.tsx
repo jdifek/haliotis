@@ -139,8 +139,10 @@ export default async function Home({ params }: Props) {
     title: slide.title || "Find the Experience",
     description: slide.description || "The Haliotis Diving Center...",
     desktopImage: slide.desktop_image_url || "/bg.png",
-    mobileImage: slide.mobile_image_url || slide.desktop_image_url || "/bg.png",
+    mobileImage: slide.mobile_image_url || "/bg.png",
   }));
+
+  console.log(heroSlides, "heroSlides");
 
   const partners = (homepageData.sliders?.equipment?.equipment_brands || [])
     .sort((a: any, b: any) => (a.position || 0) - (b.position || 0))
