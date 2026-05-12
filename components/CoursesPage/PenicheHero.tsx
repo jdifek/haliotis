@@ -1,8 +1,16 @@
 import { Breadcrumbs } from "../Breadcrumbs";
 import { BlackActionButton } from "../buttons/BlackActionButton";
 import type { CenterData } from "@/types/center";
+import { MapContainer, Marker, TileLayer } from 'react-leaflet'
+import { LatLngExpression } from 'leaflet'
+
+import 'leaflet/dist/leaflet.css'
 type Props = { center: CenterData };
 export const PenicheHero = ({ center }: Props) => {
+  const mapCenter: LatLngExpression = [
+  parseFloat(center.latitude ?? '0'),
+  parseFloat(center.longitude ?? '0')
+]
   return (
     <section className="bg-[#f5f5f5] relative pt-4 pb-4 md:pt-6 md:pb-8">
       <div className="absolute left-0 right-0 bottom-0  border-b-[7px] border-[#f49519]" />
@@ -153,13 +161,17 @@ export const PenicheHero = ({ center }: Props) => {
             {" "}
             <div className="flex overflow-hidden rounded-[16px] h-[442px]">
               <div className="relative h-[442px] bg-[#9bb4d4] flex-1 min-w-[200px] rounded-l-[16px]">
-                <div
-                  className="absolute inset-0 bg-cover bg-center opacity-90"
-                  style={{
-                    backgroundImage:
-`url(https://api.mapbox.com/styles/v1/mapbox/light-v11/static/pin-s+e84814(${center.longitude},${center.latitude})/[${center.longitude},${center.latitude},8,0]/393x442@2x?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw)`
-                  }}
-                />
+<MapContainer
+  center={mapCenter}
+  zoom={8}
+  className="absolute inset-0 w-full h-full opacity-90"
+  zoomControl={false}
+  dragging={false}
+  scrollWheelZoom={false}
+>
+  <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+  {/* <Marker position={mapCenter} /> */}
+</MapContainer>
                 <div className="absolute bottom-[45%] left-1/2 -translate-x-1/2">
                   <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
                     <path
@@ -444,13 +456,30 @@ href={`tel:${center.contact_phone}`}                    className="flex items-ce
               </p>
             </div>
             <div className="relative h-[180px] sm:h-[240px] bg-[#9bb4d4]">
-              <div
-                className="absolute inset-0 bg-cover bg-center opacity-90"
-                style={{
-                  backgroundImage:
-                   `url(https://api.mapbox.com/styles/v1/mapbox/light-v11/static/pin-s+e84814(${center.longitude},${center.latitude})/[${center.longitude},${center.latitude},10,0]/600x240@2x?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw)`,
-                }}
-              />
+            {/* Видали div з backgroundImage, замінити на: */}
+<MapContainer
+  center={mapCenter}
+  zoom={10}
+  className="absolute inset-0 w-full h-full opacity-90"
+  zoomControl={false}
+  dragging={false}
+  scrollWheelZoom={false}
+  doubleClickZoom={false}
+  touchZoom={false}
+>
+  <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+</MapContainer>
+
+{/* Маркер поверх */}
+<div className="absolute inset-0 flex items-center justify-center pointer-events-none z-[1000]">
+  <svg width="32" height="40" viewBox="0 0 32 40" fill="none">
+    <path
+      d="M16 0C7.163 0 0 7.163 0 16C0 26 16 40 16 40C16 40 32 26 32 16C32 7.163 24.837 0 16 0Z"
+      fill="#e84814"
+    />
+    <circle cx="16" cy="16" r="5" fill="white" />
+  </svg>
+</div>
               <div className="absolute bottom-[45%] left-1/2 -translate-x-1/2">
                 <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
                   <path

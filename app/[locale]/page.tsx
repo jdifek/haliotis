@@ -135,12 +135,18 @@ export default async function Home({ params }: Props) {
   }));
   console.log(homepageData, "homepageData");
 
-  const heroSlides = (homepageData.banner?.slides || []).map((slide: any) => ({
-    title: slide.title || "Find the Experience",
-    description: slide.description || "The Haliotis Diving Center...",
-    desktopImage: slide.desktop_image_url || "/bg.png",
-    mobileImage: slide.mobile_image_url || "/bg.png",
-  }));
+  const heroSlides = (homepageData.banner?.slides || [])
+    .filter((slide: any) => slide && (slide.desktop_image_url || slide.mobile_image_url))
+    .map((slide: any) => ({
+      title: slide.title || "Find the Experience",
+      description: slide.description || "The Haliotis Diving Center...",
+      desktopImage: slide.desktop_image_url && slide.desktop_image_url.trim() !== "" 
+        ? slide.desktop_image_url 
+        : "/bg.png",
+      mobileImage: slide.mobile_image_url && slide.mobile_image_url.trim() !== ""
+        ? slide.mobile_image_url
+        : "/bg.png",
+    }));
 
   console.log(heroSlides, "heroSlides");
 

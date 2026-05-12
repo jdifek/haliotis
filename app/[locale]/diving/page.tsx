@@ -131,6 +131,7 @@ const Diving = () => {
     )
       .then((r) => r.json())
       .then((json) => {
+        console.log(json);
         const normalized: DivingData = {
           title: json.data?.title ?? "",
           banner: json.data?.banner ?? null,
@@ -141,7 +142,11 @@ const Diving = () => {
         setDivingData(normalized);
       })
       .catch(console.error)
-      .finally(() => setDataLoading(false));
+      .catch(console.error)
+      .finally(() => {
+        console.log(divingData);
+        setDataLoading(false);
+      });
   }, [activeTab, divingCenters, locale]);
 
   // Колонки

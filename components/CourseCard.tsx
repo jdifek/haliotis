@@ -2,7 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { createPortal } from "react-dom";
 import { BookingFormModal } from "./Modals/BookingFormModal";
+
+const ModalPortal = ({ children }: { children: React.ReactNode }) => {
+  if (typeof window === "undefined") return null;
+  return createPortal(children, document.body);
+};
 
 type CourseCardProps = {
   image: string;
@@ -150,12 +156,14 @@ export const CourseCard: React.FC<CourseCardProps> = ({
         </div>
       </div>
 
-      <BookingFormModal
-        isOpen={isBookingOpen}
-        onClose={() => setIsBookingOpen(false)}
-        courseTitle={title}
-        pricePerPerson={price}
-      />
+      <ModalPortal>
+        <BookingFormModal
+          isOpen={isBookingOpen}
+          onClose={() => setIsBookingOpen(false)}
+          courseTitle={title}
+          pricePerPerson={price}
+        />
+      </ModalPortal>
     </>
   );
 };

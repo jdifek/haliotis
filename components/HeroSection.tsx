@@ -44,27 +44,31 @@ export const HeroSection: React.FC<Props> = ({ heroSlides }) => {
               <div className="relative h-full w-full">
                 {/* Десктоп */}
              {/* Десктоп */}
-<Image
-key={`desktop-${index}`} 
- src={`${slide.desktopImage}?slide=${index}`}
-  alt={`Background ${index + 1}`}
-  fill
-  quality={100}
-  sizes="100vw"
-  className="object-cover hidden lg:block"
-  priority={index === 0}
-/>
+{slide.desktopImage && slide.desktopImage.trim() !== "" && (
+  <Image
+    key={`desktop-${index}`} 
+    src={`${slide.desktopImage}?slide=${index}`}
+    alt={`Background ${index + 1}`}
+    fill
+    quality={100}
+    sizes="100vw"
+    className="object-cover hidden lg:block"
+    priority={index === 0}
+  />
+)}
 {/* Мобилка */}
-<Image
-key={`mobile-${index}`} 
- src={`${slide.mobileImage}?slide=${index}`}
-  alt={`Background ${index + 1}`}
-  fill
-  quality={100}
-  sizes="100vw"
-  className="object-cover lg:hidden"
-  priority={index === 0}
-/>
+{slide.mobileImage && slide.mobileImage.trim() !== "" && (
+  <Image
+    key={`mobile-${index}`} 
+    src={`${slide.mobileImage}?slide=${index}`}
+    alt={`Background ${index + 1}`}
+    fill
+    quality={100}
+    sizes="100vw"
+    className="object-cover lg:hidden"
+    priority={index === 0}
+  />
+)}
               </div>
             </SwiperSlide>
           ))}
