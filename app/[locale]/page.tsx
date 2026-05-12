@@ -11,9 +11,7 @@ import { createTermGetter } from "../utils/terms";
 // Функция для получения terms напрямую (для Server Component)
 async function getTerms(locale: string) {
   try {
-    const res = await fetch(`https://cp.haliotis.space/api/v1/menu/${locale}`, {
-      next: { revalidate: 3600 }, // кеш на 1 час
-    });
+    const res = await fetch(`https://cp.haliotis.space/api/v1/menu/${locale}`);
 
     if (!res.ok) {
       return {}; // возвращаем пустой объект если ошибка
@@ -29,9 +27,7 @@ async function getTerms(locale: string) {
 
 async function getHomepageData(lang: string) {
   try {
-    const res = await fetch(`https://cp.haliotis.space/api/v1/pages/homepage?lang=${lang}`, {
-      next: { revalidate: 3600 },
-    });
+    const res = await fetch(`https://cp.haliotis.space/api/v1/pages/homepage?lang=${lang}`);
 
     if (!res.ok) {
       throw new Error("Failed to fetch homepage data");

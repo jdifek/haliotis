@@ -20,7 +20,7 @@ export default async function CenterPage({
 
     const centerRes = await fetch(centerUrl, {
       headers: { Accept: "application/json" },
-      next: { revalidate: 3600 },
+      
     });
 
     console.log("[CENTER] Status:", centerRes.status);
@@ -53,7 +53,7 @@ export default async function CenterPage({
 
     const tabsRes = await fetch(tabsUrl, {
       headers: { Accept: "application/json" },
-      next: { revalidate: 3600 },
+     
     });
 
     console.log("[TABS] Status:", tabsRes.status);
@@ -81,6 +81,7 @@ export default async function CenterPage({
     centerId: center?.id,
     tabsCount: tabs?.length,
   });
+console.log(center, 'center');
 
   // ================= RENDER =================
   return <PenichePage center={center} tabs={tabs} />;

@@ -36,7 +36,7 @@ async function getPrivacyPolicy(locale: string): Promise<PrivacyPolicyData> {
     `https://cp.haliotis.space/api/v1/pages/system/privacy_policy?lang=${locale}`,
     {
       headers: { Accept: "application/json" },
-      next: { revalidate: 3600 },
+    
     }
   );
   if (!res.ok) throw new Error(`Failed: ${res.status}`);

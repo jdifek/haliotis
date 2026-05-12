@@ -17,6 +17,7 @@ type Props = {
 };
 
 export default function PenichePage({ center, tabs }: Props) {
+  
   const courseCards = center?.sliders?.courses?.entities?.map((course: any) => ({
     image: course.image_url || "/placeholder.png",
     title: course.title || course.name || "Course",
