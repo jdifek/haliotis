@@ -17,25 +17,36 @@ export const Footer: React.FC<{ logoUrl: string; logoAlt: string }> = ({
   const { menuData, loading } = useMenu(locale);
 
   const [openSection, setOpenSection] = useState<string | null>(null);
+const withLocale = (url?: string | null, slug?: string | null) => {
+  if (url) {
+    // внешние ссылки не трогаем
+    if (url.startsWith("http")) return url;
 
-  const footerSections = (menuData?.data.footer ?? []).map((section) => ({
-    id: section.id, // 👈 ДОБАВЬ
-    title: section.label,
-    links: (section.children ?? []).map((child) => ({
-      id: child.id, // 👈 тоже желательно
-      label: child.label,
-      href: child.url ?? `/${child.slug}`,
-    })),
-  }));
+    // уже есть локаль
+    if (url.startsWith(`/${locale}`)) return url;
 
-  const bottomLinks = (menuData?.data.bottom ?? []).map((item) => ({
-    label: item.label,
-    href: item.url ?? `/${item.slug}`,
-    children: (item.children ?? []).map((child) => ({
-      label: child.label,
-      href: child.url ?? `/${child.slug}`,
-    })),
-  }));
+    return `/${locale}${url.startsWith("/") ? url : `/${url}`}`;
+  }
+
+  return `/${locale}/${slug?.replace(/^\/+/, "") ?? ""}`;
+};const footerSections = (menuData?.data.footer ?? []).map((section) => ({
+  id: section.id,
+  title: section.label,
+  links: (section.children ?? []).map((child) => ({
+    id: child.id,
+    label: child.label,
+    href: withLocale(child.url, child.slug),
+  })),
+}));
+
+const bottomLinks = (menuData?.data.bottom ?? []).map((item) => ({
+  label: item.label,
+  href: withLocale(item.url, item.slug),
+  children: (item.children ?? []).map((child) => ({
+    label: child.label,
+    href: withLocale(child.url, child.slug),
+  })),
+}));
 
   const toggleSection = (title: string) =>
     setOpenSection(openSection === title ? null : title);
