@@ -131,7 +131,7 @@ const Diving = () => {
     )
       .then((r) => r.json())
       .then((json) => {
-        console.log(json);
+        console.log(`https://cp.haliotis.space/api/v1/diving-category/diving?center_id=${activeCenter.id}&lang=${locale}&attach_regions=true`);
         const normalized: DivingData = {
           title: json.data?.title ?? "",
           banner: json.data?.banner ?? null,

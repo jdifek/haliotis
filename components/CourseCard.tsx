@@ -105,9 +105,9 @@ export const CourseCard: React.FC<CourseCardProps> = ({
         </div>
 
         {/* Content */}
-        <div className="mt-2 sm:mt-3 rounded-2xl bg-[#f1f1f1] p-2 sm:p-3">
+        <div className="mt-2 sm:mt-3 h-[220px] md:h-[165px] rounded-2xl bg-[#f1f1f1] p-2 sm:p-3">
           {/* Title */}
-          <h3 className="mb-3 text-[16px] md:text-[18px] font-[500] leading-[140%] text-black">
+          <h3 className="mb-3 line-clamp-5 md:line-clamp-3 text-[16px] md:text-[18px] font-[500] leading-[140%] text-black overflow-hidden">
             {title}
           </h3>
 
