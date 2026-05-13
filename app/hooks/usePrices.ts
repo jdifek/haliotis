@@ -50,7 +50,7 @@ export type PricesData = {
 
 async function fetchPrices(centerId: number, lang: string): Promise<PricesData> {
   const res = await fetch(
-    `https://cp.haliotis.space/api/v1/diving-centers/${centerId}/prices?lang=${lang}`,
+    `${process.env.NEXT_PUBLIC_API_URL}/diving-centers/${centerId}/prices?lang=${lang}`,
     { headers: { Accept: "application/json" } }
   );
   if (!res.ok) throw new Error(`HTTP ${res.status}`);

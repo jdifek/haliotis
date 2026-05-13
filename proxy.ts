@@ -9,7 +9,7 @@ async function getLocales() {
   }
 
   try {
-    const res = await fetch('https://cp.haliotis.space/api/v1/configs/languages');
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/configs/languages`);
     const data = await res.json();
     
     console.log('API response:', JSON.stringify(data)); // ← добавь это

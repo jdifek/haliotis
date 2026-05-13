@@ -31,6 +31,10 @@ export const Footer: React.FC<{ logoUrl: string; logoAlt: string }> = ({
   const bottomLinks = (menuData?.data.bottom ?? []).map((item) => ({
     label: item.label,
     href: item.url ?? `/${item.slug}`,
+    children: (item.children ?? []).map((child) => ({
+      label: child.label,
+      href: child.url ?? `/${child.slug}`,
+    })),
   }));
 
   const toggleSection = (title: string) =>
@@ -221,14 +225,29 @@ export const Footer: React.FC<{ logoUrl: string; logoAlt: string }> = ({
           <div className="order-1 md:order-2 flex flex-col gap-2 text-left md:flex-row md:gap-8">
             {bottomLinks.length > 0
               ? bottomLinks.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className="text-sm opacity-70 text-white transition-opacity hover:opacity-100 md:text-[15px]"
-                    style={{ fontWeight: 400, lineHeight: "160%" }}
-                  >
-                    {link.label}
-                  </Link>
+                  <div key={link.href} className="flex flex-col gap-1">
+                    <Link
+                      href={link.href}
+                      className="text-sm opacity-70 text-white transition-opacity hover:opacity-100 md:text-[15px]"
+                      style={{ fontWeight: 400, lineHeight: "160%" }}
+                    >
+                      {link.label}
+                    </Link>
+                    {link.children && link.children.length > 0 && (
+                      <div className="flex flex-col gap-1 ml-4">
+                        {link.children.map((child) => (
+                          <Link
+                            key={child.href}
+                            href={child.href}
+                            className="text-sm opacity-70 text-white transition-opacity hover:opacity-100 md:text-[15px]"
+                            style={{ fontWeight: 400, lineHeight: "160%" }}
+                          >
+                            {child.label}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 ))
               : // Fallback пока данные не пришли
                 [

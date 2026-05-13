@@ -27,7 +27,7 @@ async function getTerms(locale: string) {
 
 async function getHomepageData(lang: string) {
   try {
-    const res = await fetch(`https://cp.haliotis.space/api/v1/pages/homepage?lang=${lang}`);
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/pages/homepage?lang=${lang}`);
 
     if (!res.ok) {
       throw new Error("Failed to fetch homepage data");

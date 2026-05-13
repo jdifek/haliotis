@@ -4,7 +4,7 @@ import { TravelTripsSection } from "@/components/TravelTripsSection";
 
 async function getTravelsData(locale: string) {
   const res = await fetch(
-    `https://cp.haliotis.space/api/v1/travels?attach_page=true&lang=${locale}`,
+    `${process.env.NEXT_PUBLIC_API_URL}/travels?attach_page=true&lang=${locale}`,
     { next: { revalidate: 60 } }
   );
   if (!res.ok) throw new Error('Failed to fetch travels');

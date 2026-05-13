@@ -1,4 +1,4 @@
-const BASE_URL = "https://cp.haliotis.space/api/v1";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL!;
 
 export async function getMenuWithCenters() {
   const res = await fetch(`${BASE_URL}/configs/menus`, {

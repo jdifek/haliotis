@@ -486,7 +486,7 @@ export const Header: React.FC<{
   const socialRef = useRef<HTMLDivElement>(null);
   // Languages — отдельный маленький запрос, не меню
   useEffect(() => {
-    fetch("https://cp.haliotis.space/api/v1/configs/languages")
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/configs/languages`)
       .then((res) => res.json())
       .then((data) => setLanguages(data?.data ?? []));
   }, []);

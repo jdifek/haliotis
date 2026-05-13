@@ -33,10 +33,10 @@ interface PrivacyPolicyData {
 
 async function getPrivacyPolicy(locale: string): Promise<PrivacyPolicyData> {
   const res = await fetch(
-    `https://cp.haliotis.space/api/v1/pages/system/privacy_policy?lang=${locale}`,
+    `${process.env.NEXT_PUBLIC_API_URL}/pages/system/privacy_policy?lang=${locale}`,
     {
       headers: { Accept: "application/json" },
-    
+
     }
   );
   if (!res.ok) throw new Error(`Failed: ${res.status}`);

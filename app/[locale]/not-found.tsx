@@ -3,7 +3,7 @@ import { HeroBanner } from "@/components/HeroBanner";
 
 async function getNotFoundData(locale = "pt") {
   const res = await fetch(
-    `https://cp.haliotis.space/api/v1/pages/system/not_found?lang=${locale}`,
+    `${process.env.NEXT_PUBLIC_API_URL}/pages/system/not_found?lang=${locale}`,
     { next: { revalidate: 3600 } }
   );
   const json = await res.json();
