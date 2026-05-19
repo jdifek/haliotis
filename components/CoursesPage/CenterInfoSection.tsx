@@ -272,7 +272,7 @@ export const CenterInfoSection = ({ tabs }: Props) => {
         }
         return (
           <div className="flex gap-8">
-            {tabs.diving_center_history.entities.map((item) => (
+            {tabs.diving_center_boats.entities.map((item) => (
               <div key={item.id} className="flex-1">
                 <div
                   className={`${
