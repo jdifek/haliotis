@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@fancyapps/ui": "^6.1.14",
     "leaflet": "^1.9.4",
     "next": "16.1.5",
     "next-intl": "^4.8.3",
