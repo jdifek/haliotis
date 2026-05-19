@@ -13,6 +13,7 @@ type DiveSite = {
   padiLevel: string;
   description: string;
   videoSrc?: string;
+  videoCover?: string;
 };
 
 type LocationTab = {
@@ -155,45 +156,68 @@ const RatingDots = ({
 
 // ─── Video block ──────────────────────────────────────────────────────────────
 
-const VideoBlock = ({ src, isMobile }: { src?: string; isMobile: boolean }) => (
-  <div
-    className="w-full overflow-hidden relative flex items-center justify-center"
-    style={{
-      borderRadius: 16,
-      height: isMobile ? 210 : 671,
-      background: "#0d1b35",
-    }}
-  >
-    {src ? (
-      <video
-        src={src}
-        className="w-full h-full object-cover"
-        controls
-        style={{ borderRadius: 16 }}
-      />
-    ) : (
-      <div
-        className="flex flex-col items-center gap-3"
-        style={{ opacity: 0.45 }}
-      >
-        <svg width="56" height="56" viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="10" stroke="white" strokeWidth="1" />
-          <path d="M10 8.5l5.5 3.5-5.5 3.5V8.5z" fill="white" />
-        </svg>
-        <span
-          style={{
-            color: "white",
-            fontSize: 13,
-            fontFamily: "var(--font-family)",
-          }}
-        >
-          Video
-        </span>
-      </div>
-    )}
-  </div>
-);
+const VideoBlock = ({ src, cover, isMobile }: { src?: string; cover?: string; isMobile: boolean }) => {
+  const [isLoaded, setIsLoaded] = useState(false);
 
+  return (
+    <div
+      className="w-full overflow-hidden relative flex items-center justify-center"
+      style={{
+        borderRadius: 16,
+        height: isMobile ? 210 : 671,
+        background: "#0d1b35",
+      }}
+    >
+      {!isLoaded && cover ? (
+        <>
+          <img
+            src={cover}
+            alt="Video cover"
+            className="w-full h-full object-cover"
+            style={{ borderRadius: 16 }}
+          />
+          <button
+            onClick={() => setIsLoaded(true)}
+            className="absolute flex items-center justify-center cursor-pointer hover:opacity-80"
+            style={{ transition: "opacity 0.2s" }}
+          >
+            <svg width="56" height="56" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" stroke="white" strokeWidth="1" />
+              <path d="M10 8.5l5.5 3.5-5.5 3.5V8.5z" fill="white" />
+            </svg>
+          </button>
+        </>
+      ) : isLoaded && src ? (
+        <iframe
+          src={src}
+          width="100%"
+          height="100%"
+          style={{ borderRadius: 16 }}
+          allowFullScreen
+        />
+      ) : (
+        <div
+          className="flex flex-col items-center gap-3"
+          style={{ opacity: 0.45 }}
+        >
+          <svg width="56" height="56" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="white" strokeWidth="1" />
+            <path d="M10 8.5l5.5 3.5-5.5 3.5V8.5z" fill="white" />
+          </svg>
+          <span
+            style={{
+              color: "white",
+              fontSize: 13,
+              fontFamily: "var(--font-family)",
+            }}
+          >
+            Video
+          </span>
+        </div>
+      )}
+    </div>
+  );
+};
 // ─── Dive Site Card ───────────────────────────────────────────────────────────
 
 const DiveSiteCard = ({ site }: { site: DiveSite }) => {
@@ -334,7 +358,8 @@ const DiveSiteCard = ({ site }: { site: DiveSite }) => {
             >
               {site.description}
             </p>
-            <VideoBlock src={site.videoSrc} isMobile={true} />
+<VideoBlock src={site.videoSrc} cover={site.videoCover} isMobile={true} />
+
           </div>
         </div>
 
@@ -354,7 +379,7 @@ const DiveSiteCard = ({ site }: { site: DiveSite }) => {
           >
             {site.description}
           </p>
-          <VideoBlock src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" isMobile={false} />
+<VideoBlock src={site.videoSrc} cover={site.videoCover} isMobile={false} />
         </div>
       </div>
     </div>
@@ -421,6 +446,7 @@ const DiveSitesSection = ({ regions, locations }: DiveSitesSectionProps) => {
               padiLevel: loc.certification,
               description: loc.description,
               videoSrc: normalizeVideoUrl(loc.video_url),
+              videoCover: loc.video_cover,
             })
           ),
       };

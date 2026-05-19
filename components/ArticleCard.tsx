@@ -67,7 +67,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
         </div>
         <div
           onClick={onToggleExpand}
-          className={`relative cursor-pointer mx-4 rounded-2xl bg-white  px-4 pb-3 pt-10 transition-all duration-300 lg:mx-0 lg:absolute lg:bottom-0 lg:left-4 lg:right-[35%] lg:w-[310px] ${bgTextBlock}`}
+          className={`relative cursor-pointer mx-4 rounded-2xl bg-white  px-4 pb-3 pt-10 transition-all duration-300 lg:mx-0 lg:absolute lg:bottom-0 lg:left-4 lg:right-[25%] lg:w-[340px] ${bgTextBlock}`}
           style={{
             marginTop: "-65px",
             minHeight: "205px",
