@@ -726,7 +726,7 @@ export const Header: React.FC<{
           <nav className="relative hidden rounded-xl bg-black/10 px-[clamp(8px,1vw,16px)] py-[clamp(10px,0.9vw,16.5px)] xl:flex">
 <div className="flex w-full flex-wrap items-center content-center justify-center gap-x-[clamp(8px,1.4vw,28px)] gap-y-1">
               {" "}
-              {navItems.slice(0, -1).map((item) => (
+              {navItems.map((item) => (
                 <div key={item.id} className="relative">
                   <button
                     ref={(el) => {

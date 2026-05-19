@@ -63,9 +63,9 @@ export default async function Contacts({
 
   // Данные лежат прямо в json.data, без вложенного "page"
   const data: ContactsPageData = json.data;
-
+console.log(data, 'data')
   // Маппим слайды с учётом двух типов: video и image
-  const slides = data.banner.slides.map((slide) => {
+const slides = (data.banner?.slides ?? []).map((slide) => {
     if (slide.type === "video") {
       return {
         image: slide.video_cover_url ?? "",
@@ -84,7 +84,7 @@ export default async function Contacts({
     };
   });
 
-  const firstSlide = data.banner.slides[0];
+const firstSlide = data.banner?.slides?.[0];
 console.log(data.diving_centers, 'data.diving_centers');
 
   return (
