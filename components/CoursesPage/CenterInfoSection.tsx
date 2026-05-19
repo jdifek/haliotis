@@ -375,59 +375,7 @@ export const CenterInfoSection = ({ tabs }: Props) => {
               </div>
             ))}
 
-            {/* Sunfish */}
-            <div className="flex-1">
-              <div
-                className={`${
-                  isHistorySunfishOpen ? "block" : "hidden"
-                } md:block flex flex-col gap-4`}
-              >
-                <Image
-                  src="/Rectangle 8.png"
-                  alt="Sunfish"
-                  width={757}
-                  height={435}
-                  className="w-full h-[200px] md:h-[435px] rounded-2xl"
-                />
-                <button
-                  onClick={() => setIsHistorySunfishOpen(!isHistorySunfishOpen)}
-                  className="w-full flex items-center justify-between text-[24px] font-medium leading-[140%] text-[#111] mt-2 mb-2 md:pointer-events-none"
-                >
-                  <span>Sunfish</span>
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    className={`md:hidden transition-transform ${
-                      isHistorySunfishOpen ? "" : "rotate-180"
-                    }`}
-                  >
-                    <path
-                      d="M17.8534 14.1463L12.8537 9.14663C12.8073 9.10015 12.7522 9.06327 12.6915 9.03811C12.6308 9.01295 12.5657 9 12.5 9C12.4343 9 12.3692 9.01295 12.3085 9.03811C12.2478 9.06327 12.1927 9.10015 12.1463 9.14663L7.14663 14.1463C7.07663 14.2162 7.02895 14.3053 7.00963 14.4024C6.9903 14.4994 7.00021 14.6 7.03808 14.6914C7.07595 14.7828 7.1401 14.8609 7.22239 14.9159C7.30468 14.9708 7.40142 15.0001 7.50036 15L17.4996 15C17.5986 15.0001 17.6953 14.9708 17.7776 14.9159C17.8599 14.8609 17.924 14.7828 17.9619 14.6914C17.9998 14.6 18.0097 14.4994 17.9904 14.4024C17.971 14.3053 17.9234 14.2162 17.8534 14.1463Z"
-                      fill="black"
-                    />
-                  </svg>
-                </button>
-                <p className="text-[15px] font-medium leading-[160%] text-[#101010] opacity-80">
-                  Sunfish is the ex libris of Berlengas. His scientific name is
-                  Mola mola and it's the largest known fish with bones. It can
-                  reach 4 meters of height and 2300 kg weight. The large female
-                  can put around 300 000 000 eggs.
-                </p>
-                <p className="text-[15px] font-medium leading-[160%] text-[#101010] opacity-80">
-                  It has curious behaviors like "relax" in the surface in side
-                  and its brightness is reflected and visible from a distance.
-                  It also jumps out of the water which makes it a great show.
-                </p>
-                <p className="text-[15px] font-medium leading-[160%] text-[#101010] opacity-80">
-                  Actually, the sunfish in Berlengas in the end of the Summer is
-                  an expected moment. There are already groups of divers that
-                  come from Germany and France just to see it.
-                </p>
-              </div>
-            </div>
+           
           </div>
         );
 
