@@ -27,7 +27,7 @@ type PricesServiceType = {
   name: string;
   description: string;
   position: number;
-  display_type: "information" | "calculator";
+  display_type: "information" | "calculator" | 'maintenance';
 };
 
 export type PricesData = {
