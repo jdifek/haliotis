@@ -357,7 +357,7 @@ const { data: pricesData, loading } = usePrices(activeCenter?.id ?? null, locale
 
 const tabs = divingCenters.map((c) => ({ id: c.slug, label: c.name, color: c.color }));
 
-const defaultType = pricesData?.service_types.find((t) => t.name === "Default");
+const defaultType = pricesData?.service_types.find((t) => t.display_type === "information");
 const defaultCategories = (pricesData?.categories ?? [])
   .filter((c) => c.service_type_id === defaultType?.id)
   .sort((a, b) => a.position - b.position);
@@ -623,7 +623,8 @@ function SpecializedMaintenanceSection({
   pricesData: PricesData | null;
   activeTabId: string;
 }) {
-  const maintenanceType = pricesData?.service_types.find((t) => t.name === "Specialized Maintenance");
+const maintenanceType = pricesData?.service_types.find((t) => t.display_type === "maintenance");
+
   const maintenanceCategories = (pricesData?.categories ?? [])
     .filter((c) => c.service_type_id === maintenanceType?.id)
     .sort((a, b) => a.position - b.position);
@@ -741,10 +742,8 @@ function SpecializedMaintenanceSection({
 
 function FillsSection({ pricesData }: { pricesData: PricesData | null }) {
   // Берём calculator service_type
-  const calculatorType = pricesData?.service_types.find(
-    (t) => t.display_type === "calculator"
-  );
-  
+const calculatorType = pricesData?.service_types.find((t) => t.display_type === "calculator");
+
   // Категории Initial и Final
   const calculatorCategories = (pricesData?.categories ?? [])
     .filter((c) => c.service_type_id === calculatorType?.id)
