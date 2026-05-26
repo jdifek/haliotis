@@ -188,7 +188,7 @@ export default async function CourseDetail({ params }: Props) {
           className="mb-6 md:mb-8"
           items={[
             { label: "Haliotis", href: "/" },
-            { label: "Courses", href: `/${locale}/courses` },
+            { label: "Cursos", href: `/${locale}/cursos` },
             { label: data.name },
           ]}
         />

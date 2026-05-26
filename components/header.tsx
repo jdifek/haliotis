@@ -8,7 +8,7 @@ import {
   useRouter,
   useSelectedLayoutSegments,
 } from "next/navigation";
-import Link from "next/link";
+import Link from "@/i18n/link";
 import { useMenu } from "@/app/hooks/useMenu";
 
 type Language = {

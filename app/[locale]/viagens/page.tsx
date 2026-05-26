@@ -3,12 +3,45 @@ import { HeroBanner } from "@/components/HeroBanner";
 import { TravelTripsSection } from "@/components/TravelTripsSection";
 
 async function getTravelsData(locale: string) {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/travels?attach_page=true&lang=${locale}`,
-    { next: { revalidate: 60 } }
-  );
-  if (!res.ok) throw new Error('Failed to fetch travels');
-  return res.json();
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/travels?attach_page=true&lang=${locale}`;
+
+  console.log("[Travels API] Request:", {
+    url,
+    locale,
+    timestamp: new Date().toISOString(),
+  });
+
+  const res = await fetch(url, {
+    next: { revalidate: 60 },
+  });
+
+  console.log("[Travels API] Response:", {
+    status: res.status,
+    statusText: res.statusText,
+    ok: res.ok,
+    headers: Object.fromEntries(res.headers.entries()),
+  });
+
+  if (!res.ok) {
+    const errorText = await res.text();
+
+    console.error("[Travels API] Error response body:", errorText);
+
+    throw new Error(
+      `Failed to fetch travels | Status: ${res.status}`
+    );
+  }
+
+  const data = await res.json();
+
+  console.log("[Travels API] Parsed data:", {
+    totalTrips: data?.data?.length,
+    hasAttachPage: !!data?.attachPage,
+    attachPageTitle: data?.attachPage?.title,
+    firstTrip: data?.data?.[0],
+  });
+
+  return data;
 }
 
 type Props = {
@@ -17,18 +50,23 @@ type Props = {
 
 export default async function Travel({ params }: Props) {
   const { locale } = await params;
+
+  console.log("[Travel Page] Current locale:", locale);
+
   const data = await getTravelsData(locale);
-console.log(data, 'data');
+
+  console.log("[Travel Page] Full response data:", data);
 
   const tripCards = data.data.map((trip: any) => ({
     locationId: trip.slug || trip.id.toString(),
-    images: trip.gallery.length > 0
-      ? trip.gallery.map((g: any) => g.image)
-      : [trip.image || "/travel.png"],
+    images:
+      trip.gallery.length > 0
+        ? trip.gallery.map((g: any) => g.image)
+        : [trip.image || "/travel.png"],
     price: parseFloat(trip.price.amount),
     title: trip.name,
-    description: trip.summary.replace(/<[^>]*>/g, ''),
-    link: `/travel/${trip.slug || trip.id}`,
+description: trip.summary ? trip.summary.replace(/<[^>]*>/g, "") : "",
+    link: `/viagens/${trip.slug || trip.id}`,
   }));
 
   const bannerSlides = data.attachPage?.banner?.slides?.length
@@ -41,7 +79,6 @@ console.log(data, 'data');
     : [{ image: "/prices.png" }];
 
   const pageTitle = data.attachPage?.title || "Travel";
-
   return (
     <>
       <HeroBanner

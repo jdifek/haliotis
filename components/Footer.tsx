@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/i18n/link";
 import { useState } from "react";
 import { useLocale } from "next-intl";
 import { ButtonWithIcon } from "./buttons/ButtonWithIcon";
