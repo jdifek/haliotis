@@ -68,7 +68,7 @@ export default async function Travel({ params }: Props) {
 description: trip.summary ? trip.summary.replace(/<[^>]*>/g, "") : "",
     link: `/viagens/${trip.slug || trip.id}`,
   }));
-
+  
   const bannerSlides = data.attachPage?.banner?.slides?.length
     ? data.attachPage.banner.slides.map((s: any) => ({
         image: s.desktop_image_url,

@@ -114,7 +114,7 @@ export default async function Home({ params }: Props) {
       (center.dive_trips || []).map((trip: any) => ({
         image: center.icon_url || "/image 6.png",
         price: parseFloat(trip.price?.amount || 0),
-        title: center.name,
+        title: trip.name,
         description: trip.description || center.small_description || "",
         link: `/dive-trips/${trip.slug || trip.id}`,
         location: center.slug,
