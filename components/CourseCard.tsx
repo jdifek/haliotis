@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createPortal } from "react-dom";
 import { BookingFormModal } from "./Modals/BookingFormModal";
+import { useLocale } from "next-intl";
 
 const ModalPortal = ({ children }: { children: React.ReactNode }) => {
   if (typeof window === "undefined") return null;
@@ -18,6 +19,7 @@ type CourseCardProps = {
   requestBased?: boolean;
   badge?: string;
   slug?: string;
+  centerSlug?: string; // ← ДОБАВЛЕНО
   onBookClick?: () => void;
 };
 
@@ -29,13 +31,17 @@ export const CourseCard: React.FC<CourseCardProps> = ({
   requestBased = false,
   badge,
   slug,
+  centerSlug, // ← ДОБАВЛЕНО
 }) => {
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const router = useRouter();
+  const locale = useLocale(); // ← ДОБАВЛЕНО
 
   const handleCardClick = () => {
-    if (slug) {
-      router.push(`/cursos/${slug}`);
+    if (slug && centerSlug) {
+      router.push(`/${locale}/cursos/${centerSlug}/${slug}`);
+    } else if (slug) {
+      router.push(`/${locale}/cursos/${slug}`);
     }
   };
 
@@ -49,7 +55,6 @@ export const CourseCard: React.FC<CourseCardProps> = ({
         <div className="relative w-full overflow-hidden rounded-2xl">
           <img src={image} alt={title} className="h-full w-full object-cover" />
 
-          {/* Top Badge */}
           {badge && (
             <div className="absolute right-3 top-3 rounded-2xl bg-black/10 px-2.5 py-1">
               <span className="text-[15px] leading-[160%] text-[#f1f1f1]">
@@ -58,9 +63,7 @@ export const CourseCard: React.FC<CourseCardProps> = ({
             </div>
           )}
 
-          {/* Bottom Info Bar */}
           <div className="absolute bottom-3 left-3 flex flex-col md:flex-row items-start md:items-center gap-0.5 md:gap-1 rounded-lg bg-black/50 p-0.5">
-            {/* Duration */}
             <div className="flex items-center gap-1 rounded-lg bg-black/50 p-1 lg:px-2 lg:py-1.5 xl:px-3 xl:py-2">
               <svg
                 width="20"
@@ -82,7 +85,6 @@ export const CourseCard: React.FC<CourseCardProps> = ({
               </span>
             </div>
 
-            {/* Request Based */}
             <div className="flex items-center gap-1 rounded-lg bg-black/50 p-1 lg:px-2 lg:py-1.5 xl:px-3 xl:py-2">
               <svg
                 className="w-[10px] h-[10px] lg:w-[14px] lg:h-[14px] xl:w-[20px] xl:h-[20px]"
@@ -105,15 +107,12 @@ export const CourseCard: React.FC<CourseCardProps> = ({
         </div>
 
         {/* Content */}
-<div className="mt-2 sm:mt-3 h-[220px] md:h-[165px] rounded-2xl bg-[#f1f1f1] p-2 sm:p-3 flex flex-col justify-between">
-          {/* Title */}
-          <h3 className=" line-clamp-5 md:line-clamp-3 text-[16px] md:text-[18px] font-[500] leading-[140%] text-black overflow-hidden">
+        <div className="mt-2 sm:mt-3 h-[220px] md:h-[165px] rounded-2xl bg-[#f1f1f1] p-2 sm:p-3 flex flex-col justify-between">
+          <h3 className="line-clamp-5 md:line-clamp-3 text-[16px] md:text-[18px] font-[500] leading-[140%] text-black overflow-hidden">
             {title}
           </h3>
 
-          {/* Bottom Bar */}
           <div className="flex items-center flex-col md:flex-row justify-between gap-3 items-start md:items-center">
-            {/* Price */}
             <div className="flex items-center gap-2 rounded-lg bg-white px-2 md:px-3 py-1 md:py-2">
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
@@ -128,7 +127,6 @@ export const CourseCard: React.FC<CourseCardProps> = ({
               </span>
             </div>
 
-            {/* Book Button */}
             <button
               onClick={(e) => {
                 e.stopPropagation();

@@ -16,7 +16,7 @@ type Props = {
   totalCount?: number;
 };
 
-export function FancyboxGallery({ images, previewImage, totalCount }: Props) {
+export function FancyboxGallery({ images, previewImage }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

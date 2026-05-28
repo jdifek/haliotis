@@ -1,4 +1,3 @@
-/* eslint-disable react/no-unescaped-entities */
 "use client";
 
 import { useState } from "react";
@@ -43,7 +42,6 @@ export const CenterInfoSection = ({ tabs }: Props) => {
   const [openFacilityId, setOpenFacilityId] = useState<number | null>(null);
   const [openHistoryId, setOpenHistoryId] = useState<number | null>(null);
 
-  const [isHistorySunfishOpen, setIsHistorySunfishOpen] = useState(false);
   const renderContent = () => {
     switch (activeTab) {
       case "berlengas":

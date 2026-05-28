@@ -83,12 +83,35 @@ async function fetchCourses(params: {
   url.searchParams.set("attach_agency", "true");
   url.searchParams.set("attach_page", "true");
 
+  console.log("[fetchCourses] →", {
+    url: url.toString(),
+    params,
+  });
+
   const res = await fetch(url.toString(), {
     headers: { Accept: "application/json" },
   });
 
+  console.log("[fetchCourses] ←", {
+    status: res.status,
+    ok: res.ok,
+    url: res.url,
+  });
+
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json();
+
+  const data: CoursesApiResponse = await res.json();
+
+  console.log("[fetchCourses] data", {
+    total: data.meta?.total,
+    currentPage: data.meta?.current_page,
+    lastPage: data.meta?.last_page,
+    coursesCount: data.data?.length,
+    categoriesCount: Array.isArray(data.attachCategory) ? data.attachCategory.length : 0,
+    hasAttachPage: !!data.attachPage,
+  });
+
+  return data;
 }
 
 function formatPrice(price: unknown[]): number | null {
@@ -99,7 +122,12 @@ function formatPrice(price: unknown[]): number | null {
   return first.amount ?? first.value ?? null;
 }
 
-const Courses = () => {
+// ← ДОБАВЛЕН ПРОПС
+type CoursesProps = {
+  initialCenterSlug?: string;
+};
+
+const Courses = ({ initialCenterSlug }: CoursesProps) => {
   const locale = useLocale();
   const router = useRouter();
   const { divingCenters, loading: menuLoading } = useMenu(locale);
@@ -109,7 +137,7 @@ const Courses = () => {
   const [isTabOpen, setIsTabOpen] = useState(false);
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
-  const [attachPage, setAttachPage] = useState<CoursesApiResponse['attachPage']>(undefined);
+  const [attachPage, setAttachPage] = useState<CoursesApiResponse["attachPage"]>(undefined);
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
@@ -119,11 +147,15 @@ const Courses = () => {
   const [coursesLoading, setCoursesLoading] = useState(false);
   const [coursesError, setCoursesError] = useState<string | null>(null);
 
+  // ← ИЗМЕНЁН: учитываем initialCenterSlug
   useEffect(() => {
     if (divingCenters.length > 0 && activeTabId === null) {
-      setActiveTabId(divingCenters[0].slug);
+      const target = initialCenterSlug
+        ? divingCenters.find((c) => c.slug === initialCenterSlug)?.slug
+        : undefined;
+      setActiveTabId(target ?? divingCenters[0].slug);
     }
-  }, [divingCenters, activeTabId]);
+  }, [divingCenters, activeTabId, initialCenterSlug]);
 
   const activeCenter: DivingCenter | null =
     divingCenters.find((c) => c.slug === activeTabId) ?? null;
@@ -194,8 +226,7 @@ const Courses = () => {
     setSelectedCategoryId(null);
     setSelectedCategoryData(null);
     setCategories([]);
-    // Редирект на центр
-    router.push(`/${locale}/courses/${slug}`);
+    router.push(`/${locale}/cursos/${slug}`);
   };
 
   const handleCategoryChange = (categoryId: string | null) => {
@@ -205,16 +236,8 @@ const Courses = () => {
     if (categoryId) {
       const categoryData = categories.find((cat) => cat.id === categoryId);
       setSelectedCategoryData(categoryData || null);
-      // Редирект на категорию + центр
-      if (categoryData?.slug && activeTabId) {
-        router.push(`/${locale}/courses/${categoryData.slug}/${activeTabId}`);
-      }
     } else {
       setSelectedCategoryData(null);
-      // Редирект на центр
-      if (activeTabId) {
-        router.push(`/${locale}/courses/${activeTabId}`);
-      }
     }
   };
 
@@ -250,11 +273,11 @@ const Courses = () => {
 
   return (
     <main className="-mt-[97px]">
-      <HeroSection 
+      <HeroSection
         centerName={centerData?.center_name}
         description={centerData?.small_description || undefined}
       />
-      
+
       <section className="hidden min-[930px]:flex h-[95px] bg-white justify-center items-end">
         <Tabs
           useLocationColors={true}
@@ -266,7 +289,7 @@ const Courses = () => {
           underlineClassName="absolute -bottom-1 left-0 w-full h-[2px] transition-opacity"
         />
       </section>
-      
+
       <section className="bg-[#f1f1f1] px-4 pb-12 pt-8 min-[930px]:px-[30px] min-[930px]:pb-[50px] min-[930px]:pt-[46px]">
         <div className="flex flex-col gap-[30px] min-[930px]:flex-row">
           <div className="hidden min-[930px]:flex min-[930px]:flex-col min-[930px]:gap-[10px]">
@@ -296,8 +319,17 @@ const Courses = () => {
                 <span className="text-[16px] font-semibold leading-[160%] text-[#111]">
                   {activeTabData?.label ?? ""}
                 </span>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className={`transition-transform flex-shrink-0 ${isTabOpen ? "rotate-180" : ""}`}>
-                  <path d="M17.8534 9.85369L12.8537 14.8534C12.8073 14.8999 12.7522 14.9367 12.6915 14.9619C12.6308 14.9871 12.5657 15 12.5 15C12.4343 15 12.3692 14.9871 12.3085 14.9619C12.2478 14.9367 12.1927 14.8999 12.1463 14.8534L7.14663 9.85369C7.07663 9.78377 7.02895 9.69465 7.00963 9.59761C6.9903 9.50058 7.00021 9.39999 7.03808 9.30858C7.07595 9.21718 7.1401 9.13907 7.22239 9.08413C7.30468 9.0292 7.40142 8.99992 7.50036 9H17.4996C17.5986 8.99992 17.6953 9.0292 17.7776 9.08413C17.8599 9.13907 17.924 9.21718 17.9619 9.30858C17.9998 9.39999 18.0097 9.50058 17.9904 9.59761C17.971 9.69465 17.9234 9.78377 17.8534 9.85369Z" fill="black" />
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  className={`transition-transform flex-shrink-0 ${isTabOpen ? "rotate-180" : ""}`}
+                >
+                  <path
+                    d="M17.8534 9.85369L12.8537 14.8534C12.8073 14.8999 12.7522 14.9367 12.6915 14.9619C12.6308 14.9871 12.5657 15 12.5 15C12.4343 15 12.3692 14.9871 12.3085 14.9619C12.2478 14.9367 12.1927 14.8999 12.1463 14.8534L7.14663 9.85369C7.07663 9.78377 7.02895 9.69465 7.00963 9.59761C6.9903 9.50058 7.00021 9.39999 7.03808 9.30858C7.07595 9.21718 7.1401 9.13907 7.22239 9.08413C7.30468 9.0292 7.40142 8.99992 7.50036 9H17.4996C17.5986 8.99992 17.6953 9.0292 17.7776 9.08413C17.8599 9.13907 17.924 9.21718 17.9619 9.30858C17.9998 9.39999 18.0097 9.50058 17.9904 9.59761C17.971 9.69465 17.9234 9.78377 17.8534 9.85369Z"
+                    fill="black"
+                  />
                 </svg>
               </button>
 
@@ -314,9 +346,17 @@ const Courses = () => {
                             setIsTabOpen(false);
                           }}
                           className="flex items-center cursor-pointer justify-between rounded-[10px] px-3 py-2 h-[40px] border-2"
-                          style={isSelected ? { backgroundColor: tab.color, borderColor: tab.color } : { backgroundColor: "white", borderColor: "#d9d9d9" }}
+                          style={
+                            isSelected
+                              ? { backgroundColor: tab.color, borderColor: tab.color }
+                              : { backgroundColor: "white", borderColor: "#d9d9d9" }
+                          }
                         >
-                          <span className={`text-[16px] font-normal leading-[140%] ${isSelected ? "text-white" : "text-[#111]"}`}>
+                          <span
+                            className={`text-[16px] font-normal leading-[140%] ${
+                              isSelected ? "text-white" : "text-[#111]"
+                            }`}
+                          >
                             {tab.label}
                           </span>
                         </button>
@@ -327,32 +367,49 @@ const Courses = () => {
               )}
             </div>
 
-            <h2 className="text-[20px] font-bold leading-[140%] text-center text-[#e84814]">Categories</h2>
+            <h2 className="text-[20px] font-bold leading-[140%] text-center text-[#e84814]">
+              Categories
+            </h2>
 
             <button
               onClick={() => setIsCategoryOpen(!isCategoryOpen)}
               className="flex items-center cursor-pointer justify-between rounded-[10px] px-3 py-2 h-[42px] bg-white border-2 border-[#d9d9d9]"
             >
-              <span className="text-[16px] font-semibold leading-[160%] text-[#111]">{selectedCategoryName}</span>
+              <span className="text-[16px] font-semibold leading-[160%] text-[#111]">
+                {selectedCategoryName}
+              </span>
             </button>
           </div>
 
           {isCategoryOpen && (
             <>
-              <div className="fixed inset-0 z-40 min-[930px]:hidden bg-black/50" onClick={() => setIsCategoryOpen(false)} />
+              <div
+                className="fixed inset-0 z-40 min-[930px]:hidden bg-black/50"
+                onClick={() => setIsCategoryOpen(false)}
+              />
               <div className="fixed inset-0 z-50 min-[930px]:hidden flex flex-col">
                 <div className="h-[82px] flex-shrink-0" />
                 <div className="flex-1 overflow-y-auto p-4 bg-[#f1f1f1]">
-                  <h2 className="text-[20px] font-medium leading-[140%] text-center text-black mb-[10px]">Categories</h2>
+                  <h2 className="text-[20px] font-medium leading-[140%] text-center text-black mb-[10px]">
+                    Categories
+                  </h2>
                   <div className="flex flex-col gap-[10px]">
                     <button
                       onClick={() => {
                         handleCategoryChange(null);
                         setIsCategoryOpen(false);
                       }}
-                      className={`flex items-center cursor-pointer justify-between rounded-[10px] px-3 py-2 h-[40px] border-2 ${selectedCategoryId === null ? "bg-[#e84814] border-[#e84814]" : "bg-white border-[#d9d9d9]"}`}
+                      className={`flex items-center cursor-pointer justify-between rounded-[10px] px-3 py-2 h-[40px] border-2 ${
+                        selectedCategoryId === null
+                          ? "bg-[#e84814] border-[#e84814]"
+                          : "bg-white border-[#d9d9d9]"
+                      }`}
                     >
-                      <span className={`text-[16px] font-normal leading-[140%] text-center ${selectedCategoryId === null ? "text-white" : "text-[#111]"}`}>
+                      <span
+                        className={`text-[16px] font-normal leading-[140%] text-center ${
+                          selectedCategoryId === null ? "text-white" : "text-[#111]"
+                        }`}
+                      >
                         All Categories
                       </span>
                     </button>
@@ -366,9 +423,17 @@ const Courses = () => {
                             handleCategoryChange(category.id);
                             setIsCategoryOpen(false);
                           }}
-                          className={`flex items-center cursor-pointer justify-between rounded-[10px] px-3 py-2 h-[40px] border-2 ${isSelected ? "bg-[#e84814] border-[#e84814]" : "bg-white border-[#d9d9d9]"}`}
+                          className={`flex items-center cursor-pointer justify-between rounded-[10px] px-3 py-2 h-[40px] border-2 ${
+                            isSelected
+                              ? "bg-[#e84814] border-[#e84814]"
+                              : "bg-white border-[#d9d9d9]"
+                          }`}
                         >
-                          <span className={`text-[16px] font-normal leading-[140%] text-center ${isSelected ? "text-white" : "text-[#111]"}`}>
+                          <span
+                            className={`text-[16px] font-normal leading-[140%] text-center ${
+                              isSelected ? "text-white" : "text-[#111]"
+                            }`}
+                          >
                             {category.name}
                           </span>
                         </button>
@@ -413,6 +478,8 @@ const Courses = () => {
                   const price = formatPrice(course.price);
                   return (
                     <CourseCard
+                          centerSlug={activeCenter?.slug}  // ← ДОБАВИТЬ
+
                       slug={course.slug}
                       key={course.id}
                       image={course.image ?? "/Rectangle 8.png"}
@@ -443,7 +510,7 @@ const Courses = () => {
           </div>
         </div>
       </section>
-      
+
       <CoursesSectionInfo
         body={attachPage?.content?.body}
         tabs={attachPage?.content?.tabs ?? undefined}

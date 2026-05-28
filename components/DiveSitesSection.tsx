@@ -16,11 +16,6 @@ type DiveSite = {
   videoCover?: string;
 };
 
-type LocationTab = {
-  id: string;
-  label: string;
-  sites: DiveSite[];
-};
 
 // ─── SVG Icons ────────────────────────────────────────────────────────────────
 

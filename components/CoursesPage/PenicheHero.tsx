@@ -1,7 +1,7 @@
 import { Breadcrumbs } from "../Breadcrumbs";
 import { BlackActionButton } from "../buttons/BlackActionButton";
 import type { CenterData } from "@/types/center";
-import { MapContainer, Marker, TileLayer } from 'react-leaflet'
+import { MapContainer, TileLayer } from 'react-leaflet'
 import { LatLngExpression } from 'leaflet'
 
 import 'leaflet/dist/leaflet.css'
