@@ -40,8 +40,8 @@ export const RecommendedCoursesSection: React.FC<Props> = ({
         <div className="grid grid-cols-2 gap-[10px] sm:gap-[15px] md:grid-cols-3 md:gap-[20px] lg:gap-[30px] xl:grid-cols-4">
           {courseCards.map((card, index) => (
             <CourseCard
-            slug={card.slug}
-
+              slug={card.slug}
+              centerSlug={card.location}
               key={index}
               image={card.image}
               title={card.title}

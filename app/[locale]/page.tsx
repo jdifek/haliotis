@@ -90,6 +90,7 @@ export default async function Home({ params }: Props) {
       image: course.image_url || "/Rectangle 8.png",
       title: course.name,
       slug: course.slug,
+      centerSlug: center.slug,
       price: course.price?.amount || 0,
       duration: course.duration_label || "On request",
       requestBased: !course.duration_label,
