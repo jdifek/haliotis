@@ -8,6 +8,8 @@ import { usePathname } from "next/navigation";
 type Props = LinkProps & {
   children: React.ReactNode;
   className?: string;
+    style?: React.CSSProperties;
+
 };
 
 const LOCALE_REGEX = /^\/([a-z]{2})(\/|$)/;

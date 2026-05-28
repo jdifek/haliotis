@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { FilterList } from "@/components/FilterList";
 import { Tabs } from "@/components/buttons/Tabs";
 import { useLocale } from "next-intl";
@@ -758,8 +758,13 @@ const calculatorType = pricesData?.service_types.find((t) => t.display_type === 
   const labels = pricesData?.calculator_labels;
   
   const [fieldValues, setFieldValues] = useState<Record<number, number>>({});
-  const [totalPrice] = useState(0);
-  
+
+const totalPrice = useMemo(() => {
+  return (pricesData?.services ?? []).reduce((sum, service) => {
+    const qty = fieldValues[service.id] ?? 0;
+    return sum + qty * parseFloat(service.price);
+  }, 0);
+}, [fieldValues, pricesData?.services]);
   const updateField = (serviceId: number, val: string) => {
     setFieldValues((prev) => ({ ...prev, [serviceId]: Number(val) }));
   };
