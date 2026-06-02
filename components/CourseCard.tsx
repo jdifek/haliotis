@@ -19,6 +19,7 @@ type CourseCardProps = {
   requestBased?: boolean;
   badge?: string;
   slug?: string;
+  currency?: string;
   centerSlug?: string; // ← ДОБАВЛЕНО
   onBookClick?: () => void;
 };
@@ -31,6 +32,7 @@ export const CourseCard: React.FC<CourseCardProps> = ({
   requestBased = false,
   badge,
   slug,
+  currency,
   centerSlug, // ← ДОБАВЛЕНО
 }) => {
   const [isBookingOpen, setIsBookingOpen] = useState(false);
@@ -123,7 +125,7 @@ export const CourseCard: React.FC<CourseCardProps> = ({
                 />
               </svg>
               <span className="text-[15px] font-bold leading-[120%] text-black">
-                {price}
+                {currency}{price}
               </span>
             </div>
 

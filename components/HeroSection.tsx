@@ -274,7 +274,7 @@ export const HeroSection: React.FC<Props> = ({ heroSlides }) => {
         </svg>
       </div>
 
-      <div className="absolute right-10 bottom-10 z-10 lg:right-10 lg:bottom-10">
+      <div className="absolute right-10 bottom-10 z-[6000] lg:right-10 lg:bottom-10">
         <CarouselControls
           currentSlide={heroCurrentSlide}
           totalSlides={heroSlides.length}
@@ -286,7 +286,7 @@ export const HeroSection: React.FC<Props> = ({ heroSlides }) => {
       </div>
 
       {/* Content Container */}
-      <div className="relative z-20 min-h-screen">
+      <div className="relative ">
         {/* Hero Section */}
         <section className="container px-5 py-6">
           <div className="max-w-3xl">

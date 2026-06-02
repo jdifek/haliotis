@@ -91,11 +91,11 @@ export default async function Home({ params }: Props) {
       title: course.name,
       slug: course.slug,
       centerSlug: center.slug,
+      currency: course.price?.currency || "€",
       price: course.price?.amount || 0,
       duration: course.duration_label || "On request",
       requestBased: !course.duration_label,
-      badge: course.label || "Course",
-      location: center.slug,
+badge: course.label?.name || "Course",      location: center.slug,
     }))
   );
 

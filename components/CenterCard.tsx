@@ -23,8 +23,6 @@ export const CenterCard: React.FC<CenterCardProps> = ({
     <div
       className={`relative w-full max-w-[363px] h-full overflow-hidden rounded-[20px] p-5 lg:pt-10 ${className}`}
     >
-      {" "}
-      {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <img
           src={image}

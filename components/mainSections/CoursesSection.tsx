@@ -209,6 +209,11 @@ export const CoursesSection: React.FC<Props> = ({ locations, courseCards }) => {
                   spaceBetween: 30,
                 },
                 1495: {
+                  slidesPerView: 3,
+                  slidesPerGroup: 1,
+                  spaceBetween: 30,
+                },
+                 1755: {
                   slidesPerView: 4,
                   slidesPerGroup: 1,
                   spaceBetween: 30,
