@@ -464,9 +464,11 @@ export const Header: React.FC<{
   logoAlt: string;
 }> = ({ locale, logoUrl, logoAlt }) => {
   const pathname = usePathname();
+const [isCartHovered, setIsCartHovered] = useState(false);
 
   // ← единственный источник данных меню, кэшируется глобально
   const { menuData } = useMenu(locale);
+const [isCartOpen, setIsCartOpen] = useState(false);
 
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const [selectedLang, setSelectedLang] = useState(locale.toUpperCase());
@@ -811,6 +813,182 @@ export const Header: React.FC<{
             </div>
           </nav>
           {/* Desktop Right Panel */}
+     {/* Cart Button + Dropdown */}
+<div className="relative hidden xl:flex">
+ 
+<button
+  className="flex items-center gap-2 flex-shrink-0 rounded-lg cursor-pointer transition-all"
+  style={{
+    width: 131,
+    height: 44,
+    background: isCartOpen ? '#e84814' : isCartHovered ? 'rgba(255,255,255,0.1)' : 'transparent',
+    border: '1px solid rgba(255,255,255,0.12)',
+    padding: '10px 14px',
+  }}
+  onClick={() => setIsCartOpen(!isCartOpen)}
+  onMouseEnter={() => setIsCartHovered(true)}
+  onMouseLeave={() => setIsCartHovered(false)}
+>
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <path d="M6 2L3 6V20C3 20.5304 3.21071 21.0391 3.58579 21.4142C3.96086 21.7893 4.46957 22 5 22H19C19.5304 22 20.0391 21.7893 20.4142 21.4142C20.7893 21.0391 21 20.5304 21 20V6L18 2H6Z" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M3 6H21" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M16 10C16 11.0609 15.5786 12.0783 14.8284 12.8284C14.0783 13.5786 13.0609 14 12 14C10.9391 14 9.92172 13.5786 9.17157 12.8284C8.42143 12.0783 8 11.0609 8 10" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+    <span style={{ fontFamily: 'var(--font-family)', fontWeight: 700, fontSize: 15, lineHeight: '120%', color: '#fff' }}>
+      €2,395
+    </span>
+    <span
+      className="flex items-center justify-center rounded-full text-[11px] font-bold flex-shrink-0"
+      style={{
+        width: 16,
+        height: 16,
+        minWidth: 16,
+        background: isCartOpen ? '#fff' : '#e84814',
+        color: isCartOpen ? '#e84814' : '#fff',
+      }}
+    >
+      2
+    </span>
+  </button>
+
+  {isCartOpen && (
+    <div
+      className="absolute top-full mt-2 right-0 z-50"
+      style={{
+        width: 502,
+        background: '#1f1443',
+        border: '1px solid #534580',
+        borderRadius: '20px 8px 20px 20px',
+      }}
+    >
+      {/* Header */}
+      <div
+        className="flex items-end pb-3 justify-between px-5"
+        style={{ borderBottom: '1px solid #534580', height: 65 }}
+      >
+        <span style={{ fontFamily: 'var(--font-family)', fontWeight: 500, fontSize: 24, lineHeight: '130%', color: '#fff' }}>
+          Your Cart
+        </span>
+        <span style={{ fontFamily: 'var(--font-family)', fontWeight: 400, fontSize: 15, lineHeight: '160%', color: '#cfcfcf' }}>
+          3 activities · 5 participants
+        </span>
+      </div>
+
+      {/* Items */}
+      <div className="flex flex-col">
+        {[
+          { id: 1, image: '/bg.png', title: 'PADI Open Water Diver — Madeira', type: 'Travel', participants: 2, date: 'Jun 14', price: 459 },
+          { id: 2, image: '/bg.png', title: 'PADI Open Water Diver — Madeira', type: 'Course', participants: 2, date: 'Jul 3', price: 459 },
+        ].map((item) => (
+          <div
+            key={item.id}
+            className="flex items-center gap-3 px-5 py-[10px]"
+            style={{ borderBottom: '1px solid #534580' }}
+          >
+            {/* Image */}
+            <div style={{ borderRadius: 10, width: 65, height: 60, overflow: 'hidden', flexShrink: 0, background: '#2a1f5e' }}>
+              {item.image && (
+                <img src={item.image} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              )}
+            </div>
+
+            {/* Info */}
+            <div className="flex flex-col gap-1 flex-1">
+              <span style={{ fontFamily: 'var(--font-family)', fontWeight: 400, fontSize: 16, lineHeight: '140%', color: '#fff' }}>
+                {item.title}
+              </span>
+              <div className="flex items-center gap-2">
+                <span
+                  style={{
+                    borderRadius: 5,
+                    padding: '2px 5px',
+                    fontFamily: 'var(--font-family)',
+                    fontWeight: 400,
+                    fontSize: 15,
+                    lineHeight: '160%',
+                    background: item.type === 'Travel' ? 'rgba(232, 72, 20, 0.2)' : 'rgba(160, 197, 46, 0.2)',
+                    color: item.type === 'Travel' ? '#e84814' : '#a0c52e',
+                  }}
+                >
+                  {item.type}
+                </span>
+                <span style={{ fontFamily: 'var(--font-family)', fontWeight: 400, fontSize: 15, lineHeight: '160%', color: '#cfcfcf' }}>
+                  {item.participants} participants · {item.date}
+                </span>
+              </div>
+            </div>
+
+            {/* Price */}
+            <span style={{ fontFamily: 'var(--font-family)', fontWeight: 500, fontSize: 19, lineHeight: '140%', color: '#fff' }}>
+              €{item.price}
+            </span>
+
+            {/* Remove */}
+            <button className="hover:opacity-80 transition-opacity cursor-pointer">
+              <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+                <g opacity="0.5">
+                  <path d="M8.75 8.75L21.25 21.25M8.75 21.25L21.25 8.75" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </g>
+              </svg>
+            </button>
+          </div>
+        ))}
+      </div>
+
+      {/* Total */}
+      <div
+        className="flex items-center justify-between px-5"
+        style={{ padding: '10px 20px 0', height: 41 }}
+      >
+        <span style={{ fontFamily: 'var(--font-family)', fontWeight: 500, fontSize: 24, lineHeight: '130%', color: '#fff' }}>
+          Total price
+        </span>
+        <span style={{ fontFamily: 'var(--font-family)', fontWeight: 500, fontSize: 24, lineHeight: '130%', color: '#fff' }}>
+          €2,395
+        </span>
+      </div>
+
+      {/* Buttons */}
+      <div className="flex items-center gap-3 px-5 py-4">
+        <button
+          style={{
+            border: '1px solid #534580',
+            borderRadius: 1000,
+            padding: '2px 16px',
+            width: 226,
+            height: 48,
+            background: '#1f1443',
+            fontFamily: 'var(--font-family)',
+            fontWeight: 700,
+            fontSize: 15,
+            lineHeight: '120%',
+            color: '#cfcfcf',
+            cursor: 'pointer',
+          }}
+        >
+          View cart
+        </button>
+        <button
+          style={{
+            borderRadius: 1000,
+            padding: '2px 16px',
+            width: 226,
+            height: 48,
+            background: '#e84814',
+            fontFamily: 'var(--font-family)',
+            fontWeight: 700,
+            fontSize: 15,
+            lineHeight: '120%',
+            color: '#fff',
+            cursor: 'pointer',
+          }}
+        >
+          Checkout
+        </button>
+      </div>
+    </div>
+  )}
+</div>
           <div className="hidden flex-shrink-0 rounded-xl bg-black/10 p-1 xl:flex">
             <div className="flex items-center gap-[clamp(2px,0.4vw,8px)] px-[clamp(2px,0.3vw,8px)]">
               {/* ЯЗЫ К — был и должен быть */}
