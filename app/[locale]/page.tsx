@@ -7,6 +7,7 @@ import { DiveTrips } from "@/components/mainSections/DiveTrips";
 import { CentersSection } from "@/components/mainSections/CentersSection";
 import type { Metadata } from "next";
 import { createTermGetter } from "../utils/terms";
+import { DiveExploreSection } from "@/components/mainSections/DiveExploreSection";
 
 // Функция для получения terms напрямую (для Server Component)
 async function getTerms(locale: string) {
@@ -162,6 +163,7 @@ badge: course.label?.name || "Course",      location: center.slug,
   return (
     <main className="-mt-[97px]">
       <HeroSection heroSlides={heroSlides} />
+      <DiveExploreSection />
       <CentersSection centerCards={centerCardsData} />
       <CoursesSection locations={locations} courseCards={courseCards} />
       <TripsSection locations={locations} tripCards={tripCards} />
