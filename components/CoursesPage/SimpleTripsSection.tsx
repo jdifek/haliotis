@@ -86,15 +86,15 @@ export const SimpleTripsSection: React.FC<Props> = ({
                 spaceBetween: 20,
               },
               768: {
-                slidesPerView: 2,
+                slidesPerView: 1,
                 spaceBetween: 25,
               },
               1024: {
-                slidesPerView: 2,
+                slidesPerView: 1,
                 spaceBetween: 30,
               },
               1495: {
-                slidesPerView: 3,
+                slidesPerView: 2,
                 spaceBetween: 30,
               },
               1905: {

@@ -1329,7 +1329,7 @@ const [isCartOpen, setIsCartOpen] = useState(false);
               {/* decorative svg */}
             </div>
 
-            <div className="flex items-center justify-between p-5">
+            <div className="flex items-center justify-between p-5 pt-[clamp(12px,2vw,20px)]">
               <div className="relative cursor-pointer" onClick={handleToMain}>
                 <Image
                   src={logoUrl}

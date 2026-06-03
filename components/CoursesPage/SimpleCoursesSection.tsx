@@ -90,11 +90,16 @@ export const SimpleCoursesSection: React.FC<Props> = ({
                 spaceBetween: 20,
               },
               1024: {
-                slidesPerView: 3,
+                slidesPerView: 2,
                 slidesPerGroup: 1,
                 spaceBetween: 30,
               },
               1495: {
+                slidesPerView: 3,
+                slidesPerGroup: 1,
+                spaceBetween: 30,
+              },
+              1895: {
                 slidesPerView: 4,
                 slidesPerGroup: 1,
                 spaceBetween: 30,
