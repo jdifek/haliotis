@@ -462,15 +462,15 @@ export function TripCard({ card }: { card: TripCard }) {
               </svg>
             }
           />
-          <div className="max-[1500px]:flex hidden overflow-hidden items-center justify-end" style={{ width: 66, height: 48 }}>
+          <div className="max-[1500px]:flex hidden overflow-hidden items-center justify-end" style={{ width: 70, height: 52 }}>
             {svg && React.isValidElement(svg) && React.cloneElement(svg as React.ReactElement<{ width?: number; height?: number }>, { width: 60, height: 40 })}
           </div>
         </div>
       </div>
 
       {/* Right: decorative SVG */}
-    <div className="hidden min-[1500px]:flex flex-shrink-0 items-start justify-end">
-  <div style={{ transformOrigin: "top right" }} className="scale-50 min-[1500px]:scale-100">
+<div className="hidden min-[1500px]:flex flex-shrink-0 items-start justify-end" style={{ width: 120, overflow: 'hidden' }}>
+  <div style={{ transformOrigin: "top right", transform: 'scale(0.55)' }}>
     {svg}
   </div>
 </div>

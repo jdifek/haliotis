@@ -58,7 +58,7 @@ export default async function Travel({ params }: Props) {
   console.log("[Travel Page] Full response data:", data);
 
   const tripCards = data.data.map((trip: any) => ({
-    locationId: trip.slug || trip.id.toString(),
+  locationId: trip.diving_center?.slug || trip.slug || trip.id.toString(),
     images:
       trip.gallery.length > 0
         ? trip.gallery.map((g: any) => g.image)
