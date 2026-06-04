@@ -21,10 +21,10 @@ export function CategoriesList({
   onCategorySelect,
 }: CategoriesListProps) {
   return (
-    <div className="rounded-[24px] bg-white p-2" style={{ width: "285px" }}>
+    <div className="rounded-[24px] bg-white p-2" >
       <div
         className="rounded-[24px] bg-[#f1f1f1] p-[10px_15px]"
-        style={{ width: "269px" }}
+      
       >
         {/* Header */}
         <h3 className="mb-3 text-start text-[15px] font-semibold leading-[160%] text-[#111]">
@@ -41,7 +41,6 @@ export function CategoriesList({
                 ? "border-[#e84814] bg-[#e84814] text-white"
                 : "border-[#d9d9d9] bg-white text-[#111] hover:border-[#e84814]"
             }`}
-            style={{ width: "239px" }}
           >
             <span className="text-center text-[15px] font-normal leading-[160%]">
               All Categories
@@ -72,7 +71,6 @@ export function CategoriesList({
                     ? "border-[#e84814] bg-[#e84814] text-white"
                     : "border-[#d9d9d9] bg-white text-[#111] hover:border-[#e84814]"
                 }`}
-                style={{ width: "239px" }}
               >
                 <span className="text-center text-[15px] font-normal leading-[160%]">
                   {category.name}

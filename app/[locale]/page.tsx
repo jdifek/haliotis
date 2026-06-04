@@ -100,6 +100,9 @@ badge: course.label?.name || "Course",      location: center.slug,
     }))
   );
 
+  console.log(courseCards, 'courseCards');
+  
+
   const centerCardsData = (
     homepageData.sliders?.diving_centers?.entities || []
   ).map((center: any) => ({

@@ -14,6 +14,8 @@ type DiveSite = {
   padiLevel: string;
   description: string;
   videoSrc?: string;
+    videoCover?: string;
+
 };
 
 
@@ -152,45 +154,60 @@ const RatingDots = ({
 
 // ─── Video block ──────────────────────────────────────────────────────────────
 
-const VideoBlock = ({ src, isMobile }: { src?: string; isMobile: boolean }) => (
-  <div
-    className="w-full overflow-hidden relative flex items-center justify-center"
-    style={{
-      borderRadius: 16,
-      height: isMobile ? 210 : 671,
-      background: "#0d1b35",
-    }}
-  >
-    {src ? (
-       <iframe
-       src={src}
-       className="w-full h-full"
-       style={{ borderRadius: 16, border: "none" }}
-       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-       allowFullScreen
-     />
-    ) : (
-      <div
-        className="flex flex-col items-center gap-3"
-        style={{ opacity: 0.45 }}
-      >
-        <svg width="56" height="56" viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="10" stroke="white" strokeWidth="1" />
-          <path d="M10 8.5l5.5 3.5-5.5 3.5V8.5z" fill="white" />
-        </svg>
-        <span
-          style={{
-            color: "white",
-            fontSize: 13,
-            fontFamily: "var(--font-family)",
-          }}
-        >
-          Video
-        </span>
-      </div>
-    )}
-  </div>
-);
+const VideoBlock = ({ src, cover, isMobile }: { src?: string; cover?: string; isMobile: boolean }) => {
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  return (
+    <div
+      className="w-full overflow-hidden relative flex items-center justify-center"
+      style={{
+        borderRadius: 16,
+        height: isMobile ? 210 : 671,
+        background: "#0d1b35",
+      }}
+    >
+      {!isLoaded && cover ? (
+        <>
+          <img
+            src={cover}
+            alt="Video cover"
+            className="w-full h-full object-cover"
+            style={{ borderRadius: 16 }}
+          />
+          <button
+            onClick={() => setIsLoaded(true)}
+            className="absolute flex items-center justify-center cursor-pointer hover:opacity-80"
+            style={{ transition: "opacity 0.2s" }}
+          >
+            <svg width="56" height="56" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" stroke="white" strokeWidth="1" />
+              <path d="M10 8.5l5.5 3.5-5.5 3.5V8.5z" fill="white" />
+            </svg>
+          </button>
+        </>
+      ) : isLoaded && src ? (
+        <iframe
+          src={src}
+          width="100%"
+          height="100%"
+          style={{ borderRadius: 16, border: "none" }}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        />
+      ) : (
+        <div className="flex flex-col items-center gap-3" style={{ opacity: 0.45 }}>
+          <svg width="56" height="56" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="white" strokeWidth="1" />
+            <path d="M10 8.5l5.5 3.5-5.5 3.5V8.5z" fill="white" />
+          </svg>
+          <span style={{ color: "white", fontSize: 13, fontFamily: "var(--font-family)" }}>
+            Video
+          </span>
+        </div>
+      )}
+    </div>
+  );
+};
 
 // ─── Dive Site Card ───────────────────────────────────────────────────────────
 
@@ -332,7 +349,7 @@ const DiveSiteCard = ({ site }: { site: DiveSite }) => {
             >
               {site.description}
             </p>
-            <VideoBlock src={site.videoSrc} isMobile={false} />
+            <VideoBlock src={site.videoSrc} isMobile={false} cover={site.videoCover}/>
             </div>
         </div>
 
@@ -352,7 +369,7 @@ const DiveSiteCard = ({ site }: { site: DiveSite }) => {
           >
             {site.description}
           </p>
-          <VideoBlock src={site.videoSrc} isMobile={false} />
+          <VideoBlock src={site.videoSrc} cover={site.videoCover} isMobile={false} />
           </div>
       </div>
     </div>
@@ -396,14 +413,22 @@ const FreediveSitesSection = ({ regions, locations }: FreediveSitesSectionProps)
     .sort((a, b) => a.position - b.position)
     .filter((r, idx, arr) => arr.findIndex(x => x.name === r.name) === idx);
 
-  const locationTabs = uniqueRegions.map(region => {
-    const regionIds = regions.filter(r => r.name === region.name).map(r => r.id);
-    return {
-      id: String(region.id),
-      label: region.name,
-      sites: locations
-        .filter(loc => regionIds.includes(loc.region_id))
-        .map(loc => ({
+    console.log(uniqueRegions, 'uniqueRegions')
+ const locationTabs = uniqueRegions.map(region => {
+  const regionIds = regions.filter(r => r.name === region.name).map(r => r.id);
+
+  return {
+    id: String(region.id),
+    label: region.name,
+    sites: locations
+      .filter(loc => regionIds.includes(loc.region_id))
+      .map(loc => {
+        console.log("LOCATION:", loc.name, {
+          video_url: loc.video_url,
+          video_cover: loc.video_cover,
+        });
+
+        return {
           id: String(loc.id),
           name: loc.name,
           fishes: loc.fish_level,
@@ -413,10 +438,10 @@ const FreediveSitesSection = ({ regions, locations }: FreediveSitesSectionProps)
           description: loc.description,
           videoSrc: normalizeVideoUrl(loc.video_url),
           videoCover: loc.video_cover,
-        })),
-    };
-  }).filter(tab => tab.sites.length > 0);
-
+        };
+      }),
+  };
+}).filter(tab => tab.sites.length > 0);
   const [activeTab, setActiveTab] = useState("");
 
   useEffect(() => {

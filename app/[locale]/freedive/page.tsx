@@ -103,16 +103,17 @@ const Diving = ({ params }: { params: Promise<{ locale: string }> }) => {
       { headers: { Accept: "application/json" } }
     )
       .then((r) => r.json())
-      .then((json) => {
-        const normalized = {
-          title: json.data?.title ?? "",
-          banner: json.data?.banner ?? null,
-          seo: json.data?.seo ?? null,
-          dive_trips: json.dive_trips ?? [],
-          regions: json.regions ?? null,
-        };
-        setFreediveData(normalized);
-      })
+   .then((json) => {
+  console.log("[Freedive API] Raw response:", json);
+  const normalized = {
+    title: json.data?.title ?? "",
+    banner: json.data?.banner ?? null,
+    seo: json.data?.seo ?? null,
+    dive_trips: json.dive_trips ?? [],
+    regions: json.regions ?? null,
+  };
+  setFreediveData(normalized);
+})
       .catch(console.error)
       .finally(() => setDataLoading(false));
   }, [activeTab, divingCenters, locale]);

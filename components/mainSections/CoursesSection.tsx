@@ -22,6 +22,7 @@ type Props = {
     title: string;
     price: number;
     duration: string;
+    currency: string;
     requestBased: boolean;
     badge: string;
     location: string;
@@ -228,6 +229,7 @@ export const CoursesSection: React.FC<Props> = ({ locations, courseCards }) => {
                     slug={card.slug}
                     title={card.title}
                     price={card.price}
+                    currency={card.currency}
                     duration={card.duration}
                     requestBased={card.requestBased}
                     badge={card.badge}
