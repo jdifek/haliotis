@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { CardImageSwiper } from "../TravelTripsSection";
 
 type AccordionItem = {
   id: string;
@@ -16,6 +17,7 @@ type Props = {
   price: number;
   image: string;
   imageAlt?: string;
+  images: string[]
   onBookClick?: () => void;
   accordionItems: AccordionItem[];
 };
@@ -86,8 +88,10 @@ export const CourseDetailHeroSection: React.FC<Props> = ({
   description,
   price,
   image,
+  images,
   imageAlt = "Course image",
   onBookClick,
+  
   accordionItems,
 }) => {
   const [openAccordion, setOpenAccordion] = useState<string | null>(
@@ -97,6 +101,8 @@ export const CourseDetailHeroSection: React.FC<Props> = ({
   const toggleAccordion = (id: string) => {
     setOpenAccordion((prev) => (prev === id ? null : id));
   };
+  const [currentImage, setCurrentImage] = useState(0);
+
 
   return (
     <section className={`bg-white ${className ?? ""}`}>
@@ -111,18 +117,26 @@ export const CourseDetailHeroSection: React.FC<Props> = ({
             <p className="text-[15px] font-normal leading-[160%] text-[#101010] opacity-80">
               {description}
             </p>
+              {/* ── BOTTOM BOOK NOW ── */}
+        <div className="mt-6 md:mt-10">
+          <div className="flex items-center gap-3 md:justify-start justify-between">
+            <div className="flex items-center gap-2 rounded-lg bg-[#f1f1f1] px-3 py-2">
+              <EuroIcon />
+              <span className="text-[15px] font-bold leading-[120%] text-black">
+                {price}
+              </span>
+            </div>
+            <BookNowButton onClick={onBookClick} />
+          </div>
+        </div>
+            
           </div>
 
           {/* Right: Image */}
-          <div className="w-full md:w-[600px] md:flex-shrink-0">
-            <Image
-              src={image}
-              alt={imageAlt}
-              width={600}
-              height={400}
-              className="w-full md:w-[600px] h-[220px] sm:h-[280px] md:h-[400px] rounded-2xl object-cover"
-            />
-          </div>
+      
+<div className="w-full md:w-[600px] md:flex-shrink-0">
+  <CardImageSwiper images={images} />
+</div>
         </div>
 
         {/* ── DIVIDER ── */}

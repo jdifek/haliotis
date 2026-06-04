@@ -310,7 +310,7 @@ const EuroIcon = () => (
 );
 
 // ─── Image Swiper inside card ─────────────────────────────────────────────────
-function CardImageSwiper({ images }: { images: string[] }) {
+export function CardImageSwiper({ images }: { images: string[] }) {
   const swiperRef = useRef<SwiperType | null>(null);
 
   return (

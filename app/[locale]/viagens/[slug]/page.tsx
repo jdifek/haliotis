@@ -11,6 +11,8 @@ type Props = {
 export default async function TravelDetailPage({ params }: Props) {
   const { slug, locale } = await params;
   const { data, recommended } = await getTravelBySlug(slug, locale);
+console.log(data, 'data');
+console.log(recommended, 'recommended');
 
   const price = parseFloat(data.price[0]?.amount ?? "0");
 
@@ -38,9 +40,9 @@ export default async function TravelDetailPage({ params }: Props) {
   ];
 
   const recommendedTripCards = recommended.travels.map((t: any) => ({
-    locationId: t.divingCenter.slug,
+locationId: t.divingCenter?.slug ?? "",
     images: t.image ? [t.image] : ["/travel.png"],
-    price: parseFloat(t.price[0]?.amount ?? "0"),
+price: parseFloat(t.price?.amount ?? "0"),
     title: t.name,
     description: "",
     link: `/trips/${t.slug}`,
@@ -57,6 +59,7 @@ export default async function TravelDetailPage({ params }: Props) {
         ]}
       />
     <TravelBookingWrapper
+    images={data.gallery.map((g: any) => g.image)}
   title={data.name}
   description={data.summary?.replace(/<[^>]*>/g, "") ?? ""}
   price={price}

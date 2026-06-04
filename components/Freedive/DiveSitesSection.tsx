@@ -349,8 +349,9 @@ const DiveSiteCard = ({ site }: { site: DiveSite }) => {
             >
               {site.description}
             </p>
-            <VideoBlock src={site.videoSrc} isMobile={false} cover={site.videoCover}/>
             </div>
+              <VideoBlock src={site.videoSrc} isMobile={true} cover={site.videoCover} />
+
         </div>
 
         {/* Desktop: всегда раскрыто */}
