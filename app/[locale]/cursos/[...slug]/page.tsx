@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Metadata } from "next";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { CourseDetailClient } from "@/components/CourseDetailClient";
@@ -9,6 +10,7 @@ type Props = {
 
 type CourseData = {
   data: {
+    price: any;
     id: number;
     name: string;
     slug: string;
@@ -163,7 +165,7 @@ export default async function CoursesPage({ params }: Props) {
   }
 
   const { data, recommended, recommendedEquipment } = courseData;
-
+console.log(data, 'data')
   const accordionItems = buildAccordionItems(data).map((item) => ({
     id: item.id,
     label: item.label,
@@ -188,6 +190,8 @@ export default async function CoursesPage({ params }: Props) {
   }));
 
   console.log(data);
+  const price = (data.price as any)?.amount ?? null;
+const currency = (data.price as any)?.currency ?? "€";     
   return (
     <main className="min-h-screen bg-white relative pt-4 md:pt-6">
       <div className="px-4 md:px-8 lg:px-[188px]">
@@ -205,7 +209,8 @@ export default async function CoursesPage({ params }: Props) {
       <CourseDetailClient
         courseTitle={data.name}
         courseDescription={data.description || ""}
-        pricePerPerson={data.price_per_person_eur || 0}
+        pricePerPerson={price || 0}
+        currency={currency}
         courseImage={data.image || "/Rectangle 8.png"}
         courseImageAlt={data.name}
         accordionItems={accordionItems}

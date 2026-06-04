@@ -42,6 +42,7 @@ type Props = {
   accordionItems: AccordionItem[];
   recommendedCourses: RecommendedCourse[];
   recommendedEquipment: RecommendedEquipment;
+  currency: string
 };
 
 export const CourseDetailClient = ({
@@ -53,7 +54,8 @@ export const CourseDetailClient = ({
   accordionItems,
   recommendedCourses,
   recommendedEquipment,
-}: Props) => {
+  currency
+    }: Props) => {
   const [isBookingOpen, setIsBookingOpen] = useState(false);
 
   return (
@@ -62,6 +64,7 @@ export const CourseDetailClient = ({
         title={courseTitle}
         description={courseDescription}
         price={pricePerPerson}
+        currency={currency}
         image={courseImage}
         imageAlt={courseImageAlt}
         onBookClick={() => setIsBookingOpen(true)}

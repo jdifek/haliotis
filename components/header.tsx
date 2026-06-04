@@ -519,7 +519,7 @@ const [isCartOpen, setIsCartOpen] = useState(false);
     label: item.label,
     hasDropdown: (item.children?.length ?? 0) > 0,
     dropdownType: (item.children?.length ?? 0) > 0 ? "dropdown" : null, // просто флаг, что это дропдаун
-    href: item.url ?? `/${item.slug || ""}`,
+href: item.url ?? `/${locale}/${item.slug || ""}`,
     children: item.children,
     rawItem: item, // передаём оригинальный item, чтобы внутри дропдауна можно было смотреть на структуру
   }));
@@ -583,8 +583,7 @@ const [isCartOpen, setIsCartOpen] = useState(false);
   const langButtonRef = useRef<HTMLButtonElement>(null);
   const [langButtonWidth, setLangButtonWidth] = useState<number | null>(null);
 
-  const handleToMain = () => router.push("/");
-
+const handleToMain = () => router.push(`/${locale}`);
   const switchLocale = (newLocale: string) => {
     const pathWithoutLocale =
       pathname.replace(new RegExp(`^/${locale}`), "") || "/";

@@ -103,6 +103,7 @@ async function fetchCourses(params: {
   const data: CoursesApiResponse = await res.json();
 
   console.log("[fetchCourses] data", {
+    data: data,
     total: data.meta?.total,
     currentPage: data.meta?.current_page,
     lastPage: data.meta?.last_page,
@@ -114,15 +115,7 @@ async function fetchCourses(params: {
   return data;
 }
 
-function formatPrice(price: unknown[]): number | null {
-  if (!price || price.length === 0) return null;
-  const first = price[0] as { amount?: number; value?: number } | number | null;
-  if (first == null) return null;
-  if (typeof first === "number") return first;
-  return first.amount ?? first.value ?? null;
-}
 
-// ← ДОБАВЛЕН ПРОПС
 type CoursesProps = {
   initialCenterSlug?: string;
 };
@@ -475,8 +468,8 @@ const Courses = ({ initialCenterSlug }: CoursesProps) => {
             ) : (
               <div className="grid grid-cols-2 gap-2 sm:gap-4 max-[1500px]:grid-cols-2 min-[1220px]:grid-cols-3 min-[1500px]:grid-cols-4">
                 {courses.map((course) => {
-                  const price = formatPrice(course.price);
-                  return (
+const price = (course.price as any)?.amount ?? null;
+const currency = (course.price as any)?.currency ?? "€";                  return (
                     <CourseCard
                           centerSlug={activeCenter?.slug}  // ← ДОБАВИТЬ
 
@@ -485,6 +478,7 @@ const Courses = ({ initialCenterSlug }: CoursesProps) => {
                       image={course.image ?? "/Rectangle 8.png"}
                       title={course.name}
                       price={price ?? 0}
+                      currency={currency}
                       duration={course.duration_label}
                       requestBased={price === null}
                       badge={course.label?.name}
