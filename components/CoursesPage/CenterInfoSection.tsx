@@ -333,13 +333,14 @@ export const CenterInfoSection = ({ tabs }: Props) => {
                     openHistoryId === item.id ? "block" : "hidden"
                   } md:block flex flex-col gap-4`}
                 >
-                  <Image
-                    src={item.image_path}
-                    alt={item.title ?? ""}
-                    width={757}
-                    height={435}
-                    className="w-full h-[200px] md:h-[435px] rounded-2xl"
-                  />
+                 <div className="relative w-full h-[200px] md:h-[435px] overflow-hidden rounded-2xl">
+  <Image
+    src={item.image_path}
+    alt={item.title ?? ""}
+    fill
+    className="object-cover"
+  />
+</div>
                   <button
                     onClick={() =>
                       setOpenHistoryId(

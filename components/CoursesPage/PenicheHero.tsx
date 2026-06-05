@@ -25,15 +25,15 @@ export const PenicheHero = ({ center }: Props) => {
         ]}
       />
 
-      <div className="mx-auto max-w-[1920px] px-4 md:px-8 lg:px-[188px]">
+      <div className=" mx-auto max-w-[1920px] px-4 md:px-8 lg:px-[188px] md:py-18.25 !bg-[#f5f5f5] py-8">
         {/* Desktop: 3 columns layout */}
         <div
           className="
       hidden
-      lg:grid
-      lg:grid-cols-[140px_1fr_1fr]
-      lg:auto-rows-[442px]
-      lg:gap-6
+      min-[1440px]:grid
+      min-[1440px]:grid-cols-[140px_1fr_1fr]
+      min-[1440px]:auto-rows-[442px]
+      min-[1440px]:gap-6
       min-[1920px]:grid-cols-[140px_732px_1fr]
     "
         >
@@ -297,13 +297,13 @@ export const PenicheHero = ({ center }: Props) => {
             At md (768px–1023px) we use a 2-column grid inside cards
             to prevent the overlap bug at ~853px
         ===================================================== */}
-        <div className="flex flex-col gap-6 lg:hidden">
+        <div className="flex flex-col gap-6 min-[1440px]:hidden">
 
           {/* Card 1: Logo + Title/Text + Image
               Mobile: stacked vertically
               Tablet (md): 3-column grid [80px logo | text | image]
           */}
-          <div className="overflow-hidden rounded-[20px] bg-white min-[1024px]:grid min-[1024px]:grid-cols-[80px_1fr_280px] min-[1024px]:h-[360px]">
+          <div className="overflow-hidden rounded-[20px] bg-white md:grid md:grid-cols-[80px_1fr_280px] md:h-[360px]">
 
             {/* Orange logo bar */}
             <div className="flex items-center justify-center h-[60px] sm:h-[80px] md:h-full bg-[#f49519] px-4">
