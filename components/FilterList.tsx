@@ -11,9 +11,9 @@ type FilterListProps = {
   selected: string;
   onSelect: (id: string) => void;
   maxWidth?: string;
-  activeTabId?: string; // цвет берётся от таба, а не от самой опции
+  activeTabId?: string;
+  defaultSelectedBg?: string;
 };
-
 const COLOR_MAP: Record<string, { bg: string; text: string; arrow: string }> = {
   sesimbra: { bg: "#a0c52e", text: "#ffffff", arrow: "#ffffff" },
   "cape-verde": { bg: "#7acbe2", text: "#000000", arrow: "#000000" },
@@ -31,7 +31,9 @@ export const FilterList: React.FC<FilterListProps> = ({
   onSelect,
   maxWidth = "282px",
   activeTabId,
-}) => {
+    defaultSelectedBg,
+
+  }) => {
   const getColors = (option: FilterOption) => {
     // activeTabId всегда приоритетнее option.color
     if (activeTabId && COLOR_MAP[activeTabId]) {
@@ -53,10 +55,16 @@ export const FilterList: React.FC<FilterListProps> = ({
           <button
             key={option.id}
             onClick={() => onSelect(option.id)}
-            className={`flex items-center cursor-pointer justify-between rounded-lg px-3.5 py-2.5 transition-colors h-[38px] ${
-              isSelected ? "" : "bg-white hover:bg-gray-50"
-            }`}
-            style={isSelected ? { backgroundColor: colors.bg } : undefined}
+           className={`flex items-center cursor-pointer justify-between rounded-lg px-3.5 py-2.5 transition-colors h-[38px] ${
+  !defaultSelectedBg && !isSelected
+    ? "bg-white hover:bg-gray-50"
+    : ""
+}`}
+style={{
+  backgroundColor: isSelected
+    ? colors.bg
+    : defaultSelectedBg || undefined,
+}}
           >
             <span
               className={`text-start uppercase leading-[120%] ${

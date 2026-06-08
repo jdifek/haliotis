@@ -120,6 +120,8 @@ export const CoursesSection: React.FC<Props> = ({ locations, courseCards }) => {
                   <FilterList
                     options={locations}
                     selected={selectedLocation}
+                      defaultSelectedBg="#f1f1f1"
+
                     onSelect={handleLocationSelect}
                   />
                 </div>
@@ -138,6 +140,8 @@ export const CoursesSection: React.FC<Props> = ({ locations, courseCards }) => {
           {/* Desktop FilterList */}
           <div className="hidden lg:block">
             <FilterList
+                                  defaultSelectedBg="#f1f1f1"
+
               options={locations}
               selected={selectedLocation}
               onSelect={setSelectedLocation}
