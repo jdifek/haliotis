@@ -653,6 +653,7 @@ export default function CartPage() {
             )}
           </div>
 
+
           {/* Right: order summary */}
           <div className="w-full lg:w-[360px] flex-shrink-0">
             <OrderSummary
