@@ -513,13 +513,17 @@ const [isCartOpen, setIsCartOpen] = useState(false);
     () => pathname.split("/").filter(Boolean)[0] ?? ""
   );
   const [isScrolled, setIsScrolled] = useState(false);
-
+const router = useRouter();
+const localizeUrl = (url: string) => {
+  if (/^\/[a-z]{2}(\/|$)/.test(url)) return url;
+  return `/${locale}${url}`;
+}; 
   const navItems = (menuData?.data.main ?? []).map((item) => ({
     id: item.slug ?? item.label.toLowerCase().replace(/\s+/g, "-"),
     label: item.label,
     hasDropdown: (item.children?.length ?? 0) > 0,
     dropdownType: (item.children?.length ?? 0) > 0 ? "dropdown" : null, // просто флаг, что это дропдаун
-href: item.url ?? `/${locale}/${item.slug || ""}`,
+href: localizeUrl(item.url ?? `/${item.slug || ""}`),
     children: item.children,
     rawItem: item, // передаём оригинальный item, чтобы внутри дропдауна можно было смотреть на структуру
   }));
@@ -545,7 +549,7 @@ href: item.url ?? `/${locale}/${item.slug || ""}`,
         label: c.name.toUpperCase(),
         color: c.color,
         image: c.center_icon_url ?? "",
-        url: metaBySlug[c.slug]?.url ?? `/centros/${c.slug}`,
+url: localizeUrl(metaBySlug[c.slug]?.url ?? `/centros/${c.slug}`),
         new_tab: metaBySlug[c.slug]?.new_tab ?? false,
       }));
   })();
@@ -565,7 +569,7 @@ href: item.url ?? `/${locale}/${item.slug || ""}`,
     id: course.slug ?? course.label.toLowerCase().replace(/\s+/g, "-"),
     label: course.label,
     image: course.img_url ?? "",
-    url: course.url ?? "/cursos",
+url: localizeUrl(course.url ?? "/cursos"),
     new_tab: course.new_tab ?? false,
   }));
   useEffect(() => {
@@ -579,8 +583,7 @@ href: item.url ?? `/${locale}/${item.slug || ""}`,
   const dropdownRef = useRef<HTMLDivElement>(null);
   const coursesRef = useRef<HTMLDivElement>(null);
   const langRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
-  const langButtonRef = useRef<HTMLButtonElement>(null);
+ const langButtonRef = useRef<HTMLButtonElement>(null);
   const [langButtonWidth, setLangButtonWidth] = useState<number | null>(null);
 
 const handleToMain = () => router.push(`/${locale}`);

@@ -1,5 +1,6 @@
 import { ButtonWithIcon } from "@/components/buttons/ButtonWithIcon";
 import { HeroBanner } from "@/components/HeroBanner";
+import { headers } from "next/headers";
 
 async function getNotFoundData(locale = "pt") {
   const res = await fetch(
@@ -11,8 +12,11 @@ async function getNotFoundData(locale = "pt") {
 }
 
 export async function generateMetadata() {
-  const data = await getNotFoundData();
+  const headersList = await headers();
+  const pathname = headersList.get("x-pathname") ?? headersList.get("x-invoke-path") ?? "/pt";
+  const locale = pathname.split("/")[1] || "pt";
   
+  const data = await getNotFoundData(locale);
   return {
     title: data.title,
     description: data.seo?.meta_description,
@@ -21,8 +25,11 @@ export async function generateMetadata() {
 }
 
 export default async function NotFound() {
-  const data = await getNotFoundData();
-  
+  const headersList = await headers();
+  const pathname = headersList.get("x-pathname") ?? headersList.get("x-invoke-path") ?? "/pt";
+  const locale = pathname.split("/")[1] || "pt";
+
+  const data = await getNotFoundData(locale);
 
   const slides = (data.banner?.slides ?? []).map((slide: {
     desktop_image_url: string;
