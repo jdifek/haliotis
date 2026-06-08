@@ -949,24 +949,26 @@ const handleToMain = () => router.push(`/${locale}`);
 
       {/* Buttons */}
       <div className="flex items-center gap-3 px-5 py-4">
-        <button
-          style={{
-            border: '1px solid #534580',
-            borderRadius: 1000,
-            padding: '2px 16px',
-            width: 226,
-            height: 48,
-            background: '#1f1443',
-            fontFamily: 'var(--font-family)',
-            fontWeight: 700,
-            fontSize: 15,
-            lineHeight: '120%',
-            color: '#cfcfcf',
-            cursor: 'pointer',
-          }}
-        >
-          View cart
-        </button>
+        <Link href="/cart">
+          <button
+            style={{
+              border: '1px solid #534580',
+              borderRadius: 1000,
+              padding: '2px 16px',
+              width: 226,
+              height: 48,
+              background: '#1f1443',
+              fontFamily: 'var(--font-family)',
+              fontWeight: 700,
+              fontSize: 15,
+              lineHeight: '120%',
+              color: '#cfcfcf',
+              cursor: 'pointer',
+            }}
+          >
+            View cart
+          </button>
+        </Link>
         <button
           style={{
             borderRadius: 1000,

@@ -798,10 +798,12 @@ const ParticipantBlock = ({
           </div>
 
           {/* Desktop Swiper */}
-          <div className="hidden 3xl:block relative px-16 mt-4">
+<div className="hidden 3xl:block relative px-16 mt-4 overflow-hidden"> {/* ← overflow-hidden тут */}
             <Swiper
               modules={[Navigation]}
               spaceBetween={12}
+    className="equipment-swiper"   // ← добавь это
+
               slidesPerView="auto"
               loop={true}
               onSwiper={(swiper) => {

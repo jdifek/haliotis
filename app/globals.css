@@ -45,3 +45,13 @@ body {
 img {
   object-fit: cover;
 }
+.equipment-swiper {
+  padding-top: 16px !important;
+  padding-left: 8px !important;
+  overflow: visible !important;  /* ← разрешаем вылезать */
+}
+
+/* Но обрезаем по внешнему контейнеру */
+.equipment-swiper-wrapper {
+  overflow: hidden;
+}
