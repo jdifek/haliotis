@@ -1,9 +1,20 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import "swiper/css";
+
+// ─── Portal helper ────────────────────────────────────────────────────────────
+// Renders children into document.body to escape any overflow:hidden parent
+
+const Portal = ({ children }) => {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+  if (!mounted) return null;
+  return createPortal(children, document.body);
+};
 
 // ─── Types & Data ─────────────────────────────────────────────────────────────
 
@@ -143,6 +154,22 @@ const ShieldIcon = () => (
 
 const CustomDropdown = ({ label, value, onChange, options, unit, icon }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [pos, setPos] = useState({ top: 0, left: 0, width: 0 });
+  const triggerRef = useRef(null);
+
+  const open = () => {
+    if (triggerRef.current) {
+      const r = triggerRef.current.getBoundingClientRect();
+      setPos({ top: r.bottom + window.scrollY + 4, left: r.left + window.scrollX, width: r.width });
+    }
+    setIsOpen(true);
+  };
+
+  useEffect(() => {
+    const handler = (e) => { if (triggerRef.current && !triggerRef.current.contains(e.target)) setIsOpen(false); };
+    if (isOpen) document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [isOpen]);
 
   const renderLabel = () => {
     if (label.includes("*")) {
@@ -153,11 +180,9 @@ const CustomDropdown = ({ label, value, onChange, options, unit, icon }) => {
   };
 
   return (
-    <div className="relative">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center justify-between gap-2 ${icon ? "pl-8" : "pl-3"} pr-3 py-2 rounded-[10px] border border-[#d9d9d9] bg-white text-[15px] w-full outline-none cursor-pointer relative`}
-      >
+    <div className="relative" ref={triggerRef}>
+      <button onClick={() => isOpen ? setIsOpen(false) : open()}
+        className={`flex items-center justify-between gap-2 ${icon ? "pl-8" : "pl-3"} pr-3 py-2 rounded-[10px] border border-[#d9d9d9] bg-white text-[15px] w-full outline-none cursor-pointer relative`}>
         {icon && <span className="absolute left-3 top-1/2 -translate-y-1/2">{icon}</span>}
         <span className="text-[#111]">{value || renderLabel()}</span>
         <div className="flex items-center gap-2">
@@ -166,9 +191,9 @@ const CustomDropdown = ({ label, value, onChange, options, unit, icon }) => {
         </div>
       </button>
       {isOpen && (
-        <>
-          <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
-          <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-[#d9d9d9] rounded-[10px] shadow-lg max-h-48 overflow-y-auto" style={{ zIndex: 9999 }}>
+        <Portal>
+          <div style={{ position: "absolute", top: pos.top, left: pos.left, width: pos.width, zIndex: 99999 }}
+            className="bg-white border border-[#d9d9d9] rounded-[10px] shadow-xl max-h-48 overflow-y-auto">
             {options.map((option) => (
               <button key={option} onClick={() => { onChange(option); setIsOpen(false); }}
                 className={`w-full px-3 py-2 text-left text-[15px] hover:bg-[#f5f5f5] cursor-pointer ${value === option ? "bg-[#f7e4de] text-[#e84814]" : "text-[#111]"}`}>
@@ -176,7 +201,7 @@ const CustomDropdown = ({ label, value, onChange, options, unit, icon }) => {
               </button>
             ))}
           </div>
-        </>
+        </Portal>
       )}
     </div>
   );
@@ -302,7 +327,16 @@ const MiniCalendar = ({ selected, onSelect, onClose, allowPast = false }) => {
 
 const DatePickerField = ({ value, onChange, placeholder, allowPast = false }) => {
   const [open, setOpen] = useState(false);
+  const [pos, setPos] = useState({ top: 0, left: 0, width: 0 });
   const ref = useRef(null);
+
+  const openPicker = () => {
+    if (ref.current) {
+      const r = ref.current.getBoundingClientRect();
+      setPos({ top: r.bottom + window.scrollY + 4, left: r.left + window.scrollX, width: Math.max(r.width, 300) });
+    }
+    setOpen(true);
+  };
 
   useEffect(() => {
     const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
@@ -321,7 +355,7 @@ const DatePickerField = ({ value, onChange, placeholder, allowPast = false }) =>
 
   return (
     <div className="relative" ref={ref}>
-      <button onClick={() => setOpen(v => !v)}
+      <button onClick={() => open ? setOpen(false) : openPicker()}
         className="flex items-center justify-between px-3 py-2 rounded-[10px] border border-[#d9d9d9] bg-white text-[15px] w-full cursor-pointer transition-colors focus:outline-none focus:border-[#e84814]">
         {value
           ? <span className="text-[#111]">{formatDisplay(value)}</span>
@@ -330,9 +364,11 @@ const DatePickerField = ({ value, onChange, placeholder, allowPast = false }) =>
         <CalendarFieldIcon />
       </button>
       {open && (
-        <div className="absolute top-full left-0 right-0 mt-1 shadow-xl rounded-2xl" style={{ minWidth: 280, zIndex: 9999 }}>
-          <MiniCalendar selected={value} onSelect={onChange} onClose={() => setOpen(false)} allowPast={allowPast} />
-        </div>
+        <Portal>
+          <div style={{ position: "absolute", top: pos.top, left: pos.left, width: pos.width, zIndex: 99999 }}>
+            <MiniCalendar selected={value} onSelect={(v) => { onChange(v); setOpen(false); }} onClose={() => setOpen(false)} allowPast={allowPast} />
+          </div>
+        </Portal>
       )}
     </div>
   );

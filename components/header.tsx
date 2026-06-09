@@ -689,7 +689,7 @@ const handleToMain = () => router.push(`/${locale}`);
 
   return (
     <>
-     <header className="sticky top-0 z-50">
+     <header className="sticky top-0 z-[100000]">
   {/* Фон на уровне header */}
   {(!isTransparentInitially || isScrolled) && (
     <div className="absolute inset-0 bg-[#281d4d] -z-10" />
