@@ -19,50 +19,33 @@ type Card = {
   href: string;
 };
 
-const mockCards: Card[] = [
-  {
-    title: "Learn to Dive with PADI",
-    description:
-      "From your first breath underwater to advanced certifications — our instructors guide you every step of the way.",
-    image: "/travel.png",
-    tag: "COURSES",
-    href: "/courses",
-  },
-  {
-    title: "Dive Into the Unknown",
-    description:
-      "Join our guided dive trips to the most breathtaking underwater sites across the world.",
-    image: "/travel.png",
-    tag: "TRIPS",
-    href: "/trips",
-  },
-  {
-    title: "Plan Your Dive Adventure",
-    description:
-      "We help you combine diving with travel experiences across the best ocean destinations.",
-    image: "/travel.png",
-    tag: "TRAVEL",
-    href: "/travel",
-  },
-];
+type DiveExploreSectionProps = {
+  title: string;
+  subtitle: string;
+  cards: Card[];
+};
 
-export const DiveExploreSection = () => {
+export const DiveExploreSection = ({
+  title,
+  subtitle,
+  cards,
+}: DiveExploreSectionProps) => {
   const swiperRef = useRef<SwiperType | null>(null);
   const [currentSlide, setCurrentSlide] = useState(0);
+
+  if (!cards.length) return null;
 
   return (
     <section className="section">
       {/* Header */}
       <div className="header">
-        <h2 className="text-black">Dive. Learn. Explore.</h2>
-        <p>
-          Courses, dive trips, and travel experiences — find the adventure that&apos;s right for you.
-        </p>
+        <h2 className="text-black">{title}</h2>
+        <p>{subtitle}</p>
       </div>
 
       {/* Desktop Grid (≥1024px) */}
       <div className="desktop-grid">
-        {mockCards.map((card, index) => (
+        {cards.map((card, index) => (
           <CardItem card={card} key={index} />
         ))}
       </div>
@@ -102,7 +85,7 @@ export const DiveExploreSection = () => {
             },
           }}
         >
-          {mockCards.map((card, index) => (
+          {cards.map((card, index) => (
             <SwiperSlide key={index}>
               <CardItem card={card} />
             </SwiperSlide>
@@ -112,7 +95,7 @@ export const DiveExploreSection = () => {
         <div className="controls-row">
           <CarouselControls
             currentSlide={currentSlide}
-            totalSlides={mockCards.length}
+            totalSlides={cards.length}
             onPrev={() => swiperRef.current?.slidePrev()}
             onNext={() => swiperRef.current?.slideNext()}
             theme="dark"
@@ -121,67 +104,67 @@ export const DiveExploreSection = () => {
         </div>
       </div>
 
-   <style jsx>{`
-  .section {
-    width: 100%;
-    background: #f1f1f1;
-    padding: 64px 0;
-  }
+      <style jsx>{`
+        .section {
+          width: 100%;
+          background: #f1f1f1;
+          padding: 64px 0;
+        }
 
-  /* HEADER */
-  .header {
-    text-align: center;
-    margin-bottom: 48px;
-    padding: 0 20px;
-  }
+        /* HEADER */
+        .header {
+          text-align: center;
+          margin-bottom: 48px;
+          padding: 0 20px;
+        }
 
-  .header h2 {
-    font-size: clamp(26px, 3vw, 44px);
-    font-weight: 500;
-    margin: 0;
-  }
+        .header h2 {
+          font-size: clamp(26px, 3vw, 44px);
+          font-weight: 500;
+          margin: 0;
+        }
 
-  .header p {
-    font-size: 15px;
-    margin-top: 10px;
-    max-width: 640px;
-    margin-left: auto;
-    margin-right: auto;
-    color: rgba(0, 0, 0, 0.75);
-  }
+        .header p {
+          font-size: 15px;
+          margin-top: 10px;
+          max-width: 640px;
+          margin-left: auto;
+          margin-right: auto;
+          color: rgba(0, 0, 0, 0.75);
+        }
 
-  /* за замовчуванням — swiper видимий, grid прихований */
-  .desktop-grid {
-    display: none;
-  }
+        /* за замовчуванням — swiper видимий, grid прихований */
+        .desktop-grid {
+          display: none;
+        }
 
-  .swiper-wrapper-outer {
-    display: block;
-    padding: 0 24px;
-  }
+        .swiper-wrapper-outer {
+          display: block;
+          padding: 0 24px;
+        }
 
-  .controls-row {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 20px;
-  }
+        .controls-row {
+          display: flex;
+          justify-content: flex-end;
+          margin-top: 20px;
+        }
 
-  /* DESKTOP — grid видимий, swiper прихований */
-  @media (min-width: 1024px) {
-    .desktop-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
-      width: 100%;
-      box-sizing: border-box;
-      padding: 0 24px;
-    }
+        /* DESKTOP — grid видимий, swiper прихований */
+        @media (min-width: 1024px) {
+          .desktop-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 0 24px;
+          }
 
-    .swiper-wrapper-outer {
-      display: none;
-    }
-  }
-`}</style>
+          .swiper-wrapper-outer {
+            display: none;
+          }
+        }
+      `}</style>
     </section>
   );
 };

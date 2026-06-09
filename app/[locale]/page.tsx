@@ -83,7 +83,6 @@ export default async function Home({ params }: Props) {
     ),
   ];
 
-  // Остальной код остается без изменений...
   const courseCards = (
     homepageData.sliders?.courses?.diving_centers || []
   ).flatMap((center: any) =>
@@ -96,12 +95,12 @@ export default async function Home({ params }: Props) {
       price: course.price?.amount || 0,
       duration: course.duration_label || "On request",
       requestBased: !course.duration_label,
-badge: course.label?.name || "Course",      location: center.slug,
+      badge: course.label?.name || "Course",
+      location: center.slug,
     }))
   );
 
   console.log(courseCards, 'courseCards');
-  
 
   const centerCardsData = (
     homepageData.sliders?.diving_centers?.entities || []
@@ -139,6 +138,7 @@ badge: course.label?.name || "Course",      location: center.slug,
     locationNumber: String(center.id || index + 1),
     description: center.small_description || "",
   }));
+
   console.log(homepageData, "homepageData");
 
   const heroSlides = (homepageData.banner?.slides || [])
@@ -146,8 +146,8 @@ badge: course.label?.name || "Course",      location: center.slug,
     .map((slide: any) => ({
       title: slide.title || "Find the Experience",
       description: slide.description || "The Haliotis Diving Center...",
-      desktopImage: slide.desktop_image_url && slide.desktop_image_url.trim() !== "" 
-        ? slide.desktop_image_url 
+      desktopImage: slide.desktop_image_url && slide.desktop_image_url.trim() !== ""
+        ? slide.desktop_image_url
         : "/bg.png",
       mobileImage: slide.mobile_image_url && slide.mobile_image_url.trim() !== ""
         ? slide.mobile_image_url
@@ -163,10 +163,32 @@ badge: course.label?.name || "Course",      location: center.slug,
       image: brand.image,
     }));
 
+  // promoSliders — берём первый блок (главная секция "Dive. Learn. Explore.")
+  const promoSlider = homepageData.promoSliders?.[0] ?? null;
+
+  const exploreCards = (promoSlider?.slides || [])
+    .sort((a: any, b: any) => (a.position || 0) - (b.position || 0))
+    .map((slide: any) => ({
+      title: slide.title || "",
+      description: slide.description || "",
+      image: slide.image_url || "/travel.png",
+      tag: slide.button_name || "Explore",
+      href: slide.button_url || "/",
+    }));
+
+  const exploreSectionTitle = promoSlider?.title || "Dive. Learn. Explore.";
+  const exploreSectionSubtitle =
+    promoSlider?.subtitle ||
+    "Courses, dive trips, and travel experiences — find the adventure that's right for you.";
+
   return (
     <main className="-mt-[97px]">
       <HeroSection heroSlides={heroSlides} />
-      <DiveExploreSection />
+      <DiveExploreSection
+        title={exploreSectionTitle}
+        subtitle={exploreSectionSubtitle}
+        cards={exploreCards}
+      />
       <CentersSection centerCards={centerCardsData} />
       <CoursesSection locations={locations} courseCards={courseCards} />
       <TripsSection locations={locations} tripCards={tripCards} />
