@@ -135,8 +135,10 @@ export const TripsSection: React.FC<Props> = ({ locations, tripCards }) => {
 
               {/* Dropdown Content */}
               {isDropdownOpen && (
-                <div className="absolute left-0 right-0 top-full z-10 mt-2 rounded-lg bg-white shadow-lg">
+                <div className="absolute left-0 right-0 top-full z-[50] mt-2 rounded-lg bg-white shadow-lg">
                   <FilterList
+                      maxWidth="100%"
+
                     options={locations}
                     selected={selectedLocation}
                     onSelect={handleLocationSelect}

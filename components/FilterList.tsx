@@ -46,7 +46,7 @@ export const FilterList: React.FC<FilterListProps> = ({
   };
 
   return (
-    <div className="flex w-full flex-col gap-2" style={{ maxWidth: maxWidth }}>
+    <div className="z-[9999] flex w-full flex-col gap-2" style={{ maxWidth: maxWidth }}>
       {options.map((option) => {
         const colors = getColors(option);
         const isSelected = option.id === selected;
@@ -55,7 +55,7 @@ export const FilterList: React.FC<FilterListProps> = ({
           <button
             key={option.id}
             onClick={() => onSelect(option.id)}
-           className={`flex items-center cursor-pointer justify-between rounded-lg px-3.5 py-2.5 transition-colors h-[38px] ${
+           className={`flex z-20 items-center cursor-pointer justify-between rounded-lg px-3.5 py-2.5 transition-colors h-[38px] ${
   !defaultSelectedBg && !isSelected
     ? "bg-white hover:bg-gray-50"
     : ""

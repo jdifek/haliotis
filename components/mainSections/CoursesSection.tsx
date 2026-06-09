@@ -121,6 +121,7 @@ export const CoursesSection: React.FC<Props> = ({ locations, courseCards }) => {
                     options={locations}
                     selected={selectedLocation}
                       defaultSelectedBg="#f1f1f1"
+    maxWidth="100%"
 
                     onSelect={handleLocationSelect}
                   />
