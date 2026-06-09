@@ -16,7 +16,7 @@ variables:
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN $CI_REGISTRY
   script:
-    - docker build --build-arg NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL -f Dockerfile -t $TAG_COMMIT -t $TAG_LATEST .
+    - docker build --add-host=$BACKEND_DOMAIN:192.168.0.77 --build-arg NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL -f Dockerfile -t $TAG_COMMIT -t $TAG_LATEST .
     - docker push $TAG_COMMIT
     - docker push $TAG_LATEST
 
