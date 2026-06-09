@@ -182,7 +182,7 @@ console.log(data, 'data')
     title: course.name,
     price: course.price?.[0]?.amount || 0,
     duration: course.duration_label || "3hrs",
-    requestBased: false,
+     requestBased: !course.duration_label,
     badge: course.label?.name || "Course",
     location: "",
     slug: course.slug,

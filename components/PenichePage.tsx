@@ -25,9 +25,9 @@ export default function PenichePage({ center, tabs }: Props) {
       typeof course.price === "object"
         ? `${course.price.amount} ${course.price.currency}`
         : course.price ?? 0,
-    duration: course.duration ?? "",
-    requestBased: course.request_based ?? false,
-    badge: course.badge ?? "",
+      duration: course.duration_label || "On request",
+      requestBased: !course.duration_label,
+   badge: course.label?.name || "Course",
     location: center.slug,
   })) ?? [];
   const tripCards =
