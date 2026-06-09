@@ -37,7 +37,7 @@ export const PaymentMethods = ({ paymentMethods }: Props) => {
 
       {/* Контент - на десктопе всегда видим, на мобилке по клику */}
       <div className={`${isOpen ? "block" : "hidden"} md:block`}>
-        <div className="grid grid-cols-2 gap-[23px] md:flex md:flex-wrap md:gap-[30px]">
+        <div className="grid  grid-cols-2 gap-[23px] md:flex md:flex-wrap md:gap-[30px]">
           {" "}
           {paymentMethods.map((method) => (
             <Card
