@@ -25,9 +25,8 @@ variables:
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN $CI_REGISTRY
   script:
-    - docker stop haliotis && docker rm haliotis || true
-    - docker run -d --env-file ./.env -p 3000:3000 --name haliotis $TAG_COMMIT
-    - docker image prune -f --filter "until=72h"
+    - docker stop haliotis-frontend && docker rm haliotis-frontend || true
+    - docker run -d -p 3000:3000 --name haliotis-frontend $TAG_COMMIT
 
 # ==========================================
 # DEV 
