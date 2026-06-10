@@ -105,8 +105,9 @@ export default async function Home({ params }: Props) {
   const centerCardsData = (
     homepageData.sliders?.diving_centers?.entities || []
   ).map((center: any) => ({
-    image: center.icon_url || "/CTABackgroundImage.png",
+    image: center.icon_url,
     title: center.name,
+    imageFull: center.image_url || "/image 6.png",
     slug: center.slug,
     description: center.small_description || "",
     buttonColor: center.color || "#f49519",

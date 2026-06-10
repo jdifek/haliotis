@@ -8,6 +8,7 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import React, { useState, useRef } from "react";
 import type { Swiper as SwiperType } from "swiper";
+import image from "next/image";
 
 type Props = {
   centerCards: {
@@ -17,6 +18,7 @@ type Props = {
     buttonColor: string;
     slug: string;
     location: string;
+    imageFull: string;
   }[];
 };
 
@@ -69,6 +71,7 @@ export const CentersSection: React.FC<Props> = ({ centerCards }) => {
           {uniqueCards.map((card, index) => (
             <SwiperSlide key={index} className="!h-auto">
               <CenterCard
+              imageFull={card.imageFull}
               className="!max-w-none"
                 image={card.image}
                 slug={card.slug}
@@ -110,7 +113,7 @@ export const CentersSection: React.FC<Props> = ({ centerCards }) => {
                 image={card.image}
                 title={card.title}
                 slug={card.slug}
-
+imageFull={card.imageFull}
                 description={card.description}
                 buttonColor={card.buttonColor}
                 onMoreInfoClick={() => console.log("More info clicked")}
@@ -138,6 +141,7 @@ export const CentersSection: React.FC<Props> = ({ centerCards }) => {
             key={index}
               
             image={card.image}                slug={card.slug}
+            imageFull={card.imageFull}
 
             title={card.title}
             description={card.description}
