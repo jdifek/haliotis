@@ -350,7 +350,6 @@ const DynamicDropdown = ({
                   />
                 </div>
               )}
-            
             </div>
           </button>
         ))}

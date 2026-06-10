@@ -17,6 +17,7 @@ type Props = {
     image: string;
     slug: string;
     title: string;
+    currency: string
     price: number;
     duration: string;
     requestBased: boolean;
@@ -85,7 +86,7 @@ export const SimpleCoursesSection: React.FC<Props> = ({
                 spaceBetween: 15,
               },
               768: {
-                slidesPerView: 3,
+                slidesPerView: 2,
                 slidesPerGroup: 1,
                 spaceBetween: 20,
               },
@@ -114,6 +115,7 @@ export const SimpleCoursesSection: React.FC<Props> = ({
                   image={card.image}
                   title={card.title}
                   price={card.price}
+                  currency={card.currency}
                   duration={card.duration}
                   requestBased={card.requestBased}
                   badge={card.badge}

@@ -14,7 +14,8 @@ export default async function TravelDetailPage({ params }: Props) {
 console.log(data, 'data');
 console.log(recommended, 'recommended');
 
-  const price = parseFloat(data.price[0]?.amount ?? "0");
+  const price = parseFloat(data.price?.amount ?? "0");
+  const currency = data.price?.currency;
 
   const accordionItems = [
     ...(data.information ? [{
@@ -54,7 +55,7 @@ price: parseFloat(t.price?.amount ?? "0"),
         className="mb-6 mx-5 md:mb-8"
         items={[
           { label: "Haliotis", href: "/" },
-          { label: "Travel", href: "/travel" },
+          { label: "Travel", href: "/viagens" },
           { label: data.destination?.name ?? data.name },
         ]}
       />
@@ -66,6 +67,7 @@ price: parseFloat(t.price?.amount ?? "0"),
   image={data.image_url ?? "/travel.png"}
   imageAlt={data.name}
   pricePerPerson={price}
+  currency={currency}
   accordionItems={accordionItems}
 />
       <RecommendedCoursesSection

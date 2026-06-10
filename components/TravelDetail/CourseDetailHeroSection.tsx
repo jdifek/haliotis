@@ -16,6 +16,7 @@ type Props = {
   description: string;
   price: number;
   image: string;
+  currency: string
   imageAlt?: string;
   images: string[]
   onBookClick?: () => void;
@@ -85,6 +86,7 @@ const BookNowButton = ({ onClick }: { onClick?: () => void }) => (
 export const CourseDetailHeroSection: React.FC<Props> = ({
   className,
   title,
+  currency,
   description,
   price,
   image,
@@ -97,6 +99,7 @@ export const CourseDetailHeroSection: React.FC<Props> = ({
   const [openAccordion, setOpenAccordion] = useState<string | null>(
     accordionItems[0]?.id ?? null
   );
+console.log(currency, 'currencycurrency');
 
   const toggleAccordion = (id: string) => {
     setOpenAccordion((prev) => (prev === id ? null : id));
@@ -121,7 +124,12 @@ export const CourseDetailHeroSection: React.FC<Props> = ({
         <div className="mt-6 md:mt-10">
           <div className="flex items-center gap-3 md:justify-start justify-between">
             <div className="flex items-center gap-2 rounded-lg bg-[#f1f1f1] px-3 py-2">
-              <EuroIcon />
+             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="10" cy="10" r="10" fill="black"/>
+ <text x="10" y="14" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+  {currency}
+</text>
+</svg>
               <span className="text-[15px] font-bold leading-[120%] text-black">
                 {price}
               </span>
@@ -184,12 +192,7 @@ export const CourseDetailHeroSection: React.FC<Props> = ({
         {/* ── BOTTOM BOOK NOW ── */}
         <div className="mt-6 md:mt-10">
           <div className="flex items-center gap-3 md:justify-start justify-between">
-            <div className="flex items-center gap-2 rounded-lg bg-[#f1f1f1] px-3 py-2">
-              <EuroIcon />
-              <span className="text-[15px] font-bold leading-[120%] text-black">
-                {price}
-              </span>
-            </div>
+           
             <BookNowButton onClick={onBookClick} />
           </div>
         </div>
