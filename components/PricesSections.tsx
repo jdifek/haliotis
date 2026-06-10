@@ -204,6 +204,7 @@ export default function PricesSection() {
 
   const activeCenter = divingCenters.find((c) => c.slug === activeTabId) ?? null;
   const { data: pricesData, loading } = usePrices(activeCenter?.id ?? null, locale);
+console.log(pricesData, 'pricesData');
 
   const tabs = divingCenters.map((c) => ({ id: c.slug, label: c.name, color: c.color }));
 
@@ -244,7 +245,7 @@ export default function PricesSection() {
         />
       </section>
 
-      <section className="relative overflow-hidden bg-[#f1f1f1] px-4 pb-12 pt-8 md:px-[30px] lg:px-[188px] md:pb-[50px] md:pt-[46px]">
+      <section className="relative overflow-hidden bg-[#f1f1f1] px-4 pb-12 pt-8 md:px-[30px] xl:px-[188px] md:pb-[50px] md:pt-[46px]">
         {/* Mobile tab selector */}
         <div className="md:hidden mb-4 flex flex-col gap-2">
           <button
@@ -306,7 +307,7 @@ export default function PricesSection() {
         {loading ? (
           <>
             {/* Desktop skeleton */}
-            <div className="hidden lg:flex gap-20 items-start">
+            <div className="hidden xl:flex gap-20 items-start">
               <div className="flex flex-col gap-2" style={{ width: "395px", flexShrink: 0 }}>
                 {Array.from({ length: 6 }).map((_, i) => (
                   <div key={i} className="animate-pulse rounded-[10px] bg-white" style={{ height: "40px", opacity: 1 - i * 0.1 }} />
@@ -323,7 +324,7 @@ export default function PricesSection() {
             </div>
 
             {/* Mobile skeleton */}
-            <div className="flex flex-col gap-2 lg:hidden">
+            <div className="flex flex-col gap-2 xl:hidden">
               <div className="animate-pulse rounded-[10px] bg-white h-[42px]" />
               <div className="animate-pulse rounded-[24px] bg-white h-[28px] w-1/2 mt-2" />
               <div className="flex flex-col gap-2 mt-1">
@@ -336,7 +337,7 @@ export default function PricesSection() {
         ) : (
           <div className="relative z-10">
             {/* Mobile: stacked */}
-            <div className="flex flex-col gap-4 lg:hidden">
+            <div className="flex flex-col gap-4 xl:hidden">
               <FilterList
                 options={filterOptions}
                 selected={selectedCategoryId ?? ""}
@@ -360,7 +361,7 @@ export default function PricesSection() {
             </div>
 
             {/* Desktop: side by side */}
-            <div className="hidden lg:flex justify-center w-full">
+            <div className="hidden xl:flex justify-center w-full">
               <div className="flex gap-20 items-start">
                 <div className="w-[395px] flex-shrink-0">
                   <FilterList
@@ -371,10 +372,10 @@ export default function PricesSection() {
                     activeTabId={activeTabId ?? ""}
                   />
                 </div>
-                <div className="relative w-[757px] flex-shrink-0">
+                <div className="relative xl:w-[757px] flex-shrink-0">
                   {fish && (
                     <div
-                      className="hidden lg:block absolute pointer-events-none select-none"
+                      className="hidden xl:block absolute pointer-events-none select-none"
                       style={{ zIndex: 0, right: "-285px", top: "-20px", opacity: 0.6 }}
                     >
                       {fish}
@@ -447,11 +448,11 @@ function SpecializedMaintenanceSection({
     .sort((a, b) => a.position - b.position);
 
   return (
-    <section className="bg-[#eaeaea] px-4 pb-12 pt-8 md:px-[30px] lg:px-[188px] md:pb-[50px] md:pt-[46px]">
+    <section className="bg-[#eaeaea] px-4 pb-12 pt-8 md:px-[30px] xl:px-[188px] md:pb-[50px] md:pt-[46px]">
       {/* Title + description — same centering as desktop columns */}
-      <div className="mb-6 lg:mb-8">
+      <div className="mb-6 xl:mb-8">
         {/* Mobile: plain */}
-        <div className="lg:hidden">
+        <div className="xl:hidden">
           <h2 style={{ fontFamily: "var(--font-family)", fontWeight: 500, fontSize: "clamp(28px, 3vw, 42px)", lineHeight: "130%", color: "#000", marginBottom: "12px" }}>
             {pricesData?.page.specialized_maintenance.title ?? "Specialized Maintenance Services"}
           </h2>
@@ -460,7 +461,7 @@ function SpecializedMaintenanceSection({
           </p>
         </div>
         {/* Desktop: mirrors the flex justify-center layout of the columns below */}
-        <div className="hidden lg:flex gap-20 justify-center">
+        <div className="hidden xl:flex gap-20 justify-center">
           <div className="w-[calc(395px+80px+757px)] flex-shrink-0">
             <h2 style={{ fontFamily: "var(--font-family)", fontWeight: 500, fontSize: "clamp(28px, 3vw, 42px)", lineHeight: "130%", color: "#000", marginBottom: "12px" }}>
               {pricesData?.page.specialized_maintenance.title ?? "Specialized Maintenance Services"}
@@ -473,7 +474,7 @@ function SpecializedMaintenanceSection({
       </div>
 
       {/* Mobile */}
-      <div className="flex flex-col gap-4 lg:hidden">
+      <div className="flex flex-col gap-4 xl:hidden">
         <FilterList
           options={maintenanceFilterOptions}
           maxWidth="395px"
@@ -497,7 +498,7 @@ function SpecializedMaintenanceSection({
       </div>
 
       {/* Desktop */}
-      <div className="hidden lg:flex gap-20 items-start justify-center">
+      <div className="hidden xl:flex gap-20 items-start justify-center">
         <div className="w-[395px] flex-shrink-0">
           <FilterList
             options={maintenanceFilterOptions}
@@ -513,7 +514,7 @@ function SpecializedMaintenanceSection({
             borderRadius: "24px",
             padding: "10px 15px",
           }}
-          className="w-[757px] flex-shrink-0"
+          className="xl:w-[757px] flex-shrink-0"
         >
           <h3
             className="mb-3"
@@ -563,10 +564,9 @@ function FillsSection({ pricesData }: { pricesData: PricesData | null }) {
   };
 
   return (
-    <section className="bg-white px-4 pb-12 pt-8 md:px-[30px] lg:px-[188px] md:pb-[50px] md:pt-[46px]">
-      <div className="flex flex-col lg:flex-row gap-8 lg:gap-20 items-start justify-center">
-        {/* Left: text */}
-        <div className="w-full lg:w-[395px] lg:flex-shrink-0">
+    <section className="bg-white px-4 pb-12 pt-8 md:px-[30px] xl:px-[188px] md:pb-[50px] md:pt-[46px]">
+      <div className="flex flex-col xl:flex-row gap-8 xl:gap-20 items-start justify-center">
+  <div className="w-full xl:w-[395px] xl:flex-shrink-0">
           <h2
             style={{
               fontFamily: "var(--font-family)",
@@ -603,7 +603,7 @@ function FillsSection({ pricesData }: { pricesData: PricesData | null }) {
             padding: "8px",
             boxShadow: "0 0 35px 0 rgba(0,0,0,0.25)",
           }}
-          className="w-full lg:w-[757px] lg:flex-shrink-0"
+          className="w-full xl:w-[757px] xl:flex-shrink-0"
         >
           {/* Header */}
           <div
@@ -702,22 +702,36 @@ function FillsSection({ pricesData }: { pricesData: PricesData | null }) {
       {/* Partners */}
       <div className="mt-10">
         <div className="rounded-[30px] p-4 md:p-8">
-          <div className="grid grid-cols-3 gap-x-4 gap-y-4 md:flex md:flex-nowrap md:items-center md:justify-between">
-            {[
-              "cressi-71", "dan-79", "lightmotion-66", "mares-15", "oms-28",
-              "padi-44", "x", "poseidon-08", "razor-logo-22", "retra-98",
-              "scubapro-06", "shearwater-59", "sitech-34", "tusa-86",
-            ].map((name) => (
-              <div key={name} className="flex items-center justify-center">
-                <img
-                  src={`/${name}.png`}
-                  alt={name.replace(/-/g, " ")}
-                  className="h-6 object-contain md:h-8"
-                  loading="lazy"
-                />
-              </div>
-            ))}
-          </div>
+         <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-4">
+  {[
+    "cressi-71",
+    "dan-79",
+    "lightmotion-66",
+    "mares-15",
+    "oms-28",
+    "padi-44",
+    "x",
+    "poseidon-08",
+    "razor-logo-22",
+    "retra-98",
+    "scubapro-06",
+    "shearwater-59",
+    "sitech-34",
+    "tusa-86",
+  ].map((name) => (
+    <div
+      key={name}
+      className="flex items-center justify-center flex-shrink-0"
+    >
+      <img
+        src={`/${name}.png`}
+        alt={name.replace(/-/g, " ")}
+        className="h-6 object-contain md:h-8"
+        loading="lazy"
+      />
+    </div>
+  ))}
+</div>
         </div>
       </div>
     </section>
