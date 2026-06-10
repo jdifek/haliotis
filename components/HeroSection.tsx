@@ -23,7 +23,7 @@ export const HeroSection: React.FC<Props> = ({ heroSlides }) => {
   const heroSwiperRef = useRef<SwiperType | null>(null);
 
   return (
-    <section className="relative h-[930px] w-full pt-[97px]">
+    <section className="relative h-[678px] w-full pt-[97px]">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <Swiper
