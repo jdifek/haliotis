@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { createTermGetter } from "@/app/utils/terms";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { RecommendedCoursesSection } from "@/components/TravelDetail/RecommendedCoursesSection";
 import { TravelBookingWrapper } from "@/components/TravelDetail/TravelBookingWrapper";
@@ -7,12 +8,33 @@ import { getTravelBySlug } from "@/services/travels";
 type Props = {
   params: Promise<{ slug: string; locale: string }>;
 };
+async function getTerms(locale: string) {
+  try {
+    const res = await fetch(`https://cp.haliotis.space/api/v1/configs/menus?lang=${locale}`);
+console.log(res, 'resres');
+
+    if (!res.ok) {
+      return {}; // возвращаем пустой объект если ошибка
+    }
+
+    const data = await res.json();
+    console.log(data,'aaaaaa');
+    
+    return data?.terms || {};
+  } catch (error) {
+    console.error("Error fetching terms:", error);
+    return {};
+  }
+}
 
 export default async function TravelDetailPage({ params }: Props) {
   const { slug, locale } = await params;
   const { data, recommended } = await getTravelBySlug(slug, locale);
 console.log(data, 'data');
 console.log(recommended, 'recommended');
+const terms = await getTerms(locale);
+
+console.log(terms, 'terms');
 
   const price = parseFloat(data.price?.amount ?? "0");
   const currency = data.price?.currency;
@@ -20,11 +42,21 @@ console.log(recommended, 'recommended');
   const accordionItems = [
     ...(data.information ? [{
       id: "information",
-      label: "Information",
+      label: terms.information,
       content: (
         <div
           className="text-[15px] font-normal leading-[160%] text-[#101010] opacity-80"
           dangerouslySetInnerHTML={{ __html: data.information }}
+        />
+      ),
+    }] : []),
+    ...(data.other_information?.body ? [{
+      id: "other_information",
+      label: terms.other_information,
+      content: (
+        <div
+          className="text-[15px] font-normal leading-[160%] text-[#101010] opacity-80"
+          dangerouslySetInnerHTML={{ __html: data.other_information.body }}
         />
       ),
     }] : []),

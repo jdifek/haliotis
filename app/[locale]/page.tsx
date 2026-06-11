@@ -12,14 +12,14 @@ import { DiveExploreSection } from "@/components/mainSections/DiveExploreSection
 // Функция для получения terms напрямую (для Server Component)
 async function getTerms(locale: string) {
   try {
-    const res = await fetch(`https://cp.haliotis.space/api/v1/menu/${locale}`);
+    const res = await fetch(`https://cp.haliotis.space/api/v1/configs/menus?lang=${locale}`);
 
     if (!res.ok) {
       return {}; // возвращаем пустой объект если ошибка
     }
 
     const data = await res.json();
-    return data.data?.terms || {};
+    return data?.terms || {};
   } catch (error) {
     console.error("Error fetching terms:", error);
     return {};
