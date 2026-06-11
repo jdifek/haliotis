@@ -117,7 +117,7 @@ export default async function Home({ params }: Props) {
   const tripCards = (homepageData.sliders?.dive_trip?.entities || []).flatMap(
     (center: any) =>
       (center.dive_trips || []).map((trip: any) => ({
-        image: center.icon_url || "/image 6.png",
+        image: center.image_url || "/image 6.png",
         price: parseFloat(trip.price?.amount || 0),
         title: trip.name,
         description: trip.description || center.small_description || "",
@@ -133,7 +133,7 @@ export default async function Home({ params }: Props) {
   const diveTripsCards = (
     homepageData.sliders?.diving_centers?.entities || []
   ).map((center: any, index: number) => ({
-    image: center.icon_url || "/CTABackgroundImage.png",
+    image: center.image_url || "/CTABackgroundImage.png",
     location: center.name,
     slug: center.slug,
     locationNumber: String(center.id || index + 1),
