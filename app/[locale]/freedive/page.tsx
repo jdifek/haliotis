@@ -279,7 +279,7 @@ const Diving = ({ params }: { params: Promise<{ locale: string }> }) => {
               const rowStartIndex = rowIndex * colCount;
               return (
                 <div key={`${activeTab}-${currentPage}-row-${rowIndex}`}>
-                  <div className="grid max-[700px]:grid-cols-1 max-[1500px]:grid-cols-2 min-[1500px]:grid-cols-3 gap-5">
+                  <div className="grid max-[700px]:grid-cols-1 max-[1670px]:grid-cols-2 min-[1670px]:grid-cols-3 gap-5">
                     {row.map((card, colIndex) => {
                       const globalIndex = rowStartIndex + colIndex;
                       return (
