@@ -171,6 +171,7 @@ export default async function Home({ params }: Props) {
     .sort((a: any, b: any) => (a.position || 0) - (b.position || 0))
     .map((slide: any) => ({
       title: slide.title || "",
+      button_name: slide.button_name || "",
       description: slide.description || "",
       image: slide.image_url || "/travel.png",
       tag: slide.button_name || "Explore",
