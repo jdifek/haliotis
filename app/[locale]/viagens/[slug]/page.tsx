@@ -112,11 +112,14 @@ price: parseFloat(t.price?.amount ?? "0"),
   currency={currency}
   accordionItems={accordionItems}
 />
+{recommendedTripCards > 0 &&  (
+
       <RecommendedCoursesSection
         title={recommended.headers.title}
         description={recommended.headers.description}
         courseCards={recommendedTripCards}
       />
+) }
     </main>
   );
 }
