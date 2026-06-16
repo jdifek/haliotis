@@ -97,7 +97,7 @@ price: parseFloat(t.price?.amount ?? "0"),
         className="mb-6 mx-5 md:mb-8"
         items={[
           { label: "Haliotis", href: "/" },
-          { label: "Travel", href: "/viagens" },
+          { label: "Viagens", href: "/viagens" },
           { label: data.destination?.name ?? data.name },
         ]}
       />

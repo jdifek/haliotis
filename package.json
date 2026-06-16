@@ -10,12 +10,10 @@
   },
   "dependencies": {
     "@fancyapps/ui": "^6.1.14",
-    "leaflet": "^1.9.4",
     "next": "16.1.5",
     "next-intl": "^4.8.3",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "react-leaflet": "^5.0.0",
     "swiper": "^12.1.0"
   },
   "devDependencies": {
@@ -26,6 +24,8 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.1.5",
+    "leaflet": "^1.9.4",
+    "react-leaflet": "^5.0.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

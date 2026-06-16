@@ -71,3 +71,10 @@ img {
 .custom-scroll::-webkit-scrollbar-thumb:hover {
   background: #9ca3af !important;
 }
+.leaflet-container {
+  z-index: 0;
+}
+.custom-dive-marker {
+  background: transparent !important;
+  border: none !important;
+}

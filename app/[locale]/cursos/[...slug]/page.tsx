@@ -191,7 +191,7 @@ console.log(data, 'data')
     duration: course.duration_label || "3hrs",
      requestBased: !course.duration_label,
     badge: course.label?.name || "Course",
-    location: "",
+    location: course.centers[0].slug,
     slug: course.slug,
     centerSlug: centerSlug,
   }));
