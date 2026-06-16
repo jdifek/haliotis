@@ -560,7 +560,7 @@ function FillsSection({ pricesData }: { pricesData: PricesData | null }) {
   }, [fieldValues, pricesData?.services]);
 
   const updateField = (serviceId: number, val: string) => {
-    setFieldValues((prev) => ({ ...prev, [serviceId]: Number(val) }));
+    setFieldValues((prev) => ({ ...prev, [serviceId]: val === "" ? undefined : Number(val) }));
   };
 
   return (
@@ -645,11 +645,26 @@ function FillsSection({ pricesData }: { pricesData: PricesData | null }) {
                       {field.name}
                     </span>
                     <input
-                      type="number"
-                      value={fieldValues[field.id] ?? 0}
-                      onChange={(e) => updateField(field.id, e.target.value)}
-                      style={{ width: "100px", height: "24px", textAlign: "right", fontFamily: "var(--font-family)", fontSize: "15px", color: "#111", background: "transparent", outline: "none", border: "none" }}
-                    />
+  type="number"
+  min="0"
+  step="0.01"
+  value={fieldValues[field.id] === undefined || fieldValues[field.id] === null ? "" : fieldValues[field.id]}
+  onChange={(e) => {
+    const val = e.target.value;
+    if (val === "") {
+      updateField(field.id, "");
+    } else if (parseFloat(val) >= 0) {
+      updateField(field.id, val);
+    }
+  }}
+  onBlur={(e) => {
+    if (e.target.value === "") {
+      updateField(field.id, "");
+    }
+  }}
+  placeholder="0"
+  style={{ width: "100px", height: "24px", textAlign: "right", fontFamily: "var(--font-family)", fontSize: "15px", color: "#111", background: "transparent", outline: "none", border: "none" }}
+/>
                   </div>
                 ))}
               </div>
