@@ -40,6 +40,16 @@ console.log(data, 'datadatadata');
   const currency = data.price?.currency;
 
   const accordionItems = [
+    ...(data.summary ? [{
+      id: "summary",
+      label: terms.summary,
+      content: (
+        <div
+          className="text-[15px] font-normal leading-[160%] text-[#101010] opacity-80"
+          dangerouslySetInnerHTML={{ __html: data.summary }}
+        />
+      ),
+    }] : []),
     ...(data.information ? [{
       id: "information",
       label: terms.information,
@@ -94,7 +104,7 @@ price: parseFloat(t.price?.amount ?? "0"),
     <TravelBookingWrapper
     images={data.gallery.map((g: any) => g.image)}
   title={data.name}
-  description={data.summary?.replace(/<[^>]*>/g, "") ?? ""}
+  description={data.description?.replace(/<[^>]*>/g, "") ?? ""}
   price={price}
   image={data.image_url ?? "/travel.png"}
   imageAlt={data.name}

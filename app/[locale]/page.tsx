@@ -213,8 +213,7 @@ export default async function Home({ params }: Props) {
         locations={locations}
         courseCards={courseCards}
       />
-     
-                
+
       <TripsSection
         filter_name={homepageData.sliders?.courses?.filter_name}
         title={homepageData.sliders?.courses?.title}
@@ -223,6 +222,7 @@ export default async function Home({ params }: Props) {
         tripCards={tripCards}
       />
       <DiveTrips
+      locale={locale}
         diveTripsTitile={homepageData.sliders?.travels?.title}
         diveTripsCards={diveTripsCards}
         equipmentData={{

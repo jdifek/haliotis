@@ -196,7 +196,8 @@ console.log(data, 'data')
     centerSlug: centerSlug,
   }));
 
-  console.log(data);
+  console.log(data.description, 'data.description');
+  console.log(data, 'data.description');
   const price = (data.price as any)?.amount ?? null;
 const currency = (data.price as any)?.currency ?? "€";     
   return (

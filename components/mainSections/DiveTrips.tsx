@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -8,10 +9,12 @@ import "swiper/css/pagination";
 import { useState, useRef } from "react";
 import type { Swiper as SwiperType } from "swiper";
 import { ButtonWithIcon } from "../buttons/ButtonWithIcon";
+import { useMenu } from "@/app/hooks/useMenu";
+import { createTermGetter } from "@/app/utils/terms";
 
 type Props = {
   diveTripsTitile: string;
-
+  locale: string;
   diveTripsCards: {
     image: string;
     slug: string;
@@ -36,9 +39,12 @@ export const DiveTrips: React.FC<Props> = ({
   diveTripsCards,
   diveTripsTitile,
   equipmentData,
+  locale
 }) => {
   const [diveTripsCurrentSlide, setDiveTripsCurrentSlide] = useState(0);
   const diveTripswiperRef = useRef<SwiperType | null>(null);
+  const { terms } = useMenu(locale);
+  console.log(terms, 'ttt');
 
   return (
     <section className="bg-[#ffff] px-4 pt-6 pb-12 md:px-[30px] md:pb-[77px]">
@@ -162,7 +168,7 @@ export const DiveTrips: React.FC<Props> = ({
               <ButtonWithIcon
                 href={`/centros/${diveTripsCards[diveTripsCurrentSlide].slug}`}
                 width="164px"
-                label="Find More"
+                label={terms.find_more || 'Find More'}
                 textColor="text-black"
                 className="flex items-center gap-2 rounded-full bg-white px-4 py-2.5 text-sm transition-all hover:bg-gray-200 "
                 icon={

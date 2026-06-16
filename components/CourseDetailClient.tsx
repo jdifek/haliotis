@@ -61,6 +61,7 @@ export const CourseDetailClient = ({
   currency
     }: Props) => {
   const [isBookingOpen, setIsBookingOpen] = useState(false);
+console.log(courseDescription, 'courseDescriptioncourseDescription');
 
   return (
     <>
