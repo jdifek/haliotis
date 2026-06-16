@@ -12,7 +12,9 @@ import { DiveExploreSection } from "@/components/mainSections/DiveExploreSection
 // Функция для получения terms напрямую (для Server Component)
 async function getTerms(locale: string) {
   try {
-    const res = await fetch(`https://cp.haliotis.space/api/v1/configs/menus?lang=${locale}`);
+    const res = await fetch(
+      `https://cp.haliotis.space/api/v1/configs/menus?lang=${locale}`
+    );
 
     if (!res.ok) {
       return {}; // возвращаем пустой объект если ошибка
@@ -28,7 +30,9 @@ async function getTerms(locale: string) {
 
 async function getHomepageData(lang: string) {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/pages/homepage?lang=${lang}`);
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/pages/homepage?lang=${lang}`
+    );
 
     if (!res.ok) {
       throw new Error("Failed to fetch homepage data");
@@ -100,7 +104,7 @@ export default async function Home({ params }: Props) {
     }))
   );
 
-  console.log(courseCards, 'courseCards');
+  console.log(courseCards, "courseCards");
 
   const centerCardsData = (
     homepageData.sliders?.diving_centers?.entities || []
@@ -130,29 +134,34 @@ export default async function Home({ params }: Props) {
       }))
   );
 
-  const diveTripsCards = (
-    homepageData.sliders?.diving_centers?.entities || []
-  ).map((center: any, index: number) => ({
-    image: center.image_url || "/CTABackgroundImage.png",
-    location: center.name,
-    slug: center.slug,
-    locationNumber: String(center.id || index + 1),
-    description: center.small_description || "",
-  }));
+  const diveTripsCards = (homepageData.sliders?.travels?.entities || []).map(
+    (center: any, index: number) => ({
+      image: center.image_url || "/CTABackgroundImage.png",
+      location: center.name,
+      slug: center.slug,
+      locationNumber: String(center.divingCenter.id || index + 1),
+      description: center.description || "",
+    })
+  );
 
   console.log(homepageData, "homepageData");
 
   const heroSlides = (homepageData.banner?.slides || [])
-    .filter((slide: any) => slide && (slide.desktop_image_url || slide.mobile_image_url))
+    .filter(
+      (slide: any) =>
+        slide && (slide.desktop_image_url || slide.mobile_image_url)
+    )
     .map((slide: any) => ({
       title: slide.title || "Find the Experience",
       description: slide.description || "The Haliotis Diving Center...",
-      desktopImage: slide.desktop_image_url && slide.desktop_image_url.trim() !== ""
-        ? slide.desktop_image_url
-        : "/bg.png",
-      mobileImage: slide.mobile_image_url && slide.mobile_image_url.trim() !== ""
-        ? slide.mobile_image_url
-        : "/bg.png",
+      desktopImage:
+        slide.desktop_image_url && slide.desktop_image_url.trim() !== ""
+          ? slide.desktop_image_url
+          : "/bg.png",
+      mobileImage:
+        slide.mobile_image_url && slide.mobile_image_url.trim() !== ""
+          ? slide.mobile_image_url
+          : "/bg.png",
     }));
 
   console.log(heroSlides, "heroSlides");
@@ -191,10 +200,30 @@ export default async function Home({ params }: Props) {
         subtitle={exploreSectionSubtitle}
         cards={exploreCards}
       />
-      <CentersSection centerCards={centerCardsData} />
-      <CoursesSection locations={locations} courseCards={courseCards} />
-      <TripsSection locations={locations} tripCards={tripCards} />
+      <CentersSection
+        title={homepageData.sliders?.diving_centers?.title}
+        subtitle={homepageData.sliders?.diving_centers?.subtitle}
+        filter_name={homepageData.sliders?.diving_centers?.filter_name}
+        centerCards={centerCardsData}
+      />
+      <CoursesSection
+        filter_name={homepageData.sliders?.dive_trip?.filter_name}
+        title={homepageData.sliders?.dive_trip?.title}
+        subtitle={homepageData.sliders?.dive_trip?.subtitle}
+        locations={locations}
+        courseCards={courseCards}
+      />
+     
+                
+      <TripsSection
+        filter_name={homepageData.sliders?.courses?.filter_name}
+        title={homepageData.sliders?.courses?.title}
+        subtitle={homepageData.sliders?.courses?.subtitle}
+        locations={locations}
+        tripCards={tripCards}
+      />
       <DiveTrips
+        diveTripsTitile={homepageData.sliders?.travels?.title}
         diveTripsCards={diveTripsCards}
         equipmentData={{
           title:
@@ -203,6 +232,14 @@ export default async function Home({ params }: Props) {
           subtitle:
             homepageData.sliders?.equipment?.subtitle ||
             "Discover premium equipment at unbeatable prices — limited-time deals for divers.",
+          label_name:
+            homepageData.sliders?.equipment?.label_name || "Equipment",
+          online_shop_title:
+            homepageData.sliders?.equipment?.online_shop_title ||
+            "Visit our Online Shop",
+          online_shop_link:
+            homepageData.sliders?.equipment?.online_shop_link ||
+            "https://shop.haliotis.pt/",
           partners: partners,
         }}
       />

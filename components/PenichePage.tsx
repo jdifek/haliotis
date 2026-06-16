@@ -51,14 +51,20 @@ export default function PenichePage({ center, tabs }: Props) {
       <PenicheHero center={center} />
       <SimpleTripsSection className="!bg-white py-8" tripCards={tripCards} />
       <SimpleCoursesSection
-        className="!bg-[#f1f1f1]"
-        courseCards={courseCards}
+      className="!bg-[#f1f1f1]"
+      courseCards={courseCards}
       />{" "}
       <CenterInfoSection tabs={tabs} />
       <Parceiros partners={center.partners} />
       <div className="md:hidden mx-4 h-px border border-[#e4e4e4] mt-10" />
-      <PaymentMethods paymentMethods={center.payment_methods} />
+      <PaymentMethods paymentMethods={Array.isArray(center.payment_methods) ? center.payment_methods : []} />
+      {Array.isArray(center.legal_supports) ? (
       <LegalInfo legalSupports={center.legal_supports} />
+      ) : (
+      <div className="text-red-500 text-center mt-4">
+        Legal supports data is unavailable.
+      </div>
+      )}
     </div>
   );
 }

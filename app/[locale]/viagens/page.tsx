@@ -65,7 +65,7 @@ export default async function Travel({ params }: Props) {
         : [trip.image || "/travel.png"],
     price: parseFloat(trip.price.amount),
     title: trip.name,
-description: trip.summary ? trip.summary.replace(/<[^>]*>/g, "") : "",
+description: trip.description ? trip.description.replace(/<[^>]*>/g, "") : "",
     link: `/viagens/${trip.slug || trip.id}`,
   }));
   

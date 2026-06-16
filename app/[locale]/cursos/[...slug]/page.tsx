@@ -177,10 +177,17 @@ console.log(data, 'data')
     ),
   }));
 
+  console.log(recommended, 
+    'recommended'
+  );
+  const recommendedHeader = recommended.headers;
+
+  
   const recommendedCourseCards = recommended.courses.map((course) => ({
     image: course.image_url || "/Rectangle 8.png",
     title: course.name,
-    price: course.price?.[0]?.amount || 0,
+    price: course.price?.amount || 0,
+    currency: course.price?.currency || 0,
     duration: course.duration_label || "3hrs",
      requestBased: !course.duration_label,
     badge: course.label?.name || "Course",
@@ -211,6 +218,7 @@ const currency = (data.price as any)?.currency ?? "€";
         courseDescription={data.description || ""}
         pricePerPerson={price || 0}
         currency={currency}
+        recommendedHeader={recommendedHeader}
         courseImage={data.image || "/Rectangle 8.png"}
         courseImageAlt={data.name}
         accordionItems={accordionItems}

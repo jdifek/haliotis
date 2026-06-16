@@ -10,6 +10,8 @@ import type { Swiper as SwiperType } from "swiper";
 import { ButtonWithIcon } from "../buttons/ButtonWithIcon";
 
 type Props = {
+  diveTripsTitile: string;
+
   diveTripsCards: {
     image: string;
     slug: string;
@@ -19,6 +21,9 @@ type Props = {
   }[];
   equipmentData: {
     title: string;
+    online_shop_title: string;
+    label_name: string;
+    online_shop_link: string;
     subtitle: string;
     partners: {
       name: string;
@@ -27,14 +32,17 @@ type Props = {
   };
 };
 
-export const DiveTrips: React.FC<Props> = ({ diveTripsCards, equipmentData }) => {
+export const DiveTrips: React.FC<Props> = ({
+  diveTripsCards,
+  diveTripsTitile,
+  equipmentData,
+}) => {
   const [diveTripsCurrentSlide, setDiveTripsCurrentSlide] = useState(0);
   const diveTripswiperRef = useRef<SwiperType | null>(null);
 
   return (
     <section className="bg-[#ffff] px-4 pt-6 pb-12 md:px-[30px] md:pb-[77px]">
       <div className="flex flex-col gap-[20px] lg:flex-row lg:gap-[30px]">
-        {/* Upcoming Dive Trips Card */}
         <div
           className="relative h-[558px] md:h-[720px] overflow-hidden lg:flex-[2]"
           style={{
@@ -82,7 +90,7 @@ export const DiveTrips: React.FC<Props> = ({ diveTripsCards, equipmentData }) =>
                   lineHeight: "140%",
                 }}
               >
-                Upcoming Dive Trips
+                {diveTripsTitile}
               </p>
             </div>
 
@@ -152,8 +160,7 @@ export const DiveTrips: React.FC<Props> = ({ diveTripsCards, equipmentData }) =>
               </p>
 
               <ButtonWithIcon
-        href={`/centros/${diveTripsCards[diveTripsCurrentSlide].slug}`}
-
+                href={`/centros/${diveTripsCards[diveTripsCurrentSlide].slug}`}
                 width="164px"
                 label="Find More"
                 textColor="text-black"
@@ -270,7 +277,7 @@ export const DiveTrips: React.FC<Props> = ({ diveTripsCards, equipmentData }) =>
                   lineHeight: "140%",
                 }}
               >
-                Equipment
+                {equipmentData.label_name}
               </p>
             </div>
 
@@ -314,9 +321,9 @@ export const DiveTrips: React.FC<Props> = ({ diveTripsCards, equipmentData }) =>
 
               <div className="flex justify-center mt-auto">
                 <ButtonWithIcon
-                href="https://shop.haliotis.pt/"
-                  width="237px"
-                  label="Visit our Online Shop"
+                  href={equipmentData.online_shop_link}
+                  width="!w-fit "
+                  label={equipmentData.online_shop_title}
                   textColor="text-black"
                   className="flex items-center gap-3 rounded-full bg-white px-6 py-3 transition-all hover:bg-gray-100"
                   icon={

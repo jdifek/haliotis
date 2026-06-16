@@ -34,6 +34,7 @@ console.log(recommended, 'recommended');
 const terms = await getTerms(locale);
 
 console.log(terms, 'terms');
+console.log(data, 'datadatadata');
 
   const price = parseFloat(data.price?.amount ?? "0");
   const currency = data.price?.currency;

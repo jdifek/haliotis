@@ -1,16 +1,18 @@
-'use client'
+"use client";
 import { CenterCard } from "../CenterCard";
 import { CarouselControls } from "../CarouselControls";
 import { Swiper, SwiperSlide } from "swiper/react";
-import {  Pagination } from "swiper/modules";
+import { Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import React, { useState, useRef } from "react";
 import type { Swiper as SwiperType } from "swiper";
-import image from "next/image";
 
 type Props = {
+  title: string;
+  filter_name: string;
+  subtitle: string;
   centerCards: {
     image: string;
     title: string;
@@ -22,7 +24,12 @@ type Props = {
   }[];
 };
 
-export const CentersSection: React.FC<Props> = ({ centerCards }) => {
+export const CentersSection: React.FC<Props> = ({
+  centerCards,
+  title,
+  subtitle,
+  filter_name
+}) => {
   const mobileRef = useRef<SwiperType | null>(null);
   const tabletRef = useRef<SwiperType | null>(null);
   const [mobileSlide, setMobileSlide] = useState(0);
@@ -42,17 +49,32 @@ export const CentersSection: React.FC<Props> = ({ centerCards }) => {
           className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full p-1.5"
           style={{ backgroundColor: "#e84814" }}
         >
-          <svg width="9" height="9" viewBox="0 0 9 9" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-full w-full">
-            <path d="M4.16705 0.69458V7.63902M6.62228 1.71157L1.71181 6.62203M7.63927 4.1668H0.694824M6.62228 6.62203L1.71181 1.71157" stroke="#0C0C0C" strokeWidth="0.833333" strokeLinecap="round" strokeLinejoin="round" />
+          <svg
+            width="9"
+            height="9"
+            viewBox="0 0 9 9"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-full w-full"
+          >
+            <path
+              d="M4.16705 0.69458V7.63902M6.62228 1.71157L1.71181 6.62203M7.63927 4.1668H0.694824M6.62228 6.62203L1.71181 1.71157"
+              stroke="#0C0C0C"
+              strokeWidth="0.833333"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
         </div>
         <div className="flex flex-col gap-[10px]">
-          <h2 className="text-[24px] font-medium leading-[140%] text-black">CENTERS</h2>
+          <h2 className="text-[24px] font-medium leading-[140%] text-black">
+            {filter_name}
+          </h2>
           <p className="text-[28px] font-medium leading-[130%] text-black sm:text-[36px] lg:text-[clamp(32px,2.5vw,42px)]">
-            Discover Where We Dive
+            {title}
           </p>
           <p className="text-[15px] font-normal leading-[160%] text-black opacity-80">
-            From crystal-clear waters to hidden reefs — choose your next dive.
+          {subtitle}
           </p>
         </div>
       </div>
@@ -64,15 +86,17 @@ export const CentersSection: React.FC<Props> = ({ centerCards }) => {
           spaceBetween={16}
           slidesPerView={1}
           loop={uniqueCards.length > 1}
-          onSwiper={(swiper) => { mobileRef.current = swiper; }}
+          onSwiper={(swiper) => {
+            mobileRef.current = swiper;
+          }}
           onSlideChange={(swiper) => setMobileSlide(swiper.realIndex)}
           pagination={{ type: "progressbar", el: ".centers-progress-mobile" }}
         >
           {uniqueCards.map((card, index) => (
             <SwiperSlide key={index} className="!h-auto">
               <CenterCard
-              imageFull={card.imageFull}
-              className="!max-w-none"
+                imageFull={card.imageFull}
+                className="!max-w-none"
                 image={card.image}
                 slug={card.slug}
                 title={card.title}
@@ -102,18 +126,20 @@ export const CentersSection: React.FC<Props> = ({ centerCards }) => {
           spaceBetween={20}
           slidesPerView={2}
           loop={uniqueCards.length > 2}
-          onSwiper={(swiper) => { tabletRef.current = swiper; }}
+          onSwiper={(swiper) => {
+            tabletRef.current = swiper;
+          }}
           onSlideChange={(swiper) => setTabletSlide(swiper.realIndex)}
           pagination={{ type: "progressbar", el: ".centers-progress-tablet" }}
         >
           {uniqueCards.map((card, index) => (
             <SwiperSlide key={index} className="!h-auto">
               <CenterCard
-              className="!max-w-none"
+                className="!max-w-none"
                 image={card.image}
                 title={card.title}
                 slug={card.slug}
-imageFull={card.imageFull}
+                imageFull={card.imageFull}
                 description={card.description}
                 buttonColor={card.buttonColor}
                 onMoreInfoClick={() => console.log("More info clicked")}
@@ -137,12 +163,11 @@ imageFull={card.imageFull}
       <div className="hidden lg:grid lg:grid-cols-3 lg:gap-5">
         {uniqueCards.map((card, index) => (
           <CenterCard
-           className="!max-w-none "
+            className="!max-w-none "
             key={index}
-              
-            image={card.image}                slug={card.slug}
+            image={card.image}
+            slug={card.slug}
             imageFull={card.imageFull}
-
             title={card.title}
             description={card.description}
             buttonColor={card.buttonColor}
