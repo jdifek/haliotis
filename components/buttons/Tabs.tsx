@@ -111,7 +111,7 @@ export const Tabs: React.FC<TabsProps> = ({
       </div>
 
       {/* ── Mobile dropdown ── */}
-      <div className="md:hidden">
+      <div className="hidden">
         <button
           onClick={() => setIsOpen((v) => !v)}
           className="flex w-full items-center justify-between rounded-[10px] px-3 py-2 h-[42px] bg-white border"

@@ -88,10 +88,10 @@ async function fetchCourses(params: {
     params,
   });
 
-  const res = await fetch(url.toString(), {
-    headers: { Accept: "application/json" },
-  });
-
+const res = await fetch(url.toString(), {
+  headers: { Accept: "application/json" },
+  cache: "no-store",
+});
   console.log("[fetchCourses] ←", {
     status: res.status,
     ok: res.ok,
@@ -266,9 +266,15 @@ const Courses = ({ initialCenterSlug }: CoursesProps) => {
 
   return (
     <main className="-mt-[97px]">
-      <HeroSection
+  <HeroSection
         centerName={centerData?.center_name}
-        description={centerData?.small_description || undefined}
+        title={selectedCategoryData?.banner?.slides?.[0]?.title ?? undefined}
+        description={
+          selectedCategoryData?.banner?.slides?.[0]?.description ??
+          centerData?.small_description ??
+          undefined
+        }
+        bannerImage={selectedCategoryData?.banner?.slides?.[0]?.desktop_image_url ?? undefined}
       />
 
       <section className="hidden min-[930px]:flex h-[95px] bg-white justify-center items-end">
@@ -371,6 +377,9 @@ const Courses = ({ initialCenterSlug }: CoursesProps) => {
               <span className="text-[16px] font-semibold leading-[160%] text-[#111]">
                 {selectedCategoryName}
               </span>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M3.75 7C3.75 6.80109 3.82902 6.61032 3.96967 6.46967C4.11032 6.32902 4.30109 6.25 4.5 6.25H19.5C19.6989 6.25 19.8897 6.32902 20.0303 6.46967C20.171 6.61032 20.25 6.80109 20.25 7C20.25 7.19891 20.171 7.38968 20.0303 7.53033C19.8897 7.67098 19.6989 7.75 19.5 7.75H4.5C4.30109 7.75 4.11032 7.67098 3.96967 7.53033C3.82902 7.38968 3.75 7.19891 3.75 7ZM6.25 12C6.25 11.8011 6.32902 11.6103 6.46967 11.4697C6.61032 11.329 6.80109 11.25 7 11.25H17C17.1989 11.25 17.3897 11.329 17.5303 11.4697C17.671 11.6103 17.75 11.8011 17.75 12C17.75 12.1989 17.671 12.3897 17.5303 12.5303C17.3897 12.671 17.1989 12.75 17 12.75H7C6.80109 12.75 6.61032 12.671 6.46967 12.5303C6.32902 12.3897 6.25 12.1989 6.25 12ZM9.25 17C9.25 16.8011 9.32902 16.6103 9.46967 16.4697C9.61032 16.329 9.80109 16.25 10 16.25H14C14.1989 16.25 14.3897 16.329 14.5303 16.4697C14.671 16.6103 14.75 16.8011 14.75 17C14.75 17.1989 14.671 17.3897 14.5303 17.5303C14.3897 17.671 14.1989 17.75 14 17.75H10C9.80109 17.75 9.61032 17.671 9.46967 17.5303C9.32902 17.3897 9.25 17.1989 9.25 17Z" fill="#E84814" />
+</svg>
             </button>
           </div>
 
@@ -408,30 +417,44 @@ const Courses = ({ initialCenterSlug }: CoursesProps) => {
                     </button>
 
                     {categories.map((category) => {
-                      const isSelected = category.id === selectedCategoryId;
-                      return (
-                        <button
-                          key={category.id}
-                          onClick={() => {
-                            handleCategoryChange(category.id);
-                            setIsCategoryOpen(false);
-                          }}
-                          className={`flex items-center cursor-pointer justify-between rounded-[10px] px-3 py-2 h-[40px] border-2 ${
-                            isSelected
-                              ? "bg-[#e84814] border-[#e84814]"
-                              : "bg-white border-[#d9d9d9]"
-                          }`}
-                        >
-                          <span
-                            className={`text-[16px] font-normal leading-[140%] text-center ${
-                              isSelected ? "text-white" : "text-[#111]"
-                            }`}
-                          >
-                            {category.name}
-                          </span>
-                        </button>
-                      );
-                    })}
+  const isSelected = category.id === selectedCategoryId;
+  return (
+    <button
+      key={category.id}
+      onClick={() => {
+        handleCategoryChange(category.id);
+        setIsCategoryOpen(false);
+      }}
+      className={`flex items-center cursor-pointer justify-between rounded-[10px] px-3 py-2 h-[40px] border-2 ${
+        isSelected
+          ? "bg-[#e84814] border-[#e84814]"
+          : "bg-white border-[#d9d9d9]"
+      }`}
+    >
+      <span
+        className={`text-[16px] font-normal leading-[140%] text-center ${
+          isSelected ? "text-white" : "text-[#111]"
+        }`}
+      >
+        {category.name}
+      </span>
+      {isSelected && (
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          className="flex-shrink-0"
+        >
+          <path
+            d="M9.85369 17.8534L14.8534 12.8537C14.8999 12.8073 14.9367 12.7522 14.9619 12.6915C14.9871 12.6308 15 12.5657 15 12.5C15 12.4343 14.9871 12.3692 14.9619 12.3085C14.9367 12.2478 14.8999 12.1927 14.8534 12.1463L9.85369 7.14663C9.78377 7.07663 9.69465 7.02895 9.59761 7.00963C9.50058 6.9903 9.39999 7.00021 9.30858 7.03808C9.21718 7.07595 9.13907 7.1401 9.08413 7.22239C9.0292 7.30468 8.99992 7.40142 9 7.50036V17.4996C8.99992 17.5986 9.0292 17.6953 9.08413 17.7776C9.13907 17.8599 9.21718 17.924 9.30858 17.9619C9.39999 17.9998 9.50058 18.0097 9.59761 17.9904C9.69465 17.971 9.78377 17.9234 9.85369 17.8534Z"
+            fill="white"
+          />
+        </svg>
+      )}
+    </button>
+  );
+})}
                   </div>
                 </div>
               </div>
