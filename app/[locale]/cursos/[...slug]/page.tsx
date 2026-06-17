@@ -79,7 +79,7 @@ async function getCourseData(
 ): Promise<CourseData | null> {
   try {
     const response = await fetch(
-      `https://cp.haliotis.space/api/v1/courses/${slug}?lang=${locale}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/courses/${slug}?lang=${locale}`,
       {
         headers: { Accept: "application/json" },
         next: { revalidate: 3600 },

@@ -9,7 +9,7 @@ type Props = {
 };
 async function getTerms(locale: string) {
   try {
-    const res = await fetch(`https://cp.haliotis.space/api/v1/configs/menus?lang=${locale}`);
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/configs/menus?lang=${locale}`);
 console.log(res, 'resres');
 
     if (!res.ok) {

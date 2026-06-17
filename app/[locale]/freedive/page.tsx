@@ -99,7 +99,7 @@ const Diving = ({ params }: { params: Promise<{ locale: string }> }) => {
     setFreediveData(null);
 
     fetch(
-      `https://cp.haliotis.space/api/v1/diving-category/freedive?center_id=${activeCenter.id}&lang=${locale}&attach_regions=true`,
+      `${process.env.NEXT_PUBLIC_API_URL}/diving-category/freedive?center_id=${activeCenter.id}&lang=${locale}&attach_regions=true`,
       { headers: { Accept: "application/json" } }
     )
       .then((r) => r.json())

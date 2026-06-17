@@ -70,7 +70,7 @@ async function fetchCourses(params: {
   page: number;
   attachCategory?: boolean;
 }): Promise<CoursesApiResponse> {
-  const url = new URL("https://cp.haliotis.space/api/v1/courses");
+  const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/courses`);
   url.searchParams.set("center", String(params.centerId));
   url.searchParams.set("page", String(params.page));
   url.searchParams.set("per_page", "12");

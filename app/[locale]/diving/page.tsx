@@ -126,7 +126,7 @@ const Diving = () => {
     setDivingData(null);
 
     fetch(
-      `https://cp.haliotis.space/api/v1/diving-category/diving?center_id=${activeCenter.id}&lang=${locale}&attach_regions=true`,
+      `${process.env.NEXT_PUBLIC_API_URL}/diving-category/diving?center_id=${activeCenter.id}&lang=${locale}&attach_regions=true`,
       { headers: { Accept: "application/json" } }
     )
       .then((r) => r.json())

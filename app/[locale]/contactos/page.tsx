@@ -80,7 +80,7 @@ interface ContactsPageData {
 async function getMenu(locale: string): Promise<MenuResponse> {
   try {
     const res = await fetch(
-      `https://cp.haliotis.space/api/v1/configs/menus?lang=${locale}`
+      `${process.env.NEXT_PUBLIC_API_URL}/configs/menus?lang=${locale}`
     );
 
     if (!res.ok) {
@@ -126,7 +126,7 @@ export default async function Contacts({
   const { locale } = await params;
 
   const [pageRes, menu] = await Promise.all([
-    fetch(`https://cp.haliotis.space/api/v1/pages/system/contact_us?lang=${locale}`),
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/pages/system/contact_us?lang=${locale}`),
     getMenu(locale),
   ]);
   console.log(menu, 'menumenu');

@@ -13,7 +13,7 @@ import { DiveExploreSection } from "@/components/mainSections/DiveExploreSection
 async function getTerms(locale: string) {
   try {
     const res = await fetch(
-      `https://cp.haliotis.space/api/v1/configs/menus?lang=${locale}`
+      `${process.env.NEXT_PUBLIC_API_URL}/configs/menus?lang=${locale}`
     );
 
     if (!res.ok) {

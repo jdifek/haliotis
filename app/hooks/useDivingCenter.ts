@@ -61,7 +61,7 @@ export function useDivingCenter(slug: string | null, locale: string) {
       setError(null);
 
       try {
-        const url = new URL(`https://cp.haliotis.space/api/v1/diving-centers/${slug}`);
+        const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/diving-centers/${slug}`);
         url.searchParams.set('lang', locale.substring(0, 2));
 
         const res = await fetch(url.toString(), {
