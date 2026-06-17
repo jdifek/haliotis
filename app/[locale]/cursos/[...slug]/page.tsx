@@ -113,13 +113,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   // /courses/center → slug = ['center']          → показываем список
   // /courses/center/course → slug = ['center', 'course'] → показываем курс
-  if (slug.length < 2) {
-    return { title: "Courses", description: "Diving courses" };
-  }
+ if (slug.length < 3) {
+  return { title: "Courses", description: "Diving courses" };
+}
 
-  const courseSlug = slug[1];
-  const courseData = await getCourseData(courseSlug, locale);
-
+const courseSlug = slug[2]; // было slug[1]
+const courseData = await getCourseData(courseSlug, locale);
   if (courseData) {
     return {
       title: courseData.data.name,
@@ -149,21 +148,32 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function CoursesPage({ params }: Props) {
   const { locale, slug } = await params;
 
-  // /courses/center-slug → slug = ['center-slug']
-  if (slug.length === 1) {
-    return <Courses initialCenterSlug={slug[0]} />;
-  }
+ if (slug.length === 1) {
+  return <Courses initialCenterSlug={slug[0]} />;
+}
 
-  // /courses/center-slug/course-slug → slug = ['center-slug', 'course-slug']
-  const centerSlug = slug[0];
-  const courseSlug = slug[1];
+// теперь категория первая
+if (slug.length === 2) {
+  return (
+    <Courses initialCategorySlug={slug[0]} initialCenterSlug={slug[1]} />
+  );
+}
+
+const categorySlugRaw = slug[0]; // было slug[1]
+const centerSlug = slug[1];      // было slug[0]
+const courseSlug = slug[2];      // не изменился
+
+// "all" — сентинел "без категории", чтобы курс без категории
+// всё равно попадал в детальную (3-сегментную) ветку
+const categorySlug = categorySlugRaw === "all" ? undefined : categorySlugRaw;
+
   const courseData = await getCourseData(courseSlug, locale);
 
   if (!courseData) {
-    // Курс не найден — показываем список центра
-    return <Courses initialCenterSlug={centerSlug} />;
+    return (
+      <Courses initialCenterSlug={centerSlug} initialCategorySlug={categorySlug} />
+    );
   }
-
   const { data, recommended, recommendedEquipment } = courseData;
 console.log(data, 'data')
   const accordionItems = buildAccordionItems(data).map((item) => ({
@@ -205,12 +215,15 @@ const currency = (data.price as any)?.currency ?? "€";
       <div className="px-4 md:px-8 lg:px-[188px]">
         <Breadcrumbs
           className="mb-6 md:mb-8"
-          items={[
-            { label: "Haliotis", href: "/" },
-            { label: "Cursos", href: `/${locale}/cursos` },
-            { label: centerSlug, href: `/${locale}/cursos/${centerSlug}` },
-            { label: data.name },
-          ]}
+         items={[
+  { label: "Haliotis", href: "/" },
+  { label: "Cursos", href: `/${locale}/cursos` },
+  { label: centerSlug, href: `/${locale}/cursos/${centerSlug}` },
+  ...(categorySlug
+    ? [{ label: categorySlug, href: `/${locale}/cursos/${categorySlug}/${centerSlug}` }]
+    : []),
+  { label: data.name },
+]}
         />
       </div>
 

@@ -11,7 +11,6 @@ const ModalPortal = ({ children }: { children: React.ReactNode }) => {
   if (typeof window === "undefined") return null;
   return createPortal(children, document.body);
 };
-
 type CourseCardProps = {
   image: string;
   title: string;
@@ -21,11 +20,10 @@ type CourseCardProps = {
   badge?: string;
   slug?: string;
   currency?: string;
-  centerSlug?: string; // ← ДОБАВЛЕНО
+  centerSlug?: string;
+  categorySlug?: string; // ← ДОБАВЛЕНО
   onBookClick?: () => void;
-};
-
-export const CourseCard: React.FC<CourseCardProps> = ({
+};export const CourseCard: React.FC<CourseCardProps> = ({
   image,
   title,
   price,
@@ -34,20 +32,18 @@ export const CourseCard: React.FC<CourseCardProps> = ({
   badge,
   slug,
   currency,
-  centerSlug, // ← ДОБАВЛЕНО
+  centerSlug,
+  categorySlug, // ← ДОБАВЛЕНО
 }) => {
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const router = useRouter();
   const locale = useLocale(); // ← ДОБАВЛЕНО
 
-  const handleCardClick = () => {
-    if (slug && centerSlug) {
-      router.push(`/${locale}/cursos/${centerSlug}/${slug}`);
-    } else if (slug) {
-      router.push(`/${locale}/cursos/${slug}`);
-    }
-  };
-
+const handleCardClick = () => {
+  if (!slug || !centerSlug) return;
+  const categoryPart = categorySlug || "all"; // фикс: без категории — sentinel, а не пропуск сегмента
+  router.push(`/${locale}/cursos/${categoryPart}/${centerSlug}/${slug}`);
+};
   return (
     <>
       <div

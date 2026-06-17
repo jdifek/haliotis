@@ -118,9 +118,10 @@ const res = await fetch(url.toString(), {
 
 type CoursesProps = {
   initialCenterSlug?: string;
+  initialCategorySlug?: string;
 };
 
-const Courses = ({ initialCenterSlug }: CoursesProps) => {
+const Courses = ({ initialCenterSlug, initialCategorySlug }: CoursesProps) => {
   const locale = useLocale();
   const router = useRouter();
   const { divingCenters, loading: menuLoading } = useMenu(locale);
@@ -140,6 +141,12 @@ const Courses = ({ initialCenterSlug }: CoursesProps) => {
   const [coursesLoading, setCoursesLoading] = useState(false);
   const [coursesError, setCoursesError] = useState<string | null>(null);
 
+  useEffect(() => {
+  if (initialCategorySlug && categories.length > 0 && selectedCategoryId === null) {
+    const found = categories.find((c) => c.slug === initialCategorySlug);
+    if (found) setSelectedCategoryId(found.id);
+  }
+}, [initialCategorySlug, categories, selectedCategoryId]);
   // ← ИЗМЕНЁН: учитываем initialCenterSlug
   useEffect(() => {
     if (divingCenters.length > 0 && activeTabId === null) {
@@ -222,18 +229,21 @@ const Courses = ({ initialCenterSlug }: CoursesProps) => {
     router.push(`/${locale}/cursos/${slug}`);
   };
 
-  const handleCategoryChange = (categoryId: string | null) => {
-    setSelectedCategoryId(categoryId);
-    setCurrentPage(1);
+const handleCategoryChange = (categoryId: string | null) => {
+  setSelectedCategoryId(categoryId);
+  setCurrentPage(1);
 
-    if (categoryId) {
-      const categoryData = categories.find((cat) => cat.id === categoryId);
-      setSelectedCategoryData(categoryData || null);
-    } else {
-      setSelectedCategoryData(null);
+  if (categoryId) {
+    const categoryData = categories.find((cat) => cat.id === categoryId);
+    setSelectedCategoryData(categoryData || null);
+    if (categoryData) {
+router.push(`/${locale}/cursos/${categoryData.slug}/${centerSlug}`);
     }
-  };
-
+  } else {
+    setSelectedCategoryData(null);
+    router.push(`/${locale}/cursos/${centerSlug}`);
+  }
+};
   useEffect(() => {
     document.body.style.overflow = isCategoryOpen ? "hidden" : "";
     return () => {
@@ -494,7 +504,8 @@ const Courses = ({ initialCenterSlug }: CoursesProps) => {
 const price = (course.price as any)?.amount ?? null;
 const currency = (course.price as any)?.currency ?? "€";                  return (
                     <CourseCard
-                          centerSlug={activeCenter?.slug}  // ← ДОБАВИТЬ
+                      categorySlug={selectedCategoryData?.slug}
+                      centerSlug={activeCenter?.slug}
 
                       slug={course.slug}
                       key={course.id}
