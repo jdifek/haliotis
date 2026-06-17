@@ -543,13 +543,22 @@ url: localizeUrl(metaBySlug[c.slug]?.url ?? `/centros/${c.slug}`),
     );
     return hasChildren && isListLayout && hasNoCenter;
   });
-  const coursesData = (coursesMenuItem?.children ?? []).map((course) => ({
+ const coursesData = (coursesMenuItem?.children ?? []).map((course) => {
+  const isCourseCategory = course.link_type === "course_category";
+  const firstCenterSlug = centersData[0]?.id ?? "";
+
+  const builtUrl = isCourseCategory
+    ? `/cursos/${course.slug}/${firstCenterSlug}`
+    : (course.url ?? "/cursos");
+
+  return {
     id: course.slug ?? course.label.toLowerCase().replace(/\s+/g, "-"),
     label: course.label,
     image: course.img_url ?? "",
-url: localizeUrl(course.url ?? "/cursos"),
-    new_tab: course.new_tab ?? false,
-  }));
+    url: localizeUrl(builtUrl),
+    new_tab: course.new_tab ?? false, // просто как было
+  };
+});
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 0);
     window.addEventListener("scroll", handleScroll);

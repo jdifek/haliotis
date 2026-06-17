@@ -30,6 +30,7 @@ export default async function NotFound() {
   const locale = pathname.split("/")[1] || "pt";
 
   const data = await getNotFoundData(locale);
+console.log(data, 'data');
 
   const slides = (data.banner?.slides ?? []).map((slide: {
     desktop_image_url: string;
@@ -96,6 +97,7 @@ export default async function NotFound() {
   
           {data?.system_data?.not_found_button_title && (
             <ButtonWithIcon
+            
               bgColor="#FFFFFF"
               width="228px"
               textColor="text-black"
