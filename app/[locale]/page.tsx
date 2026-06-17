@@ -136,9 +136,11 @@ export default async function Home({ params }: Props) {
 
   const diveTripsCards = (homepageData.sliders?.travels?.entities || []).map(
     (center: any, index: number) => ({
-      image: center.image_url || "/CTABackgroundImage.png",
+      image: center.image || "/CTABackgroundImage.png",
       location: center.name,
       slug: center.slug,
+      currency: center.price?.currency,
+      amount: parseFloat(center.price?.amount || 0).toFixed(2).replace(/\.00$/, ''),
       locationNumber: String(center.divingCenter.id || index + 1),
       description: center.description || "",
     })
