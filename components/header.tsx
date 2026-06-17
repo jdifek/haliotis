@@ -496,16 +496,7 @@ const localizeUrl = (url: string) => {
   if (/^\/[a-z]{2}(\/|$)/.test(url)) return url;
   return `/${locale}${url}`;
 }; 
-  const navItems = (menuData?.data.main ?? []).map((item) => ({
-    id: item.slug ?? item.label.toLowerCase().replace(/\s+/g, "-"),
-    label: item.label,
-    hasDropdown: (item.children?.length ?? 0) > 0,
-    dropdownType: (item.children?.length ?? 0) > 0 ? "dropdown" : null, // просто флаг, что это дропдаун
-href: localizeUrl(item.url ?? `/${item.slug || ""}`),
-    children: item.children,
-    rawItem: item, // передаём оригинальный item, чтобы внутри дропдауна можно было смотреть на структуру
-  }));
-  const centersData = (() => {
+const centersData = (() => {
     const centrosItem = menuData?.data.main.find((item) =>
       item.children?.some((child: any) => child.link_type === "dive_center")
     );
@@ -531,6 +522,25 @@ url: localizeUrl(metaBySlug[c.slug]?.url ?? `/centros/${c.slug}`),
         new_tab: metaBySlug[c.slug]?.new_tab ?? false,
       }));
   })();
+ const navItems = (menuData?.data.main ?? []).map((item) => {
+  const firstCenterSlug = centersData[0]?.id ?? "";
+  const isCourseCategory = item.link_type === "course_category";
+
+  const rawUrl = isCourseCategory
+    ? `/cursos/${item.slug}/${firstCenterSlug}`
+    : (item.url ?? `/${item.slug || ""}`);
+
+  return {
+    id: item.slug ?? item.label.toLowerCase().replace(/\s+/g, "-"),
+    label: item.label,
+    hasDropdown: (item.children?.length ?? 0) > 0,
+    dropdownType: (item.children?.length ?? 0) > 0 ? "dropdown" : null,
+    href: localizeUrl(rawUrl),
+    children: item.children,
+    rawItem: item,
+  };
+});
+  
   // Находим пункт меню, у которого дети имеют картинки и их много
   // (точно так же, как мы определяем dropdownType = 'courses')
   // Находим пункт "Cursos" по наличию большого количества детей + menu_layout === "list"
