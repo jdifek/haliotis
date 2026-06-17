@@ -303,14 +303,21 @@ router.push(`/${locale}/cursos/${categoryData.slug}/${centerSlug}`);
         <div className="flex flex-col gap-[30px] min-[930px]:flex-row">
           <div className="hidden min-[930px]:flex min-[930px]:flex-col min-[930px]:gap-[10px]">
             {(Array.isArray(attachAgency) ? attachAgency : []).map((ag, i) => (
-              <Image
+              <a
                 key={i}
-                alt={ag.name}
-                src={ag.image_url}
-                width={285}
-                height={140}
-                className="h-[140px] w-[285px]"
-              />
+                href={ag.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block"
+              >
+                <Image
+                  alt={ag.name}
+                  src={ag.image_url}
+                  width={285}
+                  height={140}
+                  className="h-[140px] w-[285px]"
+                />
+              </a>
             ))}
             <CategoriesList
               categories={categories}
