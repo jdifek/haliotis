@@ -197,27 +197,27 @@ export const CenterInfoSection = ({ tabs }: Props) => {
 
             {/* Desktop: 3-column grid | Mobile: accordion list */}
             <div className="hidden md:grid md:grid-cols-3 md:gap-x-6 md:gap-y-8">
-              {tabs.diving_center_facilities.entities.map((item) => (
-                <div key={item.id} className="flex flex-col gap-3">
-                  <h3 className="text-[18px] font-medium leading-[140%] text-[#111]">
-                    {item.title}
-                  </h3>
-                  <Image
-                    src={item.image_path}
-                    alt={item.title ?? ""}
-                    width={495}
-                    height={285}
-                    className="w-full h-[285px] rounded-2xl object-cover"
-                  />
-                  <p className="text-[15px] font-medium leading-[160%] text-[#101010] opacity-80">
-                    {item.description}
-                  </p>
-                </div>
-              ))}
-            </div>
+  {tabs.diving_center_facilities.entities.map((item) => (
+    <div key={item.id} className="flex flex-col gap-3">
+      <h3 className="min-h-[50px] text-[18px] font-medium leading-[140%] text-[#111] line-clamp-2">
+        {item.title}
+      </h3>
+      <Image
+        src={item.image_path}
+        alt={item.title ?? ""}
+        width={495}
+        height={285}
+        className="w-full h-[285px] rounded-2xl object-cover"
+      />
+      <p className="text-[15px] font-medium leading-[160%] text-[#101010] opacity-80">
+        {item.description}
+      </p>
+    </div>
+  ))}
+</div>
 
             {/* Mobile: accordion list */}
-            <div className="flex flex-col gap-6 md:hidden">
+            <div className="flex flex-col gap-6  md:hidden">
               {tabs.diving_center_facilities.entities.map((item) => (
                 <div key={item.id}>
                   <button

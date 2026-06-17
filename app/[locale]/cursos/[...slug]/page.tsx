@@ -79,7 +79,7 @@ async function getCourseData(
 ): Promise<CourseData | null> {
   try {
     const response = await fetch(
-      `https://cp.haliotis.space/api/v1/courses/${slug}?lang=${locale}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/courses/${slug}?lang=${locale}`,
       {
         headers: { Accept: "application/json" },
         next: { revalidate: 3600 },
@@ -113,13 +113,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   // /courses/center → slug = ['center']          → показываем список
   // /courses/center/course → slug = ['center', 'course'] → показываем курс
-  if (slug.length < 2) {
-    return { title: "Courses", description: "Diving courses" };
-  }
+ if (slug.length < 3) {
+  return { title: "Courses", description: "Diving courses" };
+}
 
-  const courseSlug = slug[1];
-  const courseData = await getCourseData(courseSlug, locale);
-
+const courseSlug = slug[2]; // было slug[1]
+const courseData = await getCourseData(courseSlug, locale);
   if (courseData) {
     return {
       title: courseData.data.name,
@@ -149,21 +148,32 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function CoursesPage({ params }: Props) {
   const { locale, slug } = await params;
 
-  // /courses/center-slug → slug = ['center-slug']
-  if (slug.length === 1) {
-    return <Courses initialCenterSlug={slug[0]} />;
-  }
+ if (slug.length === 1) {
+  return <Courses initialCenterSlug={slug[0]} />;
+}
 
-  // /courses/center-slug/course-slug → slug = ['center-slug', 'course-slug']
-  const centerSlug = slug[0];
-  const courseSlug = slug[1];
+// теперь категория первая
+if (slug.length === 2) {
+  return (
+    <Courses initialCategorySlug={slug[0]} initialCenterSlug={slug[1]} />
+  );
+}
+
+const categorySlugRaw = slug[0]; // было slug[1]
+const centerSlug = slug[1];      // было slug[0]
+const courseSlug = slug[2];      // не изменился
+
+// "all" — сентинел "без категории", чтобы курс без категории
+// всё равно попадал в детальную (3-сегментную) ветку
+const categorySlug = categorySlugRaw === "all" ? undefined : categorySlugRaw;
+
   const courseData = await getCourseData(courseSlug, locale);
 
   if (!courseData) {
-    // Курс не найден — показываем список центра
-    return <Courses initialCenterSlug={centerSlug} />;
+    return (
+      <Courses initialCenterSlug={centerSlug} initialCategorySlug={categorySlug} />
+    );
   }
-
   const { data, recommended, recommendedEquipment } = courseData;
 console.log(data, 'data')
   const accordionItems = buildAccordionItems(data).map((item) => ({
@@ -177,19 +187,27 @@ console.log(data, 'data')
     ),
   }));
 
+  console.log(recommended, 
+    'recommended'
+  );
+  const recommendedHeader = recommended.headers;
+
+  
   const recommendedCourseCards = recommended.courses.map((course) => ({
     image: course.image_url || "/Rectangle 8.png",
     title: course.name,
-    price: course.price?.[0]?.amount || 0,
+    price: course.price?.amount || 0,
+    currency: course.price?.currency || 0,
     duration: course.duration_label || "3hrs",
-    requestBased: false,
+     requestBased: !course.duration_label,
     badge: course.label?.name || "Course",
-    location: "",
+    location: course.centers[0].slug,
     slug: course.slug,
     centerSlug: centerSlug,
   }));
 
-  console.log(data);
+  console.log(data.description, 'data.description');
+  console.log(data, 'data.description');
   const price = (data.price as any)?.amount ?? null;
 const currency = (data.price as any)?.currency ?? "€";     
   return (
@@ -197,12 +215,15 @@ const currency = (data.price as any)?.currency ?? "€";
       <div className="px-4 md:px-8 lg:px-[188px]">
         <Breadcrumbs
           className="mb-6 md:mb-8"
-          items={[
-            { label: "Haliotis", href: "/" },
-            { label: "Cursos", href: `/${locale}/cursos` },
-            { label: centerSlug, href: `/${locale}/cursos/${centerSlug}` },
-            { label: data.name },
-          ]}
+         items={[
+  { label: "Haliotis", href: "/" },
+  { label: "Cursos", href: `/${locale}/cursos` },
+  { label: centerSlug, href: `/${locale}/cursos/${centerSlug}` },
+  ...(categorySlug
+    ? [{ label: categorySlug, href: `/${locale}/cursos/${categorySlug}/${centerSlug}` }]
+    : []),
+  { label: data.name },
+]}
         />
       </div>
 
@@ -211,6 +232,7 @@ const currency = (data.price as any)?.currency ?? "€";
         courseDescription={data.description || ""}
         pricePerPerson={price || 0}
         currency={currency}
+        recommendedHeader={recommendedHeader}
         courseImage={data.image || "/Rectangle 8.png"}
         courseImageAlt={data.name}
         accordionItems={accordionItems}

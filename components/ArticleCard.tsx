@@ -67,16 +67,14 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
         </div>
         <div
           onClick={onToggleExpand}
-          className={`relative cursor-pointer mx-4 rounded-2xl bg-white  px-4 pb-3 pt-10 transition-all duration-300 lg:mx-0 lg:absolute lg:bottom-0 lg:left-4 lg:right-[25%] lg:w-[340px] ${bgTextBlock}`}
-          style={{
+          className={`relative cursor-pointer mx-4 rounded-2xl bg-white  px-4 pb-3 pt-10 transition-all duration-300 min-[1120px]:mx-0 min-[1120px]:absolute min-[1120px]:bottom-0 min-[1120px]:left-4 min-[1120px]:right-[25%] min-[1120px]:w-[340px] ${bgTextBlock}`}          style={{
             marginTop: "-65px",
             minHeight: "205px",
           }}
         >
           <ButtonWithIcon
            data-book
-            className="absolute lg:hidden -top-5 right-4"
-            label="Book now"
+           className="absolute min-[1120px]:hidden -top-5 right-4"            label="Book now"
             onClick={(e) => {
               e.stopPropagation(); // важно!
               setIsBookingOpen(true);
@@ -216,8 +214,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
           <div></div>
           <ButtonWithIcon
           data-book
-            className="absolute hidden lg:flex lg:bottom-20 lg:right-4 rounded-2xl"
-            label="Book now"
+          className="absolute hidden min-[1120px]:flex min-[1120px]:bottom-20 min-[1120px]:right-4 rounded-2xl"            label="Book now"
             onClick={(e) => {
               e.stopPropagation();
               setIsBookingOpen(true); // ✅ открывает

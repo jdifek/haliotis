@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import { ArticleCard } from "../ArticleCard";
 import { CarouselControls } from "../CarouselControls";
@@ -27,9 +27,18 @@ type Props = {
     details: string;
     equipmentPrice: string;
   }[];
+  title: string;
+  filter_name: string;
+  subtitle: string;
 };
 
-export const TripsSection: React.FC<Props> = ({ locations, tripCards }) => {
+export const TripsSection: React.FC<Props> = ({
+  title,
+  subtitle,
+  filter_name,
+  locations,
+  tripCards,
+}) => {
   const tripsSwiperRef = useRef<SwiperType | null>(null);
   const [selectedLocation, setSelectedLocation] = useState("all");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -98,7 +107,7 @@ export const TripsSection: React.FC<Props> = ({ locations, tripCards }) => {
               </svg>
             </div>
             <h2 className="text-[24px] font-medium leading-[140%] text-[#111]">
-              TRIPS
+              {filter_name}
             </h2>
           </div>
 
@@ -135,8 +144,9 @@ export const TripsSection: React.FC<Props> = ({ locations, tripCards }) => {
 
               {/* Dropdown Content */}
               {isDropdownOpen && (
-                <div className="absolute left-0 right-0 top-full z-10 mt-2 rounded-lg bg-white shadow-lg">
+                <div className="absolute left-0 right-0 top-full z-[50] mt-2 rounded-lg bg-white shadow-lg">
                   <FilterList
+                    maxWidth="100%"
                     options={locations}
                     selected={selectedLocation}
                     onSelect={handleLocationSelect}
@@ -168,11 +178,11 @@ export const TripsSection: React.FC<Props> = ({ locations, tripCards }) => {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div className="flex flex-col gap-[10px]">
               <h2 className="text-[28px] font-medium leading-[130%] text-black sm:text-[36px] lg:text-[clamp(32px,2.5vw,42px)]">
-                Dive Trips:{" "}
+              {title}{": "}
                 <span className="text-[#e84814]">{getLocationLabel()}</span>
               </h2>
               <p className="text-[15px] font-normal leading-[160%] text-[#101010] opacity-80">
-                Find the perfect diving experience
+              {subtitle}
               </p>
             </div>
             <div className="hidden sm:block">
@@ -216,7 +226,7 @@ export const TripsSection: React.FC<Props> = ({ locations, tripCards }) => {
                   slidesPerView: 1,
                   spaceBetween: 25,
                 },
-               
+
                 1400: {
                   slidesPerView: 2,
                   spaceBetween: 30,
@@ -320,12 +330,15 @@ export const TripsSection: React.FC<Props> = ({ locations, tripCards }) => {
                       </div>
 
                       <ButtonWithIcon
-                      onClick={() => {
-                        // Находим кнопку Book now внутри активной карточки и кликаем по ней
-                        const activeCard = cardRefs.current[expandedCardId!];
-                        const bookBtn = activeCard?.querySelector<HTMLButtonElement>('button[data-book]');
-                        bookBtn?.click();
-                      }}
+                        onClick={() => {
+                          // Находим кнопку Book now внутри активной карточки и кликаем по ней
+                          const activeCard = cardRefs.current[expandedCardId!];
+                          const bookBtn =
+                            activeCard?.querySelector<HTMLButtonElement>(
+                              "button[data-book]"
+                            );
+                          bookBtn?.click();
+                        }}
                         className="w-full"
                         label="Book now"
                         icon={

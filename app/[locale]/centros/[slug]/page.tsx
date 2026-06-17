@@ -11,7 +11,7 @@ export default async function CenterPage({
   console.log("[PARAMS]", { slug, locale });
 
   // ================= CENTER =================
-  const centerUrl = `https://cp.haliotis.space/api/v1/diving-centers/${slug}?lang=${locale}`;
+  const centerUrl = `${process.env.NEXT_PUBLIC_API_URL}/diving-centers/${slug}?lang=${locale}`;
 
   let center: any;
 
@@ -44,7 +44,7 @@ export default async function CenterPage({
   }
 
   // ================= TABS =================
-  const tabsUrl = `https://cp.haliotis.space/api/v1/diving-centers/tabs/${center.id}`;
+  const tabsUrl = `${process.env.NEXT_PUBLIC_API_URL}/diving-centers/tabs/${center.id}`;
 
   let tabs: any;
 

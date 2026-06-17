@@ -152,7 +152,9 @@ const RatingDots = ({
 // ─── Video block ──────────────────────────────────────────────────────────────
 
 const VideoBlock = ({ src, cover, isMobile }: { src?: string; cover?: string; isMobile: boolean }) => {
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(!cover);
+
+  if (!src) return null;
 
   return (
     <div
@@ -170,11 +172,12 @@ const VideoBlock = ({ src, cover, isMobile }: { src?: string; cover?: string; is
             alt="Video cover"
             className="w-full h-full object-cover"
             style={{ borderRadius: 16 }}
+            loading="lazy"
           />
           <button
             onClick={() => setIsLoaded(true)}
             className="absolute flex items-center justify-center cursor-pointer hover:opacity-80"
-            style={{ transition: "opacity 0.2s" }}
+            style={{ background: "none", border: "none", transition: "opacity 0.2s" }}
           >
             <svg width="56" height="56" viewBox="0 0 24 24" fill="none">
               <circle cx="12" cy="12" r="10" stroke="white" strokeWidth="1" />
@@ -182,33 +185,15 @@ const VideoBlock = ({ src, cover, isMobile }: { src?: string; cover?: string; is
             </svg>
           </button>
         </>
-      ) : isLoaded && src ? (
+      ) : (
         <iframe
           src={src}
           width="100%"
           height="100%"
           style={{ borderRadius: 16 }}
           allowFullScreen
+          loading="lazy"
         />
-      ) : (
-        <div
-          className="flex flex-col items-center gap-3"
-          style={{ opacity: 0.45 }}
-        >
-          <svg width="56" height="56" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="10" stroke="white" strokeWidth="1" />
-            <path d="M10 8.5l5.5 3.5-5.5 3.5V8.5z" fill="white" />
-          </svg>
-          <span
-            style={{
-              color: "white",
-              fontSize: 13,
-              fontFamily: "var(--font-family)",
-            }}
-          >
-            Video
-          </span>
-        </div>
       )}
     </div>
   );
@@ -351,8 +336,7 @@ const DiveSiteCard = ({ site }: { site: DiveSite }) => {
                 paddingBottom: 16,
               }}
             >
-              {site.description}
-            </p>
+<span dangerouslySetInnerHTML={{ __html: site.description }} />            </p>
 
           </div>
 <VideoBlock src={site.videoSrc} cover={site.videoCover} isMobile={true} />
@@ -372,7 +356,7 @@ const DiveSiteCard = ({ site }: { site: DiveSite }) => {
               paddingBottom: 16,
             }}
           >
-            {site.description}
+          <span dangerouslySetInnerHTML={{ __html: site.description }} />
           </p>
 <VideoBlock src={site.videoSrc} cover={site.videoCover} isMobile={false} />
         </div>

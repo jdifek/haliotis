@@ -26,7 +26,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export async function generateStaticParams() {
-  const res = await fetch("https://cp.haliotis.space/api/v1/configs/languages");
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/configs/languages`);
   const data = await res.json();
   return data.data.map((lang: { prefix: string }) => ({ locale: lang.prefix }));
 }

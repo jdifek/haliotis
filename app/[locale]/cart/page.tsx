@@ -1,9 +1,20 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import "swiper/css";
+
+// ─── Portal helper ────────────────────────────────────────────────────────────
+// Renders children into document.body to escape any overflow:hidden parent
+
+const Portal = ({ children }) => {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+  if (!mounted) return null;
+  return createPortal(children, document.body);
+};
 
 // ─── Types & Data ─────────────────────────────────────────────────────────────
 
@@ -18,7 +29,7 @@ const EQUIPMENT_TEMPLATE = [
   { id: 8, name: "Pack Regulador MBS", price: 929 },
 ];
 
-const createParticipant = (id: number) => ({
+const createParticipant = (id) => ({
   id,
   firstName: "",
   lastName: "",
@@ -143,23 +154,46 @@ const ShieldIcon = () => (
 
 const CustomDropdown = ({ label, value, onChange, options, unit, icon }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [pos, setPos] = useState({ top: 0, left: 0, width: 0 });
+  const triggerRef = useRef(null);
+
+  const open = () => {
+    if (triggerRef.current) {
+      const r = triggerRef.current.getBoundingClientRect();
+      setPos({ top: r.bottom + window.scrollY + 4, left: r.left + window.scrollX, width: r.width });
+    }
+    setIsOpen(true);
+  };
+
+  useEffect(() => {
+    const handler = (e) => { if (triggerRef.current && !triggerRef.current.contains(e.target)) setIsOpen(false); };
+    if (isOpen) document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [isOpen]);
+
+  const renderLabel = () => {
+    if (label.includes("*")) {
+      const parts = label.split("*");
+      return <><span className="text-[#111]">{parts[0]}</span><span className="text-[#e84814]">*</span></>;
+    }
+    return <span className="text-[#111]">{label}</span>;
+  };
+
   return (
-    <div className="relative">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center justify-between gap-2 ${icon ? "pl-8" : "pl-3"} pr-3 py-2 rounded-[10px] border border-[#d9d9d9] bg-white text-[15px] text-[#111] w-full outline-none cursor-pointer relative`}
-      >
+    <div className="relative" ref={triggerRef}>
+      <button onClick={() => isOpen ? setIsOpen(false) : open()}
+        className={`flex items-center justify-between gap-2 ${icon ? "pl-8" : "pl-3"} pr-3 py-2 rounded-[10px] border border-[#d9d9d9] bg-white text-[15px] w-full outline-none cursor-pointer relative`}>
         {icon && <span className="absolute left-3 top-1/2 -translate-y-1/2">{icon}</span>}
-        <span className={value ? "text-[#111]" : "text-[#999]"}>{value || label}</span>
+        <span className="text-[#111]">{value || renderLabel()}</span>
         <div className="flex items-center gap-2">
           {unit && value && <span className="text-[13px] text-[#d9d9d9] border-l border-[#d9d9d9] pl-2">{unit}</span>}
           <ChevronDown className={`text-[#d9d9d9] transition-transform ${isOpen ? "rotate-180" : ""}`} />
         </div>
       </button>
       {isOpen && (
-        <>
-          <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
-          <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-[#d9d9d9] rounded-[10px] shadow-lg z-20 max-h-48 overflow-y-auto">
+        <Portal>
+          <div style={{ position: "absolute", top: pos.top, left: pos.left, width: pos.width, zIndex: 99999 }}
+            className="bg-white border border-[#d9d9d9] rounded-[10px] shadow-xl max-h-48 overflow-y-auto">
             {options.map((option) => (
               <button key={option} onClick={() => { onChange(option); setIsOpen(false); }}
                 className={`w-full px-3 py-2 text-left text-[15px] hover:bg-[#f5f5f5] cursor-pointer ${value === option ? "bg-[#f7e4de] text-[#e84814]" : "text-[#111]"}`}>
@@ -167,13 +201,195 @@ const CustomDropdown = ({ label, value, onChange, options, unit, icon }) => {
               </button>
             ))}
           </div>
-        </>
+        </Portal>
       )}
     </div>
   );
 };
 
-const inputCls = "flex items-center gap-2 px-3 py-2 rounded-[10px] border border-[#d9d9d9] bg-white text-[15px] text-[#111] w-full outline-none focus:border-[#e84814] transition-colors placeholder:text-[#999]";
+const inputCls = "flex items-center gap-2 px-3 py-2 rounded-[10px] border border-[#d9d9d9] bg-white text-[15px] text-[#111] w-full outline-none focus:border-[#e84814] transition-colors";
+
+// Input with black placeholder text and orange *
+const PlaceholderInput = ({ placeholder, value, onChange, type = "text", extraBorder = false }) => {
+  const parts = placeholder.split("*");
+  const hasAsterisk = parts.length > 1;
+  return (
+    <div className="relative w-full">
+      <input
+        className={`${inputCls} ${extraBorder ? "border-[#e84814]" : ""}`}
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        style={{ color: value ? "#111" : "transparent", caretColor: "#111" }}
+      />
+      {!value && (
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[15px] pointer-events-none select-none whitespace-nowrap">
+          <span className="text-[#111]">{parts[0]}</span>
+          {hasAsterisk && <span className="text-[#e84814]">*</span>}
+        </span>
+      )}
+    </div>
+  );
+};
+
+// Custom calendar date picker (no native input)
+const MONTHS_CAL = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const DAYS_CAL = ["S","M","T","W","T","F","S"];
+
+const MiniCalendar = ({ selected, onSelect, onClose, allowPast = false }) => {
+  const today = new Date();
+  const [viewYear, setViewYear] = useState(selected ? new Date(selected).getFullYear() : today.getFullYear());
+  const [viewMonth, setViewMonth] = useState(selected ? new Date(selected).getMonth() : today.getMonth());
+
+  const startDay = new Date(viewYear, viewMonth, 1).getDay();
+  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+
+  const isUnavailable = (day) => {
+    if (allowPast) return false;
+    const d = new Date(viewYear, viewMonth, day);
+    return d < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  };
+
+  const selDate = selected ? new Date(selected) : null;
+  const isSelected = (day) => selDate && selDate.getFullYear() === viewYear && selDate.getMonth() === viewMonth && selDate.getDate() === day;
+  const isToday = (day) => today.getFullYear() === viewYear && today.getMonth() === viewMonth && today.getDate() === day;
+
+  const prevMonth = () => { if (viewMonth === 0) { setViewMonth(11); setViewYear(y => y - 1); } else setViewMonth(m => m - 1); };
+  const nextMonth = () => { if (viewMonth === 11) { setViewMonth(0); setViewYear(y => y + 1); } else setViewMonth(m => m + 1); };
+
+  const stripMonths = [-2,-1,0,1,2,3,4,5].map((offset) => {
+    let m = viewMonth + offset; let y = viewYear;
+    while (m < 0) { m += 12; y--; }
+    while (m > 11) { m -= 12; y++; }
+    return { m, y, label: MONTHS_CAL[m], week: m + 1 };
+  });
+
+  const cells = [];
+  for (let i = 0; i < startDay; i++) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+
+  return (
+    <div className="bg-white rounded-2xl shadow-xl overflow-hidden w-full">
+      <div className="flex items-end px-2 pt-3 pb-2 gap-2 overflow-x-auto bg-[#f5f5f5]" style={{ scrollbarWidth: "none" }}>
+        {stripMonths.map(({ m, y, label, week }) => {
+          const isCurrent = m === viewMonth && y === viewYear;
+          return (
+            <button key={`${y}-${m}`} onClick={() => { setViewMonth(m); setViewYear(y); }}
+              className={`flex flex-col items-center flex-shrink-0 px-3 py-1.5 rounded-xl cursor-pointer transition-colors ${isCurrent ? "bg-[#e84814] text-white" : "text-[#999] hover:text-[#111]"}`}>
+              <span className="text-[12px] font-medium leading-none">{label}</span>
+              <span className="text-[14px] font-bold leading-none mt-0.5">{String(week).padStart(2, "0")}</span>
+            </button>
+          );
+        })}
+      </div>
+      <div className="flex items-center justify-between px-4 py-3">
+        <button onClick={prevMonth} className="w-8 h-8 flex items-center justify-center rounded-full border border-[#e4e4e4] hover:bg-[#f5f5f5] cursor-pointer">
+          <ChevronDown className="rotate-90 w-3 h-3 text-[#111]" />
+        </button>
+        <span className="text-[15px] font-medium text-[#111]">{MONTHS_CAL[viewMonth]} {viewYear}</span>
+        <button onClick={nextMonth} className="w-8 h-8 flex items-center justify-center rounded-full border border-[#e4e4e4] hover:bg-[#f5f5f5] cursor-pointer">
+          <ChevronDown className="-rotate-90 w-3 h-3 text-[#111]" />
+        </button>
+      </div>
+      <div className="grid grid-cols-7 px-3">
+        {DAYS_CAL.map((d, i) => <div key={i} className="text-center text-[12px] text-[#999] font-medium py-1">{d}</div>)}
+      </div>
+      <div className="grid grid-cols-7 px-3 pb-3 gap-y-1">
+        {cells.map((day, i) => {
+          if (!day) return <div key={i} />;
+          const unavail = isUnavailable(day);
+          const sel = isSelected(day);
+          const tod = isToday(day);
+          return (
+            <button key={i} disabled={unavail}
+              onClick={() => {
+                const iso = `${viewYear}-${String(viewMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+                onSelect(iso);
+                onClose();
+              }}
+              className={`mx-auto w-9 h-9 flex items-center justify-center rounded-full text-[14px] font-medium transition-colors
+                ${sel ? "bg-[#e84814] text-white" : ""}
+                ${tod && !sel ? "bg-[#e84814] text-white" : ""}
+                ${unavail ? "text-[#ccc] bg-[#f5f5f5] cursor-not-allowed" : ""}
+                ${!sel && !tod && !unavail ? "text-[#111] hover:bg-[#f5f5f5] cursor-pointer" : ""}`}>
+              {day}
+            </button>
+          );
+        })}
+      </div>
+      <div className="flex items-center justify-center gap-2 pb-3">
+        <div className="w-3 h-3 rounded-full bg-[#ccc]" />
+        <span className="text-[12px] text-[#999]">Unavailable days</span>
+      </div>
+    </div>
+  );
+};
+
+const DatePickerField = ({ value, onChange, placeholder, allowPast = false }) => {
+  const [open, setOpen] = useState(false);
+  const [pos, setPos] = useState({ top: 0, left: 0, width: 0 });
+  const ref = useRef(null);
+
+  const openPicker = () => {
+    if (ref.current) {
+      const r = ref.current.getBoundingClientRect();
+      setPos({ top: r.bottom + window.scrollY + 4, left: r.left + window.scrollX, width: Math.max(r.width, 300) });
+    }
+    setOpen(true);
+  };
+
+  useEffect(() => {
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    if (open) document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [open]);
+
+  const formatDisplay = (iso) => {
+    if (!iso) return null;
+    const [y, m, d] = iso.split("-");
+    return `${d}/${m}/${y}`;
+  };
+
+  const parts = placeholder.split("*");
+  const hasAsterisk = parts.length > 1;
+
+  return (
+    <div className="relative" ref={ref}>
+      <button onClick={() => open ? setOpen(false) : openPicker()}
+        className="flex items-center justify-between px-3 py-2 rounded-[10px] border border-[#d9d9d9] bg-white text-[15px] w-full cursor-pointer transition-colors focus:outline-none focus:border-[#e84814]">
+        {value
+          ? <span className="text-[#111]">{formatDisplay(value)}</span>
+          : <span className="text-[15px]"><span className="text-[#111]">{parts[0]}</span>{hasAsterisk && <span className="text-[#e84814]">*</span>}</span>
+        }
+        <CalendarFieldIcon />
+      </button>
+      {open && (
+        <Portal>
+          <div style={{ position: "absolute", top: pos.top, left: pos.left, width: pos.width, zIndex: 99999 }}>
+            <MiniCalendar selected={value} onSelect={(v) => { onChange(v); setOpen(false); }} onClose={() => setOpen(false)} allowPast={allowPast} />
+          </div>
+        </Portal>
+      )}
+    </div>
+  );
+};
+
+// Participants counter with exact design specs
+const ParticipantsCounter = ({ value, onChange }) => (
+  <div className="flex items-center" style={{ height: 40, width: 97 }}>
+    <button onClick={() => onChange(Math.max(1, value - 1))}
+      style={{ border: "1px solid #f1f1f1", borderRadius: "10px 0 0 10px", padding: "8px 12px", width: 31, height: 40, background: "#f1f1f1", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 16, color: "#111", flexShrink: 0, lineHeight: 1 }}>
+      −
+    </button>
+    <div style={{ border: "1px solid #f1f1f1", padding: "8px 12px", width: 34, height: 40, background: "#f1f1f1", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, fontWeight: 600, color: "#111", flexShrink: 0 }}>
+      {value}
+    </div>
+    <button onClick={() => onChange(Math.min(10, value + 1))}
+      style={{ border: "1px solid #f1f1f1", borderRadius: "0 10px 10px 0", padding: "8px 12px", width: 34, height: 40, background: "#f1f1f1", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 16, color: "#111", flexShrink: 0, lineHeight: 1 }}>
+      +
+    </button>
+  </div>
+);
 
 // ─── Checkbox ─────────────────────────────────────────────────────────────────
 
@@ -310,22 +526,26 @@ const ParticipantBlock = ({ p, pNum, activityId, onChange, onToggleEquip, requir
         <div className="px-4 pb-4 flex flex-col gap-2 border-t border-[#f0f0f0]">
           {/* Row 1 */}
           <div className="grid grid-cols-3 gap-2 mt-3">
-            <input className={`${inputCls} border-[#e84814]`} placeholder="First Name *" value={p.firstName}
-              onChange={(e) => onChange(activityId, p.id, "firstName", e.target.value)} />
-            <input className={inputCls} placeholder="Last Name *" value={p.lastName}
-              onChange={(e) => onChange(activityId, p.id, "lastName", e.target.value)} />
-            <input className={inputCls} placeholder="Date of Birth" type="date" value={p.dateOfBirth}
-              onChange={(e) => onChange(activityId, p.id, "dateOfBirth", e.target.value)} />
+            <PlaceholderInput placeholder="First Name *" value={p.firstName}
+              onChange={(v) => onChange(activityId, p.id, "firstName", v)} extraBorder />
+            <PlaceholderInput placeholder="Last Name *" value={p.lastName}
+              onChange={(v) => onChange(activityId, p.id, "lastName", v)} />
+            <DatePickerField
+              value={p.dateOfBirth}
+              onChange={(v) => onChange(activityId, p.id, "dateOfBirth", v)}
+              placeholder="Date of Birth"
+              allowPast={true}
+            />
           </div>
           {/* Row 2 */}
           <div className="grid grid-cols-3 gap-2">
             <CustomDropdown label="Select Gender *" value={p.gender}
               onChange={(v) => onChange(activityId, p.id, "gender", v)}
               options={["Male", "Female", "Other"]} />
-            <input className={inputCls} placeholder="Phone Number *" type="tel" value={p.phone}
-              onChange={(e) => onChange(activityId, p.id, "phone", e.target.value)} />
-            <input className={inputCls} placeholder="E-mail *" type="email" value={p.email}
-              onChange={(e) => onChange(activityId, p.id, "email", e.target.value)} />
+            <PlaceholderInput placeholder="Phone Number *" value={p.phone}
+              onChange={(v) => onChange(activityId, p.id, "phone", v)} type="tel" />
+            <PlaceholderInput placeholder="E-mail *" value={p.email}
+              onChange={(v) => onChange(activityId, p.id, "email", v)} type="email" />
           </div>
           {/* Row 3 */}
           <div className="grid grid-cols-3 gap-2">
@@ -354,7 +574,7 @@ const ParticipantBlock = ({ p, pNum, activityId, onChange, onToggleEquip, requir
           </button>
 
           {equipExpanded && (
-            <EquipmentCarousel equipment={p.equipment} onToggle={(eid) => onToggleEquip(activityId, p.id, eid)} />
+            <EquipmentGrid equipment={p.equipment} onToggle={(eid) => onToggleEquip(activityId, p.id, eid)} />
           )}
 
           {/* Dive Certification */}
@@ -368,34 +588,18 @@ const ParticipantBlock = ({ p, pNum, activityId, onChange, onToggleEquip, requir
                 <CustomDropdown label="Certification Agency *" value={p.certAgency || ""}
                   onChange={(v) => onChange(activityId, p.id, "certAgency", v)}
                   options={["PADI","SSI","NAUI","CMAS","SDI","TDI"]} />
-                <input className={inputCls} placeholder="Certification Level *" value={p.certLevel || ""}
-                  onChange={(e) => onChange(activityId, p.id, "certLevel", e.target.value)} />
+                <PlaceholderInput placeholder="Certification Level *" value={p.certLevel || ""}
+                  onChange={(v) => onChange(activityId, p.id, "certLevel", v)} />
               </div>
               <div className="grid grid-cols-2 gap-2">
-                <input className={inputCls} placeholder="Total Dives *" type="number" value={p.totalDives || ""}
-                  onChange={(e) => onChange(activityId, p.id, "totalDives", e.target.value)} />
-                {/* Last Dive Date — custom field with orange calendar icon + placeholder text */}
-                <div className="relative">
-                  <input
-                    className={`${inputCls} cursor-pointer`}
-                    type="date"
-                    value={p.lastDiveDate || ""}
-                    onChange={(e) => onChange(activityId, p.id, "lastDiveDate", e.target.value)}
-                    style={{
-                      colorScheme: "light",
-                      color: p.lastDiveDate ? "#111" : "transparent",
-                      paddingRight: "2.5rem",
-                    }}
-                  />
-                  {!p.lastDiveDate && (
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[15px] text-[#999] pointer-events-none select-none">
-                      Last Dive Date
-                    </span>
-                  )}
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                    <CalendarOrangeIcon />
-                  </span>
-                </div>
+                <PlaceholderInput placeholder="Total Dives *" value={p.totalDives || ""}
+                  onChange={(v) => onChange(activityId, p.id, "totalDives", v)} type="number" />
+                <DatePickerField
+                  value={p.lastDiveDate || ""}
+                  onChange={(v) => onChange(activityId, p.id, "lastDiveDate", v)}
+                  placeholder="Last Dive Date"
+                  allowPast={true}
+                />
               </div>
               <div className="flex items-center gap-2 mt-3"
                 style={{ border: "1px solid #a0c52e", borderRadius: 10, padding: "5px 10px", height: 38, background: "#fff" }}>
@@ -412,12 +616,55 @@ const ParticipantBlock = ({ p, pNum, activityId, onChange, onToggleEquip, requir
   );
 };
 
-// ─── Activity Card ────────────────────────────────────────────────────────────
+const CalendarFieldIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M15.9624 11.293C16.8861 10.3501 18.3835 10.3501 19.3072 11.293C20.2309 12.2358 20.2309 13.7642 19.3072 14.707L15.2341 18.8645C15.1332 18.9675 15.0021 19.1066 14.8434 19.2195C14.7175 19.3091 14.5813 19.383 14.4381 19.4402C14.2583 19.5122 14.0727 19.5468 13.9326 19.5754L11.9487 19.9805C11.6275 20.046 11.2955 19.9435 11.0639 19.707C10.8322 19.4706 10.7317 19.1318 10.796 18.8039L11.1928 16.7789C11.2209 16.6358 11.2543 16.4461 11.3249 16.2625C11.3809 16.1164 11.4537 15.9777 11.5415 15.8492L11.6283 15.7332C11.718 15.6223 11.8136 15.5277 11.8893 15.4504L15.9624 11.293ZM17.9219 12.707C17.7634 12.5453 17.5063 12.5453 17.3478 12.707L13.2747 16.8645C13.2078 16.9328 13.175 16.9665 13.1519 16.9918C13.1513 16.9924 13.1505 16.9928 13.15 16.9934C13.1497 16.9943 13.1498 16.9955 13.1496 16.9965C13.1418 17.0301 13.1325 17.0767 13.114 17.1711L13.0053 17.725L13.5484 17.6145C13.6408 17.5956 13.6865 17.5861 13.7194 17.5781C13.7203 17.5779 13.7213 17.5775 13.7221 17.5773C13.7227 17.5768 13.7234 17.5764 13.724 17.5758C13.7488 17.5522 13.7818 17.5187 13.8488 17.4504L17.9219 13.293C18.0803 13.1312 18.0803 12.8688 17.9219 12.707ZM7.8377 14C8.37874 14 8.81736 14.4478 8.81741 15C8.8174 15.5523 8.37877 16 7.8377 16H4.89856C4.35749 16 3.91885 15.5523 3.91885 15C3.91887 14.4477 4.3575 14 4.89856 14H7.8377ZM11.2667 10C11.8077 10 12.2464 10.4478 12.2464 11C12.2464 11.5523 11.8078 12 11.2667 12H4.89856C4.35749 12 3.91885 11.5523 3.91885 11C3.91886 10.4477 4.35749 10 4.89856 10H11.2667ZM17.6348 8H1.95943V15.8C1.95943 16.3764 1.9601 16.7487 1.98277 17.032C2.00451 17.3036 2.04153 17.4045 2.0662 17.4539L2.10409 17.523C2.18475 17.6572 2.29532 17.7701 2.4267 17.8523L2.49444 17.891L2.5419 17.9117C2.60254 17.934 2.70806 17.9595 2.90776 17.9762C3.18533 17.9993 3.55003 18 4.11479 18H7.8377C8.37878 18 8.81741 18.4477 8.81741 19C8.81741 19.5523 8.37878 20 7.8377 20H4.11479C3.58233 20 3.12404 20.0009 2.74817 19.9695C2.36084 19.9372 1.97537 19.8659 1.60466 19.673C1.05169 19.3854 0.602024 18.9264 0.320322 18.3621C0.131423 17.9837 0.0614981 17.5903 0.029853 17.1949C-0.000847982 16.8113 2.35339e-06 16.3435 2.35411e-06 15.8V6.2C2.35411e-06 5.6565 -0.000849448 5.18873 0.029853 4.80508C0.061499 4.40973 0.131434 4.01627 0.320322 3.63789C0.602088 3.07348 1.0517 2.61455 1.60466 2.32695C1.97537 2.13415 2.36085 2.06277 2.74817 2.03047C3.07712 2.00304 3.46918 2.00106 3.91885 2.00078V1C3.91885 0.447715 4.35748 0 4.89856 0C5.43964 0 5.87828 0.447715 5.87828 1V2H13.716V1C13.716 0.447715 14.1546 0 14.6957 0C15.2368 0 15.6754 0.447715 15.6754 1V2.00078C16.1251 2.00106 16.5171 2.00304 16.8461 2.03047C17.2334 2.06277 17.6189 2.13414 17.9896 2.32695C18.5424 2.61449 18.9918 3.07346 19.2736 3.63789C19.4624 4.01628 19.5328 4.40973 19.5644 4.80508C19.5951 5.18873 19.5943 5.65651 19.5943 6.2V8C19.5943 8.55228 19.1556 9 18.6145 9C18.0735 9 17.6348 8.55228 17.6348 8ZM4.11479 4C3.55003 4 3.18533 4.00069 2.90776 4.02383C2.64172 4.04601 2.5429 4.08379 2.49444 4.10898C2.31011 4.20485 2.16012 4.35794 2.0662 4.54609C2.04152 4.59555 2.00451 4.69642 1.98277 4.96797C1.96284 5.21709 1.96063 5.53498 1.96019 6H17.6341C17.6336 5.53498 17.6314 5.21709 17.6115 4.96797C17.5897 4.6964 17.5527 4.59555 17.5281 4.54609C17.446 4.3816 17.321 4.24374 17.1676 4.14766L17.0998 4.10898C17.0514 4.08381 16.9526 4.04602 16.6865 4.02383C16.4089 4.00069 16.0442 4 15.4795 4H4.11479Z" fill="#E84814" />
+  </svg>
+);
 
-const ActivityCard = ({ activity, onRemove, onChangeCount, onUpdateParticipant, onToggleEquip }) => {
+// ─── Equipment Grid (no swiper) ───────────────────────────────────────────────
+
+const EquipmentGrid = ({ equipment, onToggle }) => (
+  <div className="flex flex-wrap gap-3 mt-2 pt-4 pl-4">
+    {equipment.map((item) => (
+      <div key={item.id}
+        className={`relative flex-shrink-0 w-[130px] transition-colors rounded-2xl p-2 ${item.isSelected ? "bg-[#f7e4de]" : "bg-[#f1f1f1]"}`}>
+        <button
+          onClick={() => onToggle(item.id)}
+          style={{ borderRadius: 1000, padding: 2, width: 48, height: 48, background: item.isSelected ? "#e84814" : "#000", border: "none" }}
+          className="absolute -top-3 -left-3 flex items-center justify-center z-20 cursor-pointer transition-all">
+          {item.isSelected ? (
+            <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+              <rect width="44" height="44" rx="22" fill="white"/>
+              <path d="M32.496 14.463C32.3505 14.3163 32.1774 14.1999 31.9866 14.1204C31.7959 14.0409 31.5913 14 31.3846 14C31.178 14 30.9733 14.0409 30.7826 14.1204C30.5918 14.1999 30.4187 14.3163 30.2732 14.463L18.6109 26.1403L13.7112 21.2252C13.5601 21.0792 13.3817 20.9645 13.1863 20.8874C12.9908 20.8104 12.7821 20.7727 12.5721 20.7763C12.362 20.7799 12.1547 20.8249 11.9621 20.9086C11.7694 20.9924 11.5951 21.1132 11.4492 21.2643C11.3032 21.4154 11.1884 21.5937 11.1114 21.7892C11.0344 21.9846 10.9966 22.1933 11.0002 22.4033C11.0039 22.6134 11.0488 22.8206 11.1326 23.0133C11.2163 23.206 11.3372 23.3802 11.4883 23.5262L17.4994 29.537C17.645 29.6837 17.8181 29.8001 18.0089 29.8796C18.1996 29.9591 18.4042 30 18.6109 30C18.8175 30 19.0221 29.9591 19.2129 29.8796C19.4037 29.8001 19.5768 29.6837 19.7223 29.537L32.496 16.764C32.6549 16.6174 32.7817 16.4395 32.8685 16.2415C32.9552 16.0435 33 15.8297 33 15.6135C33 15.3973 32.9552 15.1835 32.8685 14.9855C32.7817 14.7875 32.6549 14.6096 32.496 14.463Z" fill="#E84814"/>
+            </svg>
+          ) : (
+            <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+              <rect width="44" height="44" rx="22" fill="white"/>
+              <path d="M12 22H32M22 12V32" stroke="#CFCFCF" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          )}
+        </button>
+        <div className="relative w-full h-[100px] rounded-xl overflow-hidden">
+          <div className="w-full h-full bg-gradient-to-br from-[#2c2c2c] to-[#1a1a1a]" />
+          <div className="absolute top-1.5 right-1.5 flex items-center gap-0.5 bg-white rounded-lg px-1.5 py-0.5 shadow-sm z-10">
+            <CoinIcon />
+            <span className="text-[11px] font-bold text-black">{item.price}</span>
+          </div>
+        </div>
+        <div className="bg-white rounded-xl px-2 py-1.5 mt-2">
+          <p className="text-[11px] text-[#111] leading-[130%]">{item.name}</p>
+        </div>
+      </div>
+    ))}
+  </div>
+);
+
+// ─── Activity Card (no participants counter — moved to page level) ─────────────
+
+const ActivityCard = ({ activity, onRemove, onUpdateParticipant, onToggleEquip }) => {
   return (
     <div className="bg-white rounded-2xl border border-[#e4e4e4] overflow-hidden mb-4">
-      {/* Activity header */}
       <div className="p-4">
         <div className="flex items-start gap-3">
           <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0">
@@ -446,25 +693,6 @@ const ActivityCard = ({ activity, onRemove, onChangeCount, onUpdateParticipant, 
               <span className="text-[20px] font-bold text-[#111]">€{activity.pricePerPerson}</span>
               <span className="text-[13px] text-[#999]">/ person</span>
             </div>
-          </div>
-        </div>
-
-        {/* Participants count */}
-        <div className="flex items-center gap-3 mt-3 pt-3 border-t border-[#f0f0f0]">
-          <div className="flex items-center gap-1.5">
-            <PersonIcon />
-            <span className="text-[13px] font-medium text-[#111]">Participants:</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <button onClick={() => onChangeCount(activity.id, activity.participants.length - 1)}
-              className="w-7 h-7 rounded-full border border-[#d9d9d9] flex items-center justify-center hover:bg-[#f5f5f5] cursor-pointer text-[18px] leading-none text-[#666]">
-              −
-            </button>
-            <span className="text-[15px] font-semibold text-[#111] w-5 text-center">{activity.participants.length}</span>
-            <button onClick={() => onChangeCount(activity.id, activity.participants.length + 1)}
-              className="w-7 h-7 rounded-full border border-[#d9d9d9] flex items-center justify-center hover:bg-[#f5f5f5] cursor-pointer text-[18px] leading-none text-[#666]">
-              +
-            </button>
           </div>
         </div>
       </div>
@@ -577,16 +805,18 @@ export default function CartPage() {
   const [activities, setActivities] = useState(INITIAL_ACTIVITIES);
   const [privacy, setPrivacy] = useState(false);
   const [terms, setTerms] = useState(false);
+  const [participantCount, setParticipantCount] = useState(2);
 
-  const totalParticipants = activities.reduce((s, a) => s + a.participants.length, 0);
+  const totalParticipants = participantCount;
 
   const removeActivity = (id) => setActivities((prev) => prev.filter((a) => a.id !== id));
 
-  const changeCount = (actId, newCount) => {
-    const c = Math.max(1, Math.min(10, newCount));
+  const handleCountChange = (n) => {
+    const c = Math.max(1, Math.min(10, n));
+    setParticipantCount(c);
+    // Sync all activities to same participant count
     setActivities((prev) =>
       prev.map((a) => {
-        if (a.id !== actId) return a;
         const current = a.participants;
         if (c > current.length) {
           return { ...a, participants: [...current, ...Array.from({ length: c - current.length }, (_, i) => createParticipant(current.length + i + 1))] };
@@ -634,6 +864,21 @@ export default function CartPage() {
         <div className="flex flex-col lg:flex-row gap-6 items-start">
           {/* Left: activities */}
           <div className="flex-1 min-w-0">
+
+            {/* ── Participants counter — global, above all cards ── */}
+            <div className="bg-white rounded-2xl border border-[#e4e4e4] p-4 mb-4 flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <PersonIcon />
+                <span className="text-[15px] font-semibold text-[#111]">
+                  Participants <span className="text-[#e84814]">*</span>
+                </span>
+              </div>
+              <ParticipantsCounter value={participantCount} onChange={handleCountChange} />
+              <span className="text-[13px] text-[#999] ml-2">
+                Fill in details for each participant below
+              </span>
+            </div>
+
             {activities.length === 0 ? (
               <div className="bg-white rounded-2xl border border-[#e4e4e4] p-12 text-center">
                 <p className="text-[18px] font-medium text-[#999]">Your cart is empty</p>
@@ -645,14 +890,12 @@ export default function CartPage() {
                   key={act.id}
                   activity={act}
                   onRemove={removeActivity}
-                  onChangeCount={changeCount}
                   onUpdateParticipant={updateParticipant}
                   onToggleEquip={toggleEquip}
                 />
               ))
             )}
           </div>
-
 
           {/* Right: order summary */}
           <div className="w-full lg:w-[360px] flex-shrink-0">

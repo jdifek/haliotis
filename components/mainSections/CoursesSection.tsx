@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import { CarouselControls } from "../CarouselControls";
 import { FilterList } from "../FilterList";
@@ -16,6 +16,9 @@ type Props = {
     id: string;
     label: string;
   }[];
+  title: string;
+  filter_name: string;
+  subtitle: string;
   courseCards: {
     image: string;
     slug: string;
@@ -29,7 +32,13 @@ type Props = {
   }[];
 };
 
-export const CoursesSection: React.FC<Props> = ({ locations, courseCards }) => {
+export const CoursesSection: React.FC<Props> = ({
+  title,
+  subtitle,
+  filter_name,
+  locations,
+  courseCards,
+}) => {
   const [selectedLocation, setSelectedLocation] = useState("all");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const coursesSwiperRef = useRef<SwiperType | null>(null);
@@ -79,7 +88,7 @@ export const CoursesSection: React.FC<Props> = ({ locations, courseCards }) => {
               </svg>
             </div>
             <h2 className="text-[24px] font-medium leading-[140%] text-[#111]">
-              COURSES
+            {filter_name}
             </h2>
           </div>
 
@@ -120,8 +129,8 @@ export const CoursesSection: React.FC<Props> = ({ locations, courseCards }) => {
                   <FilterList
                     options={locations}
                     selected={selectedLocation}
-                      defaultSelectedBg="#f1f1f1"
-
+                    defaultSelectedBg="#f1f1f1"
+                    maxWidth="100%"
                     onSelect={handleLocationSelect}
                   />
                 </div>
@@ -140,8 +149,7 @@ export const CoursesSection: React.FC<Props> = ({ locations, courseCards }) => {
           {/* Desktop FilterList */}
           <div className="hidden lg:block">
             <FilterList
-                                  defaultSelectedBg="#f1f1f1"
-
+              defaultSelectedBg="#f1f1f1"
               options={locations}
               selected={selectedLocation}
               onSelect={setSelectedLocation}
@@ -153,11 +161,11 @@ export const CoursesSection: React.FC<Props> = ({ locations, courseCards }) => {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div className="flex flex-col gap-[10px]">
               <h2 className="text-[28px] font-medium leading-[130%] text-black sm:text-[36px] lg:text-[clamp(32px,2.5vw,42px)]">
-                Upcoming Courses:{" "}
+                {title}{": "}
                 <span className="text-[#e84814]">{getLocationLabel()}</span>
               </h2>
               <p className="text-[15px] font-normal leading-[160%] text-[#101010] opacity-80">
-                The perfect course for you
+              {subtitle}
               </p>
             </div>
             <div className="hidden sm:block">
@@ -218,7 +226,7 @@ export const CoursesSection: React.FC<Props> = ({ locations, courseCards }) => {
                   slidesPerGroup: 1,
                   spaceBetween: 30,
                 },
-                 1755: {
+                1755: {
                   slidesPerView: 4,
                   slidesPerGroup: 1,
                   spaceBetween: 30,

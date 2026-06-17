@@ -23,7 +23,7 @@ export const HeroSection: React.FC<Props> = ({ heroSlides }) => {
   const heroSwiperRef = useRef<SwiperType | null>(null);
 
   return (
-    <section className="relative h-[930px] w-full pt-[97px]">
+    <section className="relative h-[678px] w-full pt-[97px]">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <Swiper
@@ -274,17 +274,18 @@ export const HeroSection: React.FC<Props> = ({ heroSlides }) => {
         </svg>
       </div>
 
-      <div className="absolute right-10 bottom-10 z-[6000] lg:right-10 lg:bottom-10">
-        <CarouselControls
-          currentSlide={heroCurrentSlide}
-          totalSlides={heroSlides.length}
-          onPrev={() => heroSwiperRef.current?.slidePrev()}
-          onNext={() => heroSwiperRef.current?.slideNext()}
-          progressClass="hero-progress"
-          theme="light"
-        />
-      </div>
-
+      {heroSlides.length > 1 && (
+  <div className="absolute right-10 bottom-10 z-[6000] lg:right-10 lg:bottom-10">
+    <CarouselControls
+      currentSlide={heroCurrentSlide}
+      totalSlides={heroSlides.length}
+      onPrev={() => heroSwiperRef.current?.slidePrev()}
+      onNext={() => heroSwiperRef.current?.slideNext()}
+      progressClass="hero-progress"
+      theme="light"
+    />
+  </div>
+)}
       {/* Content Container */}
       <div className="relative ">
         {/* Hero Section */}

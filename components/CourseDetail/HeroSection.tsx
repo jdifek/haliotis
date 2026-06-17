@@ -1,16 +1,17 @@
 import Image from "next/image";
 import { Breadcrumbs } from "../Breadcrumbs";
-
 type Props = {
   title?: string;
   description?: string;
   centerName?: string;
+  bannerImage?: string;
 };
 
 export const HeroSection = ({ 
   title = "Courses", 
   description = "Do you want to learn how to dive or improve your knowledge and scuba skills? PADI courses and Haliotis team will provide you incredible moments!",
-  centerName 
+  centerName,
+  bannerImage,
 }: Props) => {
   return (
     <section className="relative h-[75vh] w-full pt-[97px]">
@@ -27,11 +28,10 @@ export const HeroSection = ({
         />
       </div>
 
-      {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <div className="relative h-full w-full">
           <Image
-            src="/image 2.png"
+            src={bannerImage || "/image 2.png"}
             alt="Background"
             fill
             className="object-cover"

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState } from "react";
@@ -14,6 +15,7 @@ type AccordionItem = {
 type RecommendedCourse = {
   image: string;
   title: string;
+  currency: string;
   price: number;
   duration: string;
   requestBased: boolean;
@@ -38,6 +40,7 @@ type Props = {
   pricePerPerson: number;
   courseImage: string;
   courseImageAlt: string;
+  recommendedHeader: any;
   courseDescription: string;
   accordionItems: AccordionItem[];
   recommendedCourses: RecommendedCourse[];
@@ -47,6 +50,7 @@ type Props = {
 
 export const CourseDetailClient = ({
   courseTitle,
+  recommendedHeader,
   pricePerPerson,
   courseImage,
   courseImageAlt,
@@ -57,6 +61,7 @@ export const CourseDetailClient = ({
   currency
     }: Props) => {
   const [isBookingOpen, setIsBookingOpen] = useState(false);
+console.log(courseDescription, 'courseDescriptioncourseDescription');
 
   return (
     <>
@@ -79,7 +84,7 @@ export const CourseDetailClient = ({
       />
 
       {recommendedCourses.length > 0 && (
-        <RecommendedCoursesSection courseCards={recommendedCourses} />
+        <RecommendedCoursesSection recommendedHeader={recommendedHeader} courseCards={recommendedCourses} />
       )}
 
       {recommendedEquipment?.equipment && (

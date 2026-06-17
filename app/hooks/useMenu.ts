@@ -99,7 +99,7 @@ async function fetchMenuData(locale: string): Promise<MenuData> {
   if (await _promises[locale]) return _promises[locale];
 
   _promises[locale] = fetch(
-    `https://cp.haliotis.space/api/v1/configs/menus?lang=${locale}`,
+    `${process.env.NEXT_PUBLIC_API_URL}/configs/menus?lang=${locale}`,
     { headers: { Accept: "application/json" } }
   )
     .then((res) => {

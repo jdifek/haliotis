@@ -12,14 +12,16 @@ import { DiveExploreSection } from "@/components/mainSections/DiveExploreSection
 // Функция для получения terms напрямую (для Server Component)
 async function getTerms(locale: string) {
   try {
-    const res = await fetch(`https://cp.haliotis.space/api/v1/menu/${locale}`);
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/configs/menus?lang=${locale}`
+    );
 
     if (!res.ok) {
       return {}; // возвращаем пустой объект если ошибка
     }
 
     const data = await res.json();
-    return data.data?.terms || {};
+    return data?.terms || {};
   } catch (error) {
     console.error("Error fetching terms:", error);
     return {};
@@ -28,7 +30,9 @@ async function getTerms(locale: string) {
 
 async function getHomepageData(lang: string) {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/pages/homepage?lang=${lang}`);
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/pages/homepage?lang=${lang}`
+    );
 
     if (!res.ok) {
       throw new Error("Failed to fetch homepage data");
@@ -83,7 +87,6 @@ export default async function Home({ params }: Props) {
     ),
   ];
 
-  // Остальной код остается без изменений...
   const courseCards = (
     homepageData.sliders?.courses?.diving_centers || []
   ).flatMap((center: any) =>
@@ -96,18 +99,19 @@ export default async function Home({ params }: Props) {
       price: course.price?.amount || 0,
       duration: course.duration_label || "On request",
       requestBased: !course.duration_label,
-badge: course.label?.name || "Course",      location: center.slug,
+      badge: course.label?.name || "Course",
+      location: center.slug,
     }))
   );
 
-  console.log(courseCards, 'courseCards');
-  
+  console.log(courseCards, "courseCards");
 
   const centerCardsData = (
     homepageData.sliders?.diving_centers?.entities || []
   ).map((center: any) => ({
-    image: center.icon_url || "/CTABackgroundImage.png",
+    image: center.icon_url,
     title: center.name,
+    imageFull: center.image_url || "/image 6.png",
     slug: center.slug,
     description: center.small_description || "",
     buttonColor: center.color || "#f49519",
@@ -117,7 +121,7 @@ badge: course.label?.name || "Course",      location: center.slug,
   const tripCards = (homepageData.sliders?.dive_trip?.entities || []).flatMap(
     (center: any) =>
       (center.dive_trips || []).map((trip: any) => ({
-        image: center.icon_url || "/image 6.png",
+        image: center.image_url || "/image 6.png",
         price: parseFloat(trip.price?.amount || 0),
         title: trip.name,
         description: trip.description || center.small_description || "",
@@ -130,28 +134,36 @@ badge: course.label?.name || "Course",      location: center.slug,
       }))
   );
 
-  const diveTripsCards = (
-    homepageData.sliders?.diving_centers?.entities || []
-  ).map((center: any, index: number) => ({
-    image: center.icon_url || "/CTABackgroundImage.png",
-    location: center.name,
-    slug: center.slug,
-    locationNumber: String(center.id || index + 1),
-    description: center.small_description || "",
-  }));
+  const diveTripsCards = (homepageData.sliders?.travels?.entities || []).map(
+    (center: any, index: number) => ({
+      image: center.image || "/CTABackgroundImage.png",
+      location: center.name,
+      slug: center.slug,
+      currency: center.price?.currency,
+      amount: parseFloat(center.price?.amount || 0).toFixed(2).replace(/\.00$/, ''),
+      locationNumber: String(center.divingCenter.id || index + 1),
+      description: center.description || "",
+    })
+  );
+
   console.log(homepageData, "homepageData");
 
   const heroSlides = (homepageData.banner?.slides || [])
-    .filter((slide: any) => slide && (slide.desktop_image_url || slide.mobile_image_url))
+    .filter(
+      (slide: any) =>
+        slide && (slide.desktop_image_url || slide.mobile_image_url)
+    )
     .map((slide: any) => ({
       title: slide.title || "Find the Experience",
       description: slide.description || "The Haliotis Diving Center...",
-      desktopImage: slide.desktop_image_url && slide.desktop_image_url.trim() !== "" 
-        ? slide.desktop_image_url 
-        : "/bg.png",
-      mobileImage: slide.mobile_image_url && slide.mobile_image_url.trim() !== ""
-        ? slide.mobile_image_url
-        : "/bg.png",
+      desktopImage:
+        slide.desktop_image_url && slide.desktop_image_url.trim() !== ""
+          ? slide.desktop_image_url
+          : "/bg.png",
+      mobileImage:
+        slide.mobile_image_url && slide.mobile_image_url.trim() !== ""
+          ? slide.mobile_image_url
+          : "/bg.png",
     }));
 
   console.log(heroSlides, "heroSlides");
@@ -163,14 +175,57 @@ badge: course.label?.name || "Course",      location: center.slug,
       image: brand.image,
     }));
 
+  // promoSliders — берём первый блок (главная секция "Dive. Learn. Explore.")
+  const promoSlider = homepageData.promoSliders?.[0] ?? null;
+
+  const exploreCards = (promoSlider?.slides || [])
+    .sort((a: any, b: any) => (a.position || 0) - (b.position || 0))
+    .map((slide: any) => ({
+      title: slide.title || "",
+      button_name: slide.button_name || "",
+      description: slide.description || "",
+      image: slide.image_url || "/travel.png",
+      tag: slide.button_name || "Explore",
+      href: slide.button_url || "/",
+    }));
+
+  const exploreSectionTitle = promoSlider?.title || "Dive. Learn. Explore.";
+  const exploreSectionSubtitle =
+    promoSlider?.subtitle ||
+    "Courses, dive trips, and travel experiences — find the adventure that's right for you.";
+
   return (
     <main className="-mt-[97px]">
       <HeroSection heroSlides={heroSlides} />
-      <DiveExploreSection />
-      <CentersSection centerCards={centerCardsData} />
-      <CoursesSection locations={locations} courseCards={courseCards} />
-      <TripsSection locations={locations} tripCards={tripCards} />
+      <DiveExploreSection
+        title={exploreSectionTitle}
+        subtitle={exploreSectionSubtitle}
+        cards={exploreCards}
+      />
+      <CentersSection
+        title={homepageData.sliders?.diving_centers?.title}
+        subtitle={homepageData.sliders?.diving_centers?.subtitle}
+        filter_name={homepageData.sliders?.diving_centers?.filter_name}
+        centerCards={centerCardsData}
+      />
+      <CoursesSection
+        filter_name={homepageData.sliders?.dive_trip?.filter_name}
+        title={homepageData.sliders?.dive_trip?.title}
+        subtitle={homepageData.sliders?.dive_trip?.subtitle}
+        locations={locations}
+        courseCards={courseCards}
+      />
+
+      <TripsSection
+        filter_name={homepageData.sliders?.courses?.filter_name}
+        title={homepageData.sliders?.courses?.title}
+        subtitle={homepageData.sliders?.courses?.subtitle}
+        locations={locations}
+        tripCards={tripCards}
+      />
       <DiveTrips
+      locale={locale}
+        diveTripsTitile={homepageData.sliders?.travels?.title}
         diveTripsCards={diveTripsCards}
         equipmentData={{
           title:
@@ -179,6 +234,14 @@ badge: course.label?.name || "Course",      location: center.slug,
           subtitle:
             homepageData.sliders?.equipment?.subtitle ||
             "Discover premium equipment at unbeatable prices — limited-time deals for divers.",
+          label_name:
+            homepageData.sliders?.equipment?.label_name || "Equipment",
+          online_shop_title:
+            homepageData.sliders?.equipment?.online_shop_title ||
+            "Visit our Online Shop",
+          online_shop_link:
+            homepageData.sliders?.equipment?.online_shop_link ||
+            "https://shop.haliotis.pt/",
           partners: partners,
         }}
       />

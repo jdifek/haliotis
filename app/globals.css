@@ -55,3 +55,26 @@ img {
 .equipment-swiper-wrapper {
   overflow: hidden;
 }
+.custom-scroll::-webkit-scrollbar {
+  width: 4px !important;
+}
+
+.custom-scroll::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+  background: #d1d5db !important;
+  border-radius: 999px !important;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af !important;
+}
+.leaflet-container {
+  z-index: 0;
+}
+.custom-dive-marker {
+  background: transparent !important;
+  border: none !important;
+}

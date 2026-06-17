@@ -1079,12 +1079,12 @@ export const BookingFormModal: React.FC<Props> = ({
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
+        className="fixed inset-0 z-[10000000] bg-black/60 backdrop-blur-sm"
         onClick={onClose}
       />
 
       {/* Scroll container */}
-      <div className="fixed inset-0 z-50 overflow-y-auto">
+      <div className="fixed inset-0 z-[10000000] overflow-y-auto ">
         <div className="min-h-full flex items-start justify-center">
           {/* Modal wrapper */}
           <div
@@ -1163,7 +1163,7 @@ export const BookingFormModal: React.FC<Props> = ({
               </button>
             </div>
 
-            <div className="bg-[#f1f1f1] px-6 rounded-b-2xl z-10 rounded-t-2xl shadow-2xl -mt-3 relative">
+            <div className="bg-[#f1f1f1]  px-6 rounded-b-2xl z-10 rounded-t-2xl shadow-2xl -mt-3 relative">
               <div className="py-4 px-6 text-center">
                 <p className="text-[15px] font-medium text-[#111] leading-[140%]">
                   {courseTitle}

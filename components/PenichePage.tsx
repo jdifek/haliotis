@@ -21,21 +21,23 @@ export default function PenichePage({ center, tabs }: Props) {
   const courseCards = center?.sliders?.courses?.entities?.map((course: any) => ({
     image: course.image_url || "/placeholder.png",
     title: course.title || course.name || "Course",
+    currency: course.price.currency,
     price:
       typeof course.price === "object"
-        ? `${course.price.amount} ${course.price.currency}`
+        ? `${course.price.amount} `
         : course.price ?? 0,
-    duration: course.duration ?? "",
-    requestBased: course.request_based ?? false,
-    badge: course.badge ?? "",
+      duration: course.duration_label || "On request",
+      requestBased: !course.duration_label,
+   badge: course.label?.name || "Course",
     location: center.slug,
   })) ?? [];
   const tripCards =
   center?.sliders?.dive_trip?.entities?.map((trip: any) => ({
     image: trip.image_url || "/placeholder.png",
+    currency: trip.price.currency,
     price:
       typeof trip.price === "object"
-        ? `${trip.price.amount} ${trip.price.currency}`
+        ? `${trip.price.amount} `
         : trip.price ?? 0,
     title: trip.name || "Trip",
     description: trip.subtitle || "",
@@ -49,14 +51,20 @@ export default function PenichePage({ center, tabs }: Props) {
       <PenicheHero center={center} />
       <SimpleTripsSection className="!bg-white py-8" tripCards={tripCards} />
       <SimpleCoursesSection
-        className="!bg-[#f1f1f1]"
-        courseCards={courseCards}
+      className="!bg-[#f1f1f1]"
+      courseCards={courseCards}
       />{" "}
       <CenterInfoSection tabs={tabs} />
       <Parceiros partners={center.partners} />
       <div className="md:hidden mx-4 h-px border border-[#e4e4e4] mt-10" />
-      <PaymentMethods paymentMethods={center.payment_methods} />
+      <PaymentMethods paymentMethods={Array.isArray(center.payment_methods) ? center.payment_methods : []} />
+      {Array.isArray(center.legal_supports) ? (
       <LegalInfo legalSupports={center.legal_supports} />
+      ) : (
+      <div className="text-red-500 text-center mt-4">
+        Legal supports data is unavailable.
+      </div>
+      )}
     </div>
   );
 }

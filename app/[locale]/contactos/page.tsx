@@ -1,5 +1,9 @@
 import { HeroBanner } from "@/components/HeroBanner";
+import LeafletMapWithMarkers from "@/components/LeafletMapClient";
 import LocationsSection from "@/components/LocationsSection";
+import dynamic from "next/dynamic";
+
+
 
 interface Slide {
   id: number;
@@ -30,6 +34,30 @@ interface DivingCenter {
   };
 }
 
+interface MenuDivingCenter {
+  id: number;
+  name: string;
+  slug: string;
+  color: string;
+  center_icon_url: string;
+  latitude: string;
+  longitude: string;
+}
+
+interface MenuResponse {
+    diving_centers?: MenuDivingCenter[];
+}
+
+interface DiveCenterMarker {
+  id: number;
+  name: string;
+  slug: string;
+  color: string;
+  iconUrl: string;
+  latitude: number;
+  longitude: number;
+}
+
 interface ContactsPageData {
   id: number;
   slug: string;
@@ -49,6 +77,47 @@ interface ContactsPageData {
   diving_centers: DivingCenter[];
 }
 
+async function getMenu(locale: string): Promise<MenuResponse> {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/configs/menus?lang=${locale}`
+    );
+
+    if (!res.ok) {
+      return {};
+    }
+
+    return (await res.json()) || {};
+  } catch (error) {
+    return {};
+  }
+}
+
+function getDiveCenterMarkers(menu: MenuResponse): DiveCenterMarker[] {
+  const centers = menu?.diving_centers ?? [];
+
+  return centers
+    .map((center) => {
+      const latitude = parseFloat(center.latitude);
+      const longitude = parseFloat(center.longitude);
+
+      if (Number.isNaN(latitude) || Number.isNaN(longitude)) {
+        return null;
+      }
+
+      return {
+        id: center.id,
+        name: center.name,
+        slug: center.slug,
+        color: center.color,
+        iconUrl: center.center_icon_url,
+        latitude,
+        longitude,
+      };
+    })
+    .filter((marker): marker is DiveCenterMarker => marker !== null);
+}
+
 export default async function Contacts({
   params,
 }: {
@@ -56,16 +125,21 @@ export default async function Contacts({
 }) {
   const { locale } = await params;
 
-  const res = await fetch(
-    `https://cp.haliotis.space/api/v1/pages/system/contact_us?lang=${locale}`
-  );
-  const json = await res.json();
+  const [pageRes, menu] = await Promise.all([
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/pages/system/contact_us?lang=${locale}`),
+    getMenu(locale),
+  ]);
+  console.log(menu, 'menumenu');
+  
 
-  // Данные лежат прямо в json.data, без вложенного "page"
+  const json = await pageRes.json();
   const data: ContactsPageData = json.data;
-console.log(data, 'data')
-  // Маппим слайды с учётом двух типов: video и image
-const slides = (data.banner?.slides ?? []).map((slide) => {
+
+  const markers = getDiveCenterMarkers(menu);
+  console.log(markers, 'markers');
+  
+
+  const slides = (data.banner?.slides ?? []).map((slide) => {
     if (slide.type === "video") {
       return {
         image: slide.video_cover_url ?? "",
@@ -84,8 +158,7 @@ const slides = (data.banner?.slides ?? []).map((slide) => {
     };
   });
 
-const firstSlide = data.banner?.slides?.[0];
-console.log(data.diving_centers, 'data.diving_centers');
+  const firstSlide = data.banner?.slides?.[0];
 
   return (
     <>
@@ -138,7 +211,6 @@ console.log(data.diving_centers, 'data.diving_centers');
         </section>
       </HeroBanner>
 
-      {/* Передаём diving_centers вместо несуществующего contacts */}
       <LocationsSection contacts={data.diving_centers} />
 
       <section className="bg-[#f1f1f1] px-4 pb-12 md:px-[30px] md:pb-[50px]">
@@ -161,7 +233,6 @@ console.log(data.diving_centers, 'data.diving_centers');
               color: "#fff",
             }}
           >
-            {/* system_data.center_label вместо page.center_label */}
             {data.system_data.center_label}
           </h2>
         </div>
@@ -173,15 +244,7 @@ console.log(data.diving_centers, 'data.diving_centers');
             height: "clamp(200px, 40vw, 1053px)",
           }}
         >
-          <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3065.123456789!2d-9.3817!3d39.3558!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd1f17c6b1234567%3A0x1234567890abcdef!2sHaliotis!5e0!3m2!1sen!2spt!4v1234567890"
-            width="100%"
-            height="100%"
-            style={{ border: 0, display: "block" }}
-            allowFullScreen
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-          />
+          <LeafletMapWithMarkers markers={markers} />
         </div>
       </section>
     </>

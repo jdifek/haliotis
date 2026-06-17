@@ -126,7 +126,7 @@ const Diving = () => {
     setDivingData(null);
 
     fetch(
-      `https://cp.haliotis.space/api/v1/diving-category/diving?center_id=${activeCenter.id}&lang=${locale}&attach_regions=true`,
+      `${process.env.NEXT_PUBLIC_API_URL}/diving-category/diving?center_id=${activeCenter.id}&lang=${locale}&attach_regions=true`,
       { headers: { Accept: "application/json" } }
     )
       .then((r) => r.json())
@@ -272,7 +272,7 @@ const Diving = () => {
               const rowStartIndex = rowIndex * colCount;
               return (
                 <div key={`${activeTab}-${currentPage}-row-${rowIndex}`}>
-                  <div className="grid max-[700px]:grid-cols-1 max-[1500px]:grid-cols-2 min-[1500px]:grid-cols-3 gap-5">
+                  <div className="grid max-[700px]:grid-cols-1 max-[1670px]:grid-cols-2 min-[1670px]:grid-cols-3 gap-5">
                     {row.map((card, colIndex) => {
                       const globalIndex = rowStartIndex + colIndex;
                       return (
