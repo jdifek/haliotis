@@ -128,24 +128,31 @@ function LocationCard({ location }: { location: Location }) {
       {/* Top-right icon */}
       <div className="absolute -top-10 right-4 md:right-5">
         <div
-          style={{
-            width: 76,
-            height: 80,
-            borderRadius: 16,
-            overflow: "hidden",
-            backgroundColor: location.color,
-            position: "relative",
-          }}
-        >
-          {location.iconUrl && (
-            <Image
-              src={location.iconUrl}
-              alt={location.name}
-              fill
-              className="object-cover"
-            />
-          )}
-        </div>
+  style={{
+    width: 84,
+    height: 84,
+    borderRadius: 16,
+    border: `5px solid ${location.color}`,
+    backgroundColor: "white",
+    position: "relative",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  }}
+>
+  {location.iconUrl && (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={location.iconUrl}
+      alt={location.name}
+      style={{
+        maxWidth: "90%",
+        maxHeight: "90%",
+        objectFit: "contain",
+      }}
+    />
+  )}
+</div>
       </div>
 
       {/* Card title */}
