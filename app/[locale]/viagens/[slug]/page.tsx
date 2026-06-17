@@ -87,7 +87,7 @@ locationId: t.divingCenter?.slug ?? "",
     images: t.image ? [t.image] : ["/travel.png"],
 price: parseFloat(t.price?.amount ?? "0"),
     title: t.name,
-    description: "",
+    description: t.description,
     link: `/trips/${t.slug}`,
   }));
 
