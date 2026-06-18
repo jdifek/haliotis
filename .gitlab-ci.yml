@@ -1,0 +1,86 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  TAG_LATEST: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG:latest
+  TAG_COMMIT: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG:$CI_COMMIT_SHORT_SHA
+
+# ==========================================
+# Templates
+# ==========================================
+.build_template:
+  stage: build
+  tags:
+    - gitlab-docker-builder
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN $CI_REGISTRY
+  script:
+    - docker build --build-arg NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL} --build-arg NEXT_PUBLIC_API_DOMAIN=${NEXT_PUBLIC_API_DOMAIN} -f Dockerfile -t $TAG_COMMIT -t $TAG_LATEST .
+    - docker push $TAG_COMMIT
+    - docker push $TAG_LATEST
+
+.deploy_template:
+  stage: deploy
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN $CI_REGISTRY
+  script:
+    - docker stop haliotis-frontend && docker rm haliotis-frontend || true
+    - docker run -d -p 3000:3000 --name haliotis-frontend $TAG_COMMIT
+
+# ==========================================
+# DEV 
+# ==========================================
+docker_build_dev:
+  extends: .build_template
+  environment:
+    name: dev
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev"'
+
+deploy_dev:
+  extends: .deploy_template
+  environment:
+    name: dev
+  tags:
+    - haliotis-dev
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev"'
+
+# ==========================================
+# STAGE 
+# ==========================================
+docker_build_stage:
+  extends: .build_template
+  environment:
+    name: stage
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "stage"'
+
+deploy_stage:
+  extends: .deploy_template
+  environment:
+    name: stage
+  tags:
+    - haliotis-stage
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "stage"'
+
+# ==========================================
+# PROD 
+# ==========================================
+docker_build_prod:
+  extends: .build_template
+  environment:
+    name: prod
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+deploy_prod:
+  extends: .deploy_template
+  environment:
+    name: prod
+  tags:
+    - haliotis-prod
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: manual
