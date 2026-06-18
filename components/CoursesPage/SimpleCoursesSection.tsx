@@ -24,11 +24,15 @@ type Props = {
     badge: string;
     location: string;
   }[];
+  title?: string;
+  description?: string;
 };
 
 export const SimpleCoursesSection: React.FC<Props> = ({
   className,
   courseCards,
+  title,
+  description,
 }) => {
   const coursesSwiperRef = useRef<SwiperType | null>(null);
   const [coursesCurrentSlide, setCoursesCurrentSlide] = useState(0);
@@ -40,10 +44,10 @@ export const SimpleCoursesSection: React.FC<Props> = ({
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div className="flex flex-col gap-[10px]">
             <h2 className="text-[28px] font-medium leading-[130%] text-black sm:text-[36px] lg:text-[clamp(32px,2.5vw,42px)]">
-              Upcoming Courses
+              {title || "Upcoming Courses"}
             </h2>
             <p className="text-[15px] font-normal leading-[160%] text-[#101010] opacity-80">
-              The perfect course for you
+              {description || "The perfect course for you"}
             </p>
           </div>
           <div className="hidden sm:block">

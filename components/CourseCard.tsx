@@ -15,6 +15,8 @@ type CourseCardProps = {
   image: string;
   title: string;
   price: number;
+    purchaseLink?: string;
+
   duration: string;
   requestBased?: boolean;
   badge?: string;
@@ -27,6 +29,7 @@ type CourseCardProps = {
   image,
   title,
   price,
+  purchaseLink,
   duration,
   requestBased = false,
   badge,
@@ -40,9 +43,18 @@ type CourseCardProps = {
   const locale = useLocale(); // ← ДОБАВЛЕНО
 
 const handleCardClick = () => {
+  if (purchaseLink) {
+    window.open(purchaseLink, "_blank", "noopener,noreferrer");
+    return;
+  }
+
   if (!slug || !centerSlug) return;
-  const categoryPart = categorySlug || "all"; // фикс: без категории — sentinel, а не пропуск сегмента
-  router.push(`/${locale}/cursos/${categoryPart}/${centerSlug}/${slug}`);
+
+  const categoryPart = categorySlug || "all";
+
+  router.push(
+    `/${locale}/cursos/${categoryPart}/${centerSlug}/${slug}`
+  );
 };
   return (
     <>
@@ -62,6 +74,8 @@ const handleCardClick = () => {
             </div>
           )}
 
+{duration !== "false" && (
+  
           <div className="absolute bottom-3 left-3 flex flex-col md:flex-row items-start md:items-center gap-0.5 md:gap-1 rounded-lg bg-black/50 p-0.5">
             <div className="flex items-center gap-1 rounded-lg bg-black/50 p-1 lg:px-2 lg:py-1.5 xl:px-3 xl:py-2">
               <svg
@@ -103,7 +117,10 @@ const handleCardClick = () => {
               </span>
             </div>
           </div>
+)}
+
         </div>
+        
 
         {/* Content */}
         <div className="mt-2 sm:mt-3 h-[220px] md:h-[165px] rounded-2xl bg-[#f1f1f1] p-2 sm:p-3 flex flex-col justify-between">
@@ -125,10 +142,16 @@ const handleCardClick = () => {
 </div>
 
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsBookingOpen(true);
-              }}
+          onClick={(e) => {
+  e.stopPropagation();
+
+  if (purchaseLink) {
+    window.open(purchaseLink, "_blank", "noopener,noreferrer");
+    return;
+  }
+
+  setIsBookingOpen(true);
+}}
               className="flex items-center justify-between whitespace-nowrap cursor-pointer w-full md:w-[160px] rounded-full bg-[#e84814] py-0.5 pl-[14px] md:pl-4 pr-0.5 transition-all hover:bg-[#d63f0f]"
             >
               <span className="text-[15px] font-bold leading-[120%] text-white">

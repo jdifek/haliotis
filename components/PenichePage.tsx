@@ -50,21 +50,24 @@ export default function PenichePage({ center, tabs }: Props) {
     <div className="min-h-screen bg-white">
       <PenicheHero center={center} />
       <SimpleTripsSection className="!bg-white py-8" tripCards={tripCards} />
-      <SimpleCoursesSection
-      className="!bg-[#f1f1f1]"
-      courseCards={courseCards}
-      />{" "}
+ <SimpleCoursesSection
+  className="!bg-[#f1f1f1]"
+  title={center.sliders?.courses?.subtitle}
+  description={center.sliders?.courses?.description}
+  courseCards={courseCards}
+/>
       <CenterInfoSection tabs={tabs} />
       <Parceiros partners={center.partners} />
       <div className="md:hidden mx-4 h-px border border-[#e4e4e4] mt-10" />
-      <PaymentMethods paymentMethods={Array.isArray(center.payment_methods) ? center.payment_methods : []} />
-      {Array.isArray(center.legal_supports) ? (
-      <LegalInfo legalSupports={center.legal_supports} />
-      ) : (
-      <div className="text-red-500 text-center mt-4">
-        Legal supports data is unavailable.
-      </div>
-      )}
+     <PaymentMethods
+  title={center.payment_methods?.title}
+  paymentMethods={center.payment_methods?.entities || []}
+/>
+
+<LegalInfo
+  title={center.legal_supports?.title}
+  legalSupports={center.legal_supports?.entities || []}
+/>
     </div>
   );
 }

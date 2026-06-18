@@ -5,11 +5,12 @@ import Card from "./Card";
 
 interface LegalInfo {
   logo: string;
+  title:string
   name: string;
 }
 
-type Props = { legalSupports: { id: number; name: string; images: string }[] };
-export const LegalInfo = ({ legalSupports }: Props) => {
+type Props = {title:string, legalSupports: { id: number; name: string; images: string }[] };
+export const LegalInfo = ({ title, legalSupports }: Props) => {
     const [isOpen, setIsOpen] = useState(false);
 
 
@@ -18,7 +19,7 @@ export const LegalInfo = ({ legalSupports }: Props) => {
     <div className="mx-auto max-w-[1920px] bg-white pb-8 md:py-12 px-4 md:px-8 lg:px-[188px] mt-8 md:mt-0">
       {/* Desktop - обычный заголовок */}
       <h2 className="hidden md:block text-black text-[24px] font-medium leading-[140%] mb-8">
-        Informação Legal
+        {title}
       </h2>
 
       {/* Mobile - аккордеон заголовок */}
@@ -26,7 +27,7 @@ export const LegalInfo = ({ legalSupports }: Props) => {
         onClick={() => setIsOpen(!isOpen)}
         className="md:hidden w-full flex items-center justify-between text-black text-[24px] font-medium leading-[140%] mb-8"
       >
-        <span>Informação Legal</span>
+        <span>{title}</span>
         <svg
           width="24"
           height="24"

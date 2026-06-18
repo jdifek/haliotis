@@ -3,23 +3,22 @@
 import React, { useState } from "react";
 import Card from "./Card";
 
-type Props = { paymentMethods: { id: number; name: string; images: string }[] };
-export const PaymentMethods = ({ paymentMethods }: Props) => {
+type Props = { title:string, paymentMethods: { id: number; name: string; images: string }[] };
+export const PaymentMethods = ({ title, paymentMethods }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <div className="mx-auto max-w-[1920px] bg-white pt-8 md:py-12 px-4 md:px-8 lg:px-[188px]">
       {/* Desktop - обычный заголовок */}
       <h2 className="hidden md:block text-black text-[24px] font-medium leading-[140%] mb-8">
-        Meios de Pagamento
-      </h2>
+  {title}      </h2>
 
       {/* Mobile - аккордеон заголовок */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="md:hidden w-full flex items-center justify-between text-black text-[24px] font-medium leading-[140%] mb-8"
       >
-        <span>Meios de Pagamento</span>
+        <span>{title}</span>
         <svg
           width="24"
           height="24"

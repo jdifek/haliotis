@@ -74,7 +74,7 @@ export function FancyboxGallery({ images, previewImage }: Props) {
                     fill="white"
                   />
                 </svg>
-          <span className="text-[15px] text-white">{extraCount > 0 ? `${extraCount}+` : allImages.length}</span>
+          <span className="text-[15px] text-white">{extraCount > 0 ? `${extraCount}` : allImages.length}</span>
         </div>
       </a>
 

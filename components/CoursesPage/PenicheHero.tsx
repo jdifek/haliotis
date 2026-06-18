@@ -101,15 +101,17 @@ export const PenicheHero = ({ center }: Props) => {
       hidden
       min-[1440px]:grid
       min-[1440px]:grid-cols-[140px_1fr_1fr]
-      min-[1440px]:auto-rows-[442px]
+      min-[1440px]:auto-rows-[486px]
       min-[1440px]:gap-6
       min-[1920px]:grid-cols-[140px_732px_1fr]
     "
         >
           {" "}
           <div
-            className="flex items-center justify-center overflow-hidden rounded-[16px] w-[140px] h-[442px]"
-            style={{ backgroundColor: center.color ?? "#f49519" }}
+            className="flex items-center justify-center overflow-hidden rounded-[16px] w-[140px] h-[486px]"
+            style={{ 
+              border: `5px solid ${center.color ?? "#f49519"}`,
+            }}
           >
             {" "}
             <img
@@ -119,7 +121,7 @@ export const PenicheHero = ({ center }: Props) => {
 />
           </div>
           {/* Main Info Card - 732x442 */}
-          <div className="flex w-full h-[442px] overflow-hidden rounded-[20px] bg-white">
+          <div className="flex w-full h-[486px] overflow-hidden rounded-[20px] bg-white">
             <div className="flex w-1/2 flex-col px-4 py-3">
               <h1 className="mb-3 text-[48px] font-medium leading-[130%] text-[#111]">
                 {center.center_name}
@@ -190,7 +192,7 @@ export const PenicheHero = ({ center }: Props) => {
           >
             {" "}
             <div className="flex overflow-hidden rounded-[16px]">
-              <div className="relative h-[442px] bg-[#9bb4d4]  min-w-1/2 rounded-l-[16px]">
+              <div className="relative h-[486px] bg-[#9bb4d4]  min-w-1/2 rounded-l-[16px]">
                 <MapContainer
                   center={mapCenter}
                   zoom={8}
@@ -211,7 +213,7 @@ export const PenicheHero = ({ center }: Props) => {
                   </svg>
                 </div>
               </div>
-              <div className="space-y-3 bg-white p-3 flex flex-col px-4 w-full h-[442px] rounded-r-[16px]">
+              <div className="space-y-3 bg-white p-3 flex flex-col px-4 w-full h-[486px] rounded-r-[16px]">
                 <div className="rounded-[16px] bg-[#f1f1f1] py-[31px] px-4">
                   {center.contact_phone?.split(",").map((phone, i) => (
                     <a
@@ -233,6 +235,8 @@ export const PenicheHero = ({ center }: Props) => {
                       {phone.trim()}
                     </a>
                   ))}
+
+
                   <div className="flex items-center gap-3 text-[15px] text-[#111] mb-3">
                     <svg width="20" height="23" viewBox="0 0 20 23" fill="none">
                       <path
@@ -306,7 +310,54 @@ export const PenicheHero = ({ center }: Props) => {
                     </svg>
                     peniche@haliotis.pt
                   </a>
+                                    {/* Соціальні мережі */}
+<div className="flex items-center justify-center gap-4 mt-2">
+  {center.contact_tripadvisor && (
+     <a
+      href={center.contact_tripadvisor}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-[#111] hover:text-[#e84814] transition-colors"
+      aria-label="TripAdvisor"
+    >
+     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.6827 9.28867C13.7645 9.28867 13.0208 10.033 13.0208 10.9505C13.0208 11.868 13.7652 12.6124 14.6827 12.6124C15.6008 12.6124 16.3445 11.868 16.3445 10.9505C16.3445 10.6443 16.262 10.358 16.1177 10.1118L16.122 10.1199C15.8295 9.61992 15.2945 9.28867 14.6827 9.28867ZM5.31703 9.28867C4.39891 9.28867 3.65516 10.033 3.65516 10.9505C3.65516 11.868 4.39953 12.6124 5.31703 12.6124C6.23516 12.6124 6.97891 11.868 6.97891 10.9505C6.97891 10.6443 6.89641 10.358 6.75203 10.1118L6.75641 10.1199C6.46391 9.61992 5.92891 9.28867 5.31703 9.28867ZM14.6827 7.78117C14.6833 7.78117 14.6833 7.78117 14.6839 7.78117C16.4339 7.78117 17.8527 9.19992 17.8527 10.9499C17.8527 12.6999 16.4339 14.1187 14.6839 14.1187C12.9339 14.1187 11.5152 12.6999 11.5152 10.9499C11.5152 10.3668 11.6727 9.82055 11.947 9.35117L11.9389 9.36617C12.4964 8.4118 13.5158 7.7818 14.6827 7.78117ZM5.31703 7.7793C7.06766 7.7793 8.48703 9.19867 8.48703 10.9493C8.48703 12.6999 7.06766 14.1193 5.31703 14.1193C3.56641 14.1193 2.14703 12.6999 2.14703 10.9493C2.14703 10.3655 2.30453 9.81867 2.57953 9.3493L2.57141 9.3643C3.12953 8.40992 4.14953 7.7793 5.31703 7.7793ZM10.0014 5.51305C11.2714 5.51367 12.4802 5.77305 13.5789 6.24117L13.5189 6.21867C11.5358 6.89992 10.1145 8.69992 10.0014 10.8468L10.0008 10.8593C9.88828 8.69992 8.46641 6.8993 6.51953 6.2293L6.48328 6.21867C7.52203 5.77367 8.73141 5.51492 10.0008 5.5143L10.0014 5.51305ZM10.0064 3.98242C10.0052 3.98242 10.0033 3.98242 10.002 3.98242C7.77391 3.98242 5.70641 4.6693 3.99953 5.84367L4.03516 5.82055H0.628906L2.16203 7.48805C1.21953 8.34805 0.630781 9.58117 0.630781 10.9518C0.630781 13.538 2.72766 15.6349 5.31391 15.6349C6.54578 15.6349 7.66641 15.1593 8.50266 14.3818L8.49953 14.3843L10.0008 16.018L11.502 14.3855C12.3352 15.1599 13.4558 15.6355 14.6877 15.6355C17.2745 15.6355 19.3714 13.5387 19.3714 10.9518C19.3714 9.58117 18.7827 8.34742 17.8439 7.49117L17.8402 7.48805L19.3733 5.82055H15.9758C14.3052 4.66992 12.2383 3.98305 10.0102 3.98305C10.0083 3.98305 10.007 3.98305 10.0052 3.98305L10.0064 3.98242Z" fill="#E84814"></path></svg>
+    </a>
+  )}
+
+  {center.contact_facebook && (
+     <a
+      href={center.contact_facebook}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-[#111] hover:text-[#e84814] transition-colors"
+      aria-label="Facebook"
+    >
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path
+          d="M14 8.5H16V5.5H14C12.067 5.5 10.5 7.067 10.5 9V11H8.5V14H10.5V19.5H13.5V14H16L16.5 11H13.5V9C13.5 8.724 13.724 8.5 14 8.5Z"
+          fill="#E84814"
+        />
+      </svg>
+    </a>
+  )}
+
+  {center.contact_youtube && (
+    <a
+      href={center.contact_youtube}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-[#111] hover:text-[#e84814] transition-colors"
+      aria-label="YouTube"
+    >
+      <svg width="26" height="18" viewBox="0 0 26 18" fill="none">
+        <rect x="0.75" y="0.75" width="24.5" height="16.5" rx="4" stroke="#E84814" strokeWidth="1.5" />
+        <path d="M10.5 5.5L17 9L10.5 12.5V5.5Z" fill="#E84814" />
+      </svg>
+    </a>
+  )}
+</div>
                 </div>
+                
                 <div className="mt-4 space-y-1 text-[15px] text-[#111]">
                   <div className="flex items-center gap-3">
                     <svg
@@ -328,6 +379,7 @@ export const PenicheHero = ({ center }: Props) => {
                       <p>{center.contact_address}</p>
                     </div>
                   </div>
+                  
                 </div>
 
                 <BlackActionButton

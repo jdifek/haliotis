@@ -5,6 +5,7 @@ import { useState } from "react";
 import { CourseDetailHeroSection } from "@/components/CourseDetail/CourseDetailHeroSection";
 import { RecommendedCoursesSection } from "@/components/CourseDetail/RecommendedCoursesSection";
 import { BookingFormModal } from "@/components/Modals/BookingFormModal";
+import { CourseCard } from "./CourseCard";
 
 type AccordionItem = {
   id: string;
@@ -62,6 +63,7 @@ export const CourseDetailClient = ({
     }: Props) => {
   const [isBookingOpen, setIsBookingOpen] = useState(false);
 console.log(courseDescription, 'courseDescriptioncourseDescription');
+console.log(recommendedEquipment, 'recommendedEquipment.equipment');
 
   return (
     <>
@@ -86,24 +88,32 @@ console.log(courseDescription, 'courseDescriptioncourseDescription');
       {recommendedCourses.length > 0 && (
         <RecommendedCoursesSection recommendedHeader={recommendedHeader} courseCards={recommendedCourses} />
       )}
+<section className="bg-white px-4 py-10 md:px-[30px] lg:px-[188px] md:py-[60px]">
+  <div className="mb-8 md:mb-10">
+    <h2 className="text-[42px] font-medium leading-[130%] text-[#000] mb-2">
+      {recommendedEquipment.headers.title}
+    </h2>
 
-      {recommendedEquipment?.equipment && (
-        <section className="bg-white px-4 py-10 md:px-[30px] lg:px-[188px] md:py-[60px]">
-          <div className="mb-8 md:mb-10">
-            <h2 className="text-[42px] font-medium leading-[130%] text-[#000] mb-2">
-              {recommendedEquipment.headers.title}
-            </h2>
-            <p className="text-[15px] font-normal leading-[160%] text-[#101010] opacity-80">
-              {recommendedEquipment.headers.description}
-            </p>
-          </div>
+    <p className="text-[15px] font-normal leading-[160%] text-[#101010] opacity-80">
+      {recommendedEquipment.headers.description}
+    </p>
+  </div>
 
-          <div
-            className="text-[15px] font-normal leading-[160%] text-[#101010] opacity-80"
-            dangerouslySetInnerHTML={{ __html: recommendedEquipment.equipment }}
-          />
-        </section>
-      )}
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+   {recommendedEquipment?.equipment?.map((item) => (
+  <CourseCard
+    key={item.id}
+    image={item.image}
+    title={item.name}
+    price={Number(item.price.amount)}
+    currency={item.price.currency}
+    duration="false"
+    requestBased={false}
+    purchaseLink={item.purchase_link}
+  />
+))}
+  </div>
+</section>
     </>
   );
 };
