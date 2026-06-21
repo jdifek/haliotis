@@ -19,12 +19,12 @@ type ArticleCardProps = {
   isExpanded?: boolean;
   onToggleExpand?: () => void;
   details?: string;
+  detailsLoading?: boolean;
   equipmentPrice?: string;
   bgTextBlock?: string;
   duration?: string;
   borderColor?: string;
 };
-
 export const ArticleCard: React.FC<ArticleCardProps> = ({
   image,
   price,
@@ -36,6 +36,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
   isExpanded = false,
   onToggleExpand,
   details,
+  detailsLoading,
   equipmentPrice,
   duration,
   borderColor = "#f49519",
@@ -131,13 +132,14 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
           {isExpanded && (
             <div className="lg:hidden mt-4 space-y-3">
               {/* Details */}
-              {details && (
-                <div
-                  className="text-[13px] leading-[160%] text-[#101010] opacity-80"
-                  dangerouslySetInnerHTML={{ __html: details }}
-                />
-              )}
-
+            {/* Details */}
+{details && (
+  <div
+    className="text-[13px] leading-[160%] text-[#101010]"
+    style={{ opacity: detailsLoading ? 0.4 : 0.8, transition: "opacity 0.3s" }}
+    dangerouslySetInnerHTML={{ __html: details }}
+  />
+)}
               {/* Bottom block with title, price and button */}
               <div className="w-full bg-[#f1f1f1] rounded-3xl p-4 flex flex-col items-center mb-2 justify-center gap-4">
                 <h3 className="text-[24px] font-medium leading-[1.3] text-center text-black">
