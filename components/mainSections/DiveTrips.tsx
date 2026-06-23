@@ -158,7 +158,7 @@ export const DiveTrips: React.FC<Props> = ({
               </p>
 
               <ButtonWithIcon
-                href={`/centros/${diveTripsCards[diveTripsCurrentSlide].slug}`}
+                href={`/viagens/${diveTripsCards[diveTripsCurrentSlide].slug}`}
                 width="164px"
                 label={terms.find_more || 'Find More'}
                 textColor="text-black"

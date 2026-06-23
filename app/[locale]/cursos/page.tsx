@@ -140,11 +140,13 @@ const Courses = ({ initialCenterSlug, initialCategorySlug }: CoursesProps) => {
   const [totalPages, setTotalPages] = useState(1);
   const [coursesLoading, setCoursesLoading] = useState(false);
   const [coursesError, setCoursesError] = useState<string | null>(null);
-
-  useEffect(() => {
+useEffect(() => {
   if (initialCategorySlug && categories.length > 0 && selectedCategoryId === null) {
     const found = categories.find((c) => c.slug === initialCategorySlug);
-    if (found) setSelectedCategoryId(found.id);
+    if (found) {
+      setSelectedCategoryId(found.id);
+      setSelectedCategoryData(found);
+    }
   }
 }, [initialCategorySlug, categories, selectedCategoryId]);
   // ← ИЗМЕНЁН: учитываем initialCenterSlug
@@ -220,15 +222,21 @@ const Courses = ({ initialCenterSlug, initialCategorySlug }: CoursesProps) => {
     loadCourses();
   }, [loadCourses]);
 
-  const handleTabChange = (slug: string) => {
-    setActiveTabId(slug);
-    setCurrentPage(1);
-    setSelectedCategoryId(null);
-    setSelectedCategoryData(null);
-    setCategories([]);
-    router.push(`/${locale}/cursos/${slug}`);
-  };
+const handleTabChange = (slug: string) => {
+  const currentCategorySlug = selectedCategoryData?.slug ?? null;
 
+  setActiveTabId(slug);
+  setCurrentPage(1);
+  setSelectedCategoryId(null);
+  setSelectedCategoryData(null);
+  setCategories([]);
+
+  if (currentCategorySlug) {
+    router.push(`/${locale}/cursos/${currentCategorySlug}/${slug}`, { scroll: false });
+  } else {
+    router.push(`/${locale}/cursos/${slug}`, { scroll: false });
+  }
+};
 const handleCategoryChange = (categoryId: string | null) => {
   setSelectedCategoryId(categoryId);
   setCurrentPage(1);
@@ -237,11 +245,11 @@ const handleCategoryChange = (categoryId: string | null) => {
     const categoryData = categories.find((cat) => cat.id === categoryId);
     setSelectedCategoryData(categoryData || null);
     if (categoryData) {
-router.push(`/${locale}/cursos/${categoryData.slug}/${centerSlug}`);
+      router.push(`/${locale}/cursos/${categoryData.slug}/${centerSlug}`, { scroll: false });
     }
   } else {
     setSelectedCategoryData(null);
-    router.push(`/${locale}/cursos/${centerSlug}`);
+    router.push(`/${locale}/cursos/${centerSlug}`, { scroll: false });
   }
 };
   useEffect(() => {

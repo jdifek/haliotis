@@ -24,70 +24,59 @@ export const CenterCard: React.FC<CenterCardProps> = ({
 }) => {
   return (
     <div
-      className={`relative w-full max-w-[363px] min-h-[320px] overflow-hidden rounded-[20px] p-5 lg:pt-10 ${className}`}
-    >
-      {/* Background */}
-      <div className="absolute inset-0 z-0">
+className={`relative flex-1 min-w-[220px] h-[460px] overflow-hidden rounded-[20px] ${className}`}    >
+      {/* Full-height background photo */}
+      <div className="absolute inset-0">
         <img
           src={imageFull}
           alt={title}
-          width={364}
-          height={550}
           className="h-full w-full object-cover"
         />
       </div>
 
-      {/* Overlay */}
-      <div className="absolute inset-0 z-[1] bg-black/40" />
+      {/* Small icon, top-left, overlaid on the photo */}
+      {image && (
+        <div className="absolute left-4 top-4 z-10">
+          <Image src={image} alt="" width={86} height={86} className="h-auto w-[86px]" />
+        </div>
+      )}
 
-      {/* Content */}
-      <div className="relative z-10 flex h-full flex-col">
-        {/* Top */}
-        <div>
-          <h3 className="mb-4 text-[24px] font-medium leading-[140%] text-white">
+      {/* Floating color panel */}
+      <div
+        className="absolute inset-x-3 bottom-3 z-10 flex flex-col gap-3 rounded-[16px] p-4 sm:inset-x-5 sm:bottom-5 sm:gap-4 sm:rounded-[20px] sm:p-5"
+        style={{ backgroundColor: buttonColor }}
+      >
+        <div className="flex flex-col gap-2">
+          <h3 className="text-[20px] font-medium leading-[140%] text-white sm:text-[24px]">
             {title}
           </h3>
 
-          <p className="text-[15px] font-normal leading-[160%] text-white opacity-80">
+          <p className="text-[14px] font-normal leading-[160%] text-white opacity-90 sm:text-[15px]">
             {description}
           </p>
         </div>
 
-        {/* Bottom */}
-        <div className="mt-auto flex items-end justify-between pt-6">
-          <ButtonWithIcon
-            href={`/centros/${slug}`}
-            label="More Info"
-            onClick={onMoreInfoClick}
-            className="hover:opacity-90"
-            style={{ backgroundColor: buttonColor }}
-            width="148px"
-            height="48px"
-            icon={
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-              >
-                <path
-                  d="M7.5 15L12.5 10L7.5 5"
-                  stroke={buttonColor}
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            }
-          />
-
-          <Image
-            src={image}
-            alt={title}
-            width={117}
-            height={80}
-          />
-        </div>
+        <ButtonWithIcon
+          href={`/centros/${slug}`}
+          label="More info"
+          onClick={onMoreInfoClick}
+          bgColor="#fff"
+          textColor="text-black"
+          iconBgColor={buttonColor}
+          width="100%"
+          height="48px"
+          icon={
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path
+                d="M7.5 15L12.5 10L7.5 5"
+                stroke="#fff"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          }
+        />
       </div>
     </div>
   );
