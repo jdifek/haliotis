@@ -513,19 +513,19 @@ const centersData = (() => {
     );
 
     return orderedChildren
-      .map((child: any) => {
-        const c = centerBySlug[child.slug];
-        if (!c) return null;
-        return {
-          id: c.slug,
-          label: c.name.toUpperCase(),
-          color: c.color,
-          image: c.center_icon_url ?? "",
-          url: localizeUrl(child.url ?? `/centros/${child.slug}`),
-          new_tab: child.new_tab ?? false,
-        };
-      })
-      .filter(Boolean);
+  .map((child: any) => {
+    const c = centerBySlug[child.slug];
+    if (!c) return null;
+    return {
+      id: c.slug,
+      label: c.name.toUpperCase(),
+      color: c.color,
+      image: c.center_icon_url ?? "",
+      url: localizeUrl(child.url ?? `/centros/${child.slug}`),
+      new_tab: child.new_tab ?? false,
+    };
+  })
+  .filter((c): c is NonNullable<typeof c> => c !== null);
   })();
  const navItems = (menuData?.data.main ?? []).map((item) => {
   const firstCenterSlug = centersData[0]?.id ?? "";
