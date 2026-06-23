@@ -20,7 +20,7 @@ export default function PenichePage({ center, tabs }: Props) {
   
   const courseCards = center?.sliders?.courses?.entities?.map((course: any) => ({
     image: course.image_url || "/placeholder.png",
-    title: course.title || course.name || "Course",
+    title: course.title || course.name,
     currency: course.price.currency,
     price:
       typeof course.price === "object"
@@ -28,7 +28,7 @@ export default function PenichePage({ center, tabs }: Props) {
         : course.price ?? 0,
       duration: course.duration_label || "On request",
       requestBased: !course.duration_label,
-   badge: course.label?.name || "Course",
+   badge: course.labels,
     location: center.slug,
   })) ?? [];
   const tripCards =

@@ -201,7 +201,7 @@ console.log(courseData, 'courseData')
     currency: course.price?.currency || 0,
     duration: course.duration_label || "3hrs",
      requestBased: !course.duration_label,
-    badge: course.label?.name || "Course",
+    badge: course.labels?.length > 0 ? course.labels : [],
     location: course.centers[0].slug,
     slug: course.slug,
     centerSlug: centerSlug,

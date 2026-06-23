@@ -19,7 +19,7 @@ type CourseCardProps = {
 
   duration: string;
   requestBased?: boolean;
-  badge?: string;
+  badge?: { name: string }[];
   slug?: string;
   currency?: string;
   centerSlug?: string;
@@ -66,13 +66,20 @@ const handleCardClick = () => {
         <div className="relative w-full overflow-hidden rounded-2xl">
           <img src={image} alt={title} className="h-full w-full object-cover" />
 
-          {badge && (
-            <div className="absolute right-3 top-3 rounded-2xl bg-black/10 px-2.5 py-1">
-              <span className="text-[15px] leading-[160%] text-[#f1f1f1]">
-                {badge}
-              </span>
-            </div>
-          )}
+    {badge && badge.length > 0 && (
+  <div className="absolute right-3 top-3 flex flex-col items-end gap-1">
+    {badge.map((item) => (
+      <div
+        key={item.name}
+        className="rounded-2xl w-fit bg-black/10 px-2.5 py-1"
+      >
+        <span className="block text-[15px]  leading-[160%] text-[#f1f1f1]">
+          {item.name}
+        </span>
+      </div>
+    ))}
+  </div>
+)}
 
 {duration !== "false" && (
   

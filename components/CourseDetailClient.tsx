@@ -64,6 +64,7 @@ export const CourseDetailClient = ({
   const [isBookingOpen, setIsBookingOpen] = useState(false);
 console.log(courseDescription, 'courseDescriptioncourseDescription');
 console.log(recommendedEquipment, 'recommendedEquipment.equipment');
+console.log(recommendedCourses, 'recommendedCourses');
 
   return (
     <>

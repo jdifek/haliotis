@@ -100,7 +100,7 @@ console.log(homepageData, 'homepageData');
       price: course.price?.amount || 0,
       duration: course.duration_label || "On request",
       requestBased: !course.duration_label,
-      badge: course.label?.name || "Course",
+    badge: course.labels?.length > 0 ? course.labels : [],
       location: center.slug,
     }))
   );

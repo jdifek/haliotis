@@ -25,6 +25,7 @@ export const RecommendedCoursesSection: React.FC<Props> = ({
   courseCards,
   recommendedHeader,
 }) => {
+  
   return (
     <section
       className={`bg-[#f1f1f1] relative pt-4 pb-4 md:pt-6 md:pb-8 ${className}`}
@@ -42,7 +43,10 @@ export const RecommendedCoursesSection: React.FC<Props> = ({
 
         {/* Grid всех карточек */}
         <div className="grid grid-cols-2 gap-[10px] sm:gap-[15px] md:grid-cols-3 md:gap-[20px] lg:gap-[30px] !2xl:grid-cols-4">
-          {courseCards.map((card, index) => (
+          {courseCards.map((card, index) => {
+            console.log(card.badge, 'card.badge');
+
+            return (
             <CourseCard
               slug={card.slug}
               centerSlug={card.location}
@@ -56,7 +60,8 @@ export const RecommendedCoursesSection: React.FC<Props> = ({
               badge={card.badge}
               onBookClick={() => console.log("Book clicked")}
             />
-          ))}
+          );
+        })}
         </div>
 
         {/* Кнопка "Show more courses" */}
