@@ -501,26 +501,31 @@ const centersData = (() => {
       item.children?.some((child: any) => child.link_type === "dive_center")
     );
 
-    const metaBySlug: Record<string, { url: string; new_tab: boolean }> = {};
-    centrosItem?.children?.forEach((child: any) => {
-      if (child.slug) {
-        metaBySlug[child.slug] = {
-          url: child.url ?? `/centros/${child.slug}`,
-          new_tab: child.new_tab ?? false,
-        };
-      }
+    // справочник по slug — цвет, иконка и прочие данные центра
+    const centerBySlug: Record<string, any> = {};
+    (menuData?.diving_centers ?? []).forEach((c) => {
+      centerBySlug[c.slug] = c;
     });
 
-    return (menuData?.diving_centers ?? [])
-      .sort((a, b) => a.position - b.position)
-      .map((c) => ({
-        id: c.slug,
-        label: c.name.toUpperCase(),
-        color: c.color,
-        image: c.center_icon_url ?? "",
-url: localizeUrl(metaBySlug[c.slug]?.url ?? `/centros/${c.slug}`),
-        new_tab: metaBySlug[c.slug]?.new_tab ?? false,
-      }));
+    // порядок — строго из children меню, отсортированных по их position
+    const orderedChildren = [...(centrosItem?.children ?? [])].sort(
+      (a: any, b: any) => a.position - b.position
+    );
+
+    return orderedChildren
+      .map((child: any) => {
+        const c = centerBySlug[child.slug];
+        if (!c) return null;
+        return {
+          id: c.slug,
+          label: c.name.toUpperCase(),
+          color: c.color,
+          image: c.center_icon_url ?? "",
+          url: localizeUrl(child.url ?? `/centros/${child.slug}`),
+          new_tab: child.new_tab ?? false,
+        };
+      })
+      .filter(Boolean);
   })();
  const navItems = (menuData?.data.main ?? []).map((item) => {
   const firstCenterSlug = centersData[0]?.id ?? "";
