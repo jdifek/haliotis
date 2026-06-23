@@ -45,7 +45,7 @@ export const CentersSection: React.FC<Props> = ({
     <section className="bg-[#f1f1f1] px-4 py-12 md:px-8 md:py-18.25">
       {/* Header */}
       <div className="mb-8 flex items-start gap-4">
-        <div
+        {/* <div
           className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full p-1.5"
           style={{ backgroundColor: "#e84814" }}
         >
@@ -65,11 +65,9 @@ export const CentersSection: React.FC<Props> = ({
               strokeLinejoin="round"
             />
           </svg>
-        </div>
+        </div> */}
         <div className="flex flex-col gap-[10px]">
-          <h2 className="text-[24px] font-medium leading-[140%] text-black">
-            {filter_name}
-          </h2>
+       
           <p className="text-[28px] font-medium leading-[130%] text-black sm:text-[36px] lg:text-[clamp(32px,2.5vw,42px)]">
             {title}
           </p>
@@ -159,22 +157,20 @@ export const CentersSection: React.FC<Props> = ({
         </div>
       </div>
 
-      {/* Desktop: сетка 3 колонки × 2 ряда (1024px+) */}
-      <div className="hidden lg:grid lg:grid-cols-3 lg:gap-5">
-        {uniqueCards.map((card, index) => (
-          <CenterCard
-            className="!max-w-none "
-            key={index}
-            image={card.image}
-            slug={card.slug}
-            imageFull={card.imageFull}
-            title={card.title}
-            description={card.description}
-            buttonColor={card.buttonColor}
-            onMoreInfoClick={() => console.log("More info clicked")}
-          />
-        ))}
-      </div>
+<div className="hidden lg:flex lg:flex-wrap lg:gap-5">
+  {uniqueCards.map((card, index) => (
+    <CenterCard
+      key={index}
+      image={card.image}
+      slug={card.slug}
+      imageFull={card.imageFull}
+      title={card.title}
+      description={card.description}
+      buttonColor={card.buttonColor}
+      onMoreInfoClick={() => console.log("More info clicked")}
+    />
+  ))}
+</div>
     </section>
   );
 };

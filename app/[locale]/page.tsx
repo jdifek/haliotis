@@ -71,6 +71,7 @@ export default async function Home({ params }: Props) {
   const t = createTermGetter(terms);
 
   const homepageData = await getHomepageData(locale);
+console.log(homepageData, 'homepageData');
 
   if (!homepageData) {
     notFound();
@@ -209,17 +210,18 @@ export default async function Home({ params }: Props) {
         centerCards={centerCardsData}
       />
       <CoursesSection
-        filter_name={homepageData.sliders?.dive_trip?.filter_name}
-        title={homepageData.sliders?.dive_trip?.title}
-        subtitle={homepageData.sliders?.dive_trip?.subtitle}
+      filter_name={homepageData.sliders?.courses?.filter_name}
+        title={homepageData.sliders?.courses?.title}
+        subtitle={homepageData.sliders?.courses?.subtitle}
         locations={locations}
         courseCards={courseCards}
       />
 
       <TripsSection
-        filter_name={homepageData.sliders?.courses?.filter_name}
-        title={homepageData.sliders?.courses?.title}
-        subtitle={homepageData.sliders?.courses?.subtitle}
+              filter_name={homepageData.sliders?.dive_trip?.filter_name}
+        title={homepageData.sliders?.dive_trip?.title}
+        subtitle={homepageData.sliders?.dive_trip?.subtitle}
+  
         locations={locations}
         tripCards={tripCards}
       />
