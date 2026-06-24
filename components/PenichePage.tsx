@@ -46,7 +46,7 @@ export default function PenichePage({ center, tabs }: Props) {
         : trip.price ?? 0,
     title: trip.name || "Trip",
     description: trip.subtitle || "",
-    link: "#", // если нет ссылки в API
+    link: `/diving/${trip.slug}`, // если нет ссылки в API
     location: center.slug,
     details: trip.description || "",
     equipmentPrice: "", // пока нет в API

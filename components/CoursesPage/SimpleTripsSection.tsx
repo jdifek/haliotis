@@ -10,6 +10,7 @@ import "swiper/css/pagination";
 import { useState, useRef } from "react";
 import type { Swiper as SwiperType } from "swiper";
 import { BlackActionButton } from "../buttons/BlackActionButton";
+import { useRouter } from "next/navigation";
 
 type Props = {
   tripCards: {
@@ -31,7 +32,7 @@ export const SimpleTripsSection: React.FC<Props> = ({
 }) => {
   const tripsSwiperRef = useRef<SwiperType | null>(null);
   const [tripsCurrentSlide, setTripsCurrentSlide] = useState(0);
-
+const router = useRouter()
   return (
     <section
       className={`bg-[#f1f1f1]  mx-auto max-w-[1920px] px-4 md:px-8 lg:px-[188px] md:py-18.25 ${className}`}
@@ -115,7 +116,9 @@ export const SimpleTripsSection: React.FC<Props> = ({
                   details={card.details}
                   equipmentPrice={card.equipmentPrice}
                   isExpanded={false}
-                  onToggleExpand={() => {}}
+                  onToggleExpand={() => {
+                    router.push(card.link);
+                  }}
                   onBookClick={() => console.log("Book clicked")}
                 />
               </SwiperSlide>

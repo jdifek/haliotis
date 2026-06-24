@@ -42,7 +42,7 @@ export const CentersSection: React.FC<Props> = ({
   );
 
   return (
-    <section className="bg-[#f1f1f1] px-4 py-12 md:px-8 md:py-18.25">
+    <section className="bg-[#f1f1f1] px-4 pb-12 md:px-8 md:pb-18.25">
       {/* Header */}
       <div className="mb-8 flex items-start gap-4">
         <div className="flex flex-col gap-[10px]">
