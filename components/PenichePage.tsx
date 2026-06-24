@@ -9,6 +9,8 @@ import { SimpleCoursesSection } from "@/components/CoursesPage/SimpleCoursesSect
 import { SimpleTripsSection } from "@/components/CoursesPage/SimpleTripsSection";
 import { CenterInfoSection } from "@/components/CoursesPage/CenterInfoSection";
 import type { CenterData, CenterTabs } from "@/types/center";
+import { useMenu } from "@/app/hooks/useMenu";
+import { useLocale } from "next-intl";
 
 
 type Props = {
@@ -17,6 +19,9 @@ type Props = {
 };
 
 export default function PenichePage({ center, tabs }: Props) {
+    const locale = useLocale();
+  
+  const { terms} = useMenu(locale);
   
   const courseCards = center?.sliders?.courses?.entities?.map((course: any) => ({
     image: course.image_url || "/placeholder.png",
@@ -57,7 +62,7 @@ export default function PenichePage({ center, tabs }: Props) {
   courseCards={courseCards}
 />
       <CenterInfoSection tabs={tabs} />
-      <Parceiros title={center.partners.title} partners={center.partners.entities} />
+      <Parceiros terms={terms} title={center.partners.title} partners={center.partners.entities} />
       <div className="md:hidden mx-4 h-px border border-[#e4e4e4] mt-10" />
      <PaymentMethods
   title={center.payment_methods?.title}
