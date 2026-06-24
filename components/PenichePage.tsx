@@ -57,7 +57,7 @@ export default function PenichePage({ center, tabs }: Props) {
   courseCards={courseCards}
 />
       <CenterInfoSection tabs={tabs} />
-      <Parceiros partners={center.partners} />
+      <Parceiros title={center.partners.title} partners={center.partners.entities} />
       <div className="md:hidden mx-4 h-px border border-[#e4e4e4] mt-10" />
      <PaymentMethods
   title={center.payment_methods?.title}

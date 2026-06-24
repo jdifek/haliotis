@@ -1,14 +1,14 @@
 import Image from "next/image";
 
 type Partner = { id: number; image_url: string; title: string; description: string; url: string };
-type Props = { partners: Partner[] };
+type Props = { partners: Partner[]  , title: string };
 
-export const Parceiros = ({ partners }: Props) => {
+export const Parceiros = ({ partners,title }: Props) => {
   if (!partners?.length) return null;
   return (
-    <div className="mx-auto hidden md:block max-w-[1920px] bg-[#f1f1f1] py-4 md:py-8 px-4 md:px-8 lg:px-[188px]">
+    <div className="mx-auto  max-w-[1920px] bg-[#f1f1f1] py-4 md:py-8 px-4 md:px-8 lg:px-[188px]">
       <h2 className="flex justify-center text-black text-[24px] font-medium leading-[140%]">
-        Parceiros
+          {title}
       </h2>
       <div className="flex justify-center mt-6 gap-6 flex-wrap">
         {partners.map((partner) => (

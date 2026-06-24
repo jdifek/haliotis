@@ -62,7 +62,7 @@ export default async function Travel({ params }: Props) {
     images:
       trip.gallery.length > 0
         ? trip.gallery.map((g: any) => g.image)
-        : [trip.image || "/travel.png"],
+        : [trip.image],
     price: parseFloat(trip.price.amount),
     title: trip.name,
 description: trip.description ? trip.description.replace(/<[^>]*>/g, "") : "",
@@ -76,9 +76,9 @@ description: trip.description ? trip.description.replace(/<[^>]*>/g, "") : "",
         title: s.title,
         description: s.description,
       }))
-    : [{ image: "/prices.png" }];
+    : [{ image: "" }];
 
-  const pageTitle = data.attachPage?.title || "Travel";
+  const pageTitle = data.attachPage?.title || "";
   return (
     <>
       <HeroBanner

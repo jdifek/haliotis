@@ -45,41 +45,20 @@ export const CentersSection: React.FC<Props> = ({
     <section className="bg-[#f1f1f1] px-4 py-12 md:px-8 md:py-18.25">
       {/* Header */}
       <div className="mb-8 flex items-start gap-4">
-        {/* <div
-          className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full p-1.5"
-          style={{ backgroundColor: "#e84814" }}
-        >
-          <svg
-            width="9"
-            height="9"
-            viewBox="0 0 9 9"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-full w-full"
-          >
-            <path
-              d="M4.16705 0.69458V7.63902M6.62228 1.71157L1.71181 6.62203M7.63927 4.1668H0.694824M6.62228 6.62203L1.71181 1.71157"
-              stroke="#0C0C0C"
-              strokeWidth="0.833333"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </div> */}
         <div className="flex flex-col gap-[10px]">
-       
           <p className="text-[28px] font-medium leading-[130%] text-black sm:text-[36px] lg:text-[clamp(32px,2.5vw,42px)]">
             {title}
           </p>
           <p className="text-[15px] font-normal leading-[160%] text-black opacity-80">
-          {subtitle}
+            {subtitle}
           </p>
         </div>
       </div>
 
       {/* Mobile: Swiper 1 карточка (< 640px) */}
-      <div className="block sm:hidden">
+      <div className="hidden max-[639px]:block">
         <Swiper
+          className="!overflow-hidden"
           modules={[Pagination]}
           spaceBetween={16}
           slidesPerView={1}
@@ -117,13 +96,14 @@ export const CentersSection: React.FC<Props> = ({
         </div>
       </div>
 
-      {/* Tablet: Swiper 2 карточки (640px – 1023px) */}
-      <div className="hidden sm:block lg:hidden">
+      {/* Tablet/Desktop-до-1490: Swiper, карточек по максимуму сколько влезает */}
+      <div className="hidden min-[640px]:max-[1489px]:block">
         <Swiper
+          className="!overflow-hidden"
           modules={[Pagination]}
           spaceBetween={20}
-          slidesPerView={2}
-          loop={uniqueCards.length > 2}
+          slidesPerView="auto"
+          loop={false}
           onSwiper={(swiper) => {
             tabletRef.current = swiper;
           }}
@@ -131,7 +111,7 @@ export const CentersSection: React.FC<Props> = ({
           pagination={{ type: "progressbar", el: ".centers-progress-tablet" }}
         >
           {uniqueCards.map((card, index) => (
-            <SwiperSlide key={index} className="!h-auto">
+            <SwiperSlide key={index} className="!h-auto !w-[320px]">
               <CenterCard
                 className="!max-w-none"
                 image={card.image}
@@ -157,20 +137,21 @@ export const CentersSection: React.FC<Props> = ({
         </div>
       </div>
 
-<div className="hidden lg:flex lg:flex-wrap lg:gap-5">
-  {uniqueCards.map((card, index) => (
-    <CenterCard
-      key={index}
-      image={card.image}
-      slug={card.slug}
-      imageFull={card.imageFull}
-      title={card.title}
-      description={card.description}
-      buttonColor={card.buttonColor}
-      onMoreInfoClick={() => console.log("More info clicked")}
-    />
-  ))}
-</div>
+      {/* Desktop: статичная сетка только от 1490px */}
+      <div className="hidden min-[1490px]:flex min-[1490px]:flex-wrap min-[1490px]:gap-5">
+        {uniqueCards.map((card, index) => (
+          <CenterCard
+            key={index}
+            image={card.image}
+            slug={card.slug}
+            imageFull={card.imageFull}
+            title={card.title}
+            description={card.description}
+            buttonColor={card.buttonColor}
+            onMoreInfoClick={() => console.log("More info clicked")}
+          />
+        ))}
+      </div>
     </section>
   );
 };

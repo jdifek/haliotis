@@ -423,14 +423,17 @@ export const PenicheHero = ({ center }: Props) => {
           <div className="overflow-hidden rounded-[20px] bg-white md:grid md:grid-cols-[80px_1fr_280px] md:h-[360px]">
             {/* Orange logo bar */}
             <div
-              className="flex items-center justify-center h-[60px] sm:h-[80px] md:h-full px-4"
-              style={{ backgroundColor: center.color ?? "#f49519" }}
+              className="flex items-center justify-center h-[60px] sm:h-[80px] md:h-full px-1"
+              style={{ 
+                borderRadius: "20px",
+                border: `3px solid ${center.color ?? "#f49519"}`,
+              }}
             >
               {" "}
               <img
   src={center.center_icon_url ?? undefined}
   alt={center.center_name}
-  className="w-[60px] h-[63px] sm:w-[80px] sm:h-[84px] md:w-[52px] md:h-[55px] object-contain"
+  className="w-[60px] h-[63px] sm:w-[67px] sm:h-[67px] md:w-[52px] md:h-[55px] object-contain"
 />
             </div>
 

@@ -44,12 +44,7 @@ export const DiveExploreSection = ({
         <p>{subtitle}</p>
       </div>
 
-      {/* Desktop Grid (≥1024px) */}
-      <div className="desktop-grid">
-        {cards.map((card, index) => (
-          <CardItem card={card} key={index} />
-        ))}
-      </div>
+  
 
       {/* Tablet/Mobile Swiper (<1024px) */}
       <div className="swiper-wrapper-outer">
@@ -150,21 +145,7 @@ export const DiveExploreSection = ({
           margin-top: 20px;
         }
 
-        /* DESKTOP — grid видимий, swiper прихований */
-        @media (min-width: 1024px) {
-          .desktop-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
-            width: 100%;
-            box-sizing: border-box;
-            padding: 0 24px;
-          }
-
-          .swiper-wrapper-outer {
-            display: none;
-          }
-        }
+       
       `}</style>
     </section>
   );
