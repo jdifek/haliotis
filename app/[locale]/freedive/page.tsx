@@ -141,7 +141,7 @@ const Diving = ({ params }: { params: Promise<{ locale: string }> }) => {
     details: trip.description || "",
     equipmentPrice: trip.price?.amount_description || "",
   }));
-  console.log(allCards, "allCards");
+  console.log(freediveData, "freediveData?.dive_trips");
 
   const totalPages = Math.ceil(allCards.length / CARDS_PER_PAGE);
   const paginatedCards = allCards.slice(

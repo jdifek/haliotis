@@ -24,7 +24,8 @@ export const CenterCard: React.FC<CenterCardProps> = ({
 }) => {
   return (
     <div
-className={`relative flex-1 min-w-[220px] h-[460px] overflow-hidden rounded-[20px] ${className}`}    >
+      className={`group relative flex-1 min-w-[220px] h-[460px] overflow-hidden rounded-[20px] ${className}`}
+    >
       {/* Full-height background photo */}
       <div className="absolute inset-0">
         <img
@@ -56,27 +57,29 @@ className={`relative flex-1 min-w-[220px] h-[460px] overflow-hidden rounded-[20p
           </p>
         </div>
 
-        <ButtonWithIcon
-          href={`/centros/${slug}`}
-          label="More info"
-          onClick={onMoreInfoClick}
-          bgColor="#fff"
-          textColor="text-black"
-          iconBgColor={buttonColor}
-          width="100%"
-          height="48px"
-          icon={
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path
-                d="M7.5 15L12.5 10L7.5 5"
-                stroke="#fff"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          }
-        />
+        <div className="hover-only-button max-h-0 opacity-0 overflow-hidden transition-all duration-300 ease-out group-hover:max-h-[48px] group-hover:opacity-100">
+          <ButtonWithIcon
+            href={`/centros/${slug}`}
+            label="More info"
+            onClick={onMoreInfoClick}
+            bgColor="#fff"
+            textColor="text-black"
+            iconBgColor={buttonColor}
+            width="100%"
+            height="48px"
+            icon={
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path
+                  d="M7.5 15L12.5 10L7.5 5"
+                  stroke="#fff"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            }
+          />
+        </div>
       </div>
     </div>
   );
