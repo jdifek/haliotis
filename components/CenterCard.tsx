@@ -57,7 +57,15 @@ export const CenterCard: React.FC<CenterCardProps> = ({
           </p>
         </div>
 
-        <div className="hover-only-button max-h-0 opacity-0 overflow-hidden transition-all duration-300 ease-out group-hover:max-h-[48px] group-hover:opacity-100">
+        <div
+          className="
+            max-h-[48px] opacity-100 overflow-hidden transition-all duration-300 ease-out
+            [@media(hover:hover)]:max-h-0
+            [@media(hover:hover)]:opacity-0
+            [@media(hover:hover)]:group-hover:max-h-[48px]
+            [@media(hover:hover)]:group-hover:opacity-100
+          "
+        >
           <ButtonWithIcon
             href={`/centros/${slug}`}
             label="More info"
