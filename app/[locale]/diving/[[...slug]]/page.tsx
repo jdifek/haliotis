@@ -208,8 +208,10 @@ useEffect(() => {
     }
   }, [slugFromUrl, divingData]);
   const activeColor =
-    (activeTab ? colorBySlug[activeTab] : null) ?? FALLBACK_COLOR;
-const allCards = useMemo<TripCard[]>(
+   (activeTab ? colorBySlug[activeTab] : null) ?? FALLBACK_COLOR;
+console.log(divingData, 'divingData');
+
+   const allCards = useMemo<TripCard[]>(
     () =>
       (divingData?.dive_trips ?? []).map((trip) => ({
         image: trip.image_url || "",
@@ -348,6 +350,8 @@ if (slug) {
                   className="grid max-[700px]:grid-cols-1 max-[1670px]:grid-cols-2 min-[1670px]:grid-cols-3 gap-5"
                 >
                   {row.map((card, colIndex) => {
+                    console.log(JSON.stringify(card), 'card');
+                    
                     const globalIndex = rowStartIndex + colIndex;
                     return (
                    <div

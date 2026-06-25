@@ -197,7 +197,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
 
                 {equipmentPrice && (
                   <p className="text-[15px] font-medium text-black text-center underline">
-                    Equipment/Extra Price: <span>€ {equipmentPrice}</span>
+                  <span> {equipmentPrice}</span>
                   </p>
                 )}
               </div>
