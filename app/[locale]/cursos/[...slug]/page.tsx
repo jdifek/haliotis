@@ -229,6 +229,8 @@ const currency = (data.price as any)?.currency ?? "€";
       </div>
 
       <CourseDetailClient
+       courseId={data.id}          // ← добавить
+  centerSlug={centerSlug}     // ← добавить (уже есть в scope)
         courseTitle={data.name}
         courseDescription={data.description || ""}
         pricePerPerson={price || 0}

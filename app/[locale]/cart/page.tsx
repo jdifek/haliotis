@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 
 // ─── API ──────────────────────────────────────────────────────────────────────
 
-const API_BASE = "https://cp.haliotis.space/api/v1";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 const readCartFromStorage = () => {
   try {

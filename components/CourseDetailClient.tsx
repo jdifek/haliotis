@@ -47,6 +47,8 @@ type Props = {
   recommendedCourses: RecommendedCourse[];
   recommendedEquipment: RecommendedEquipment;
   currency: string
+    courseId: number;       // ← добавить
+  centerSlug: string;  
 };
 
 export const CourseDetailClient = ({
@@ -59,8 +61,10 @@ export const CourseDetailClient = ({
   accordionItems,
   recommendedCourses,
   recommendedEquipment,
-  currency
-    }: Props) => {
+  currency,
+  courseId,
+  centerSlug
+}: Props) => {
   const [isBookingOpen, setIsBookingOpen] = useState(false);
 console.log(courseDescription, 'courseDescriptioncourseDescription');
 console.log(recommendedEquipment, 'recommendedEquipment.equipment');
@@ -69,6 +73,8 @@ console.log(recommendedCourses, 'recommendedCourses');
   return (
     <>
       <CourseDetailHeroSection
+        id={courseId}
+        location={centerSlug}
         title={courseTitle}
         description={courseDescription}
         price={pricePerPerson}

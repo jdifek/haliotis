@@ -16,12 +16,16 @@ type Props = {
   description: string;
   price: number;
   image: string;
-  currency: string
+  currency: string;
   imageAlt?: string;
-  images: string[]
+  images: string[];
   onBookClick?: () => void;
+  onAddToCart?: () => void;   // ← новое
+  addedToCart?: boolean;      // ← новое
   accordionItems: AccordionItem[];
 };
+
+// ─── Icons ────────────────────────────────────────────────────────────────────
 
 const ChevronIcon = ({ open }: { open: boolean }) => (
   <svg
@@ -30,29 +34,10 @@ const ChevronIcon = ({ open }: { open: boolean }) => (
     viewBox="0 0 24 24"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
-    className={`transition-transform duration-200 flex-shrink-0 ${
-      open ? "rotate-180" : ""
-    }`}
+    className={`transition-transform duration-200 flex-shrink-0 ${open ? "rotate-180" : ""}`}
   >
     <path
       d="M17.8534 9.85369L12.8537 14.8534C12.8073 14.8999 12.7522 14.9367 12.6915 14.9619C12.6308 14.9871 12.5657 15 12.5 15C12.4343 15 12.3692 14.9871 12.3085 14.9619C12.2478 14.9367 12.1927 14.8999 12.1463 14.8534L7.14663 9.85369C7.07663 9.78377 7.02895 9.69465 7.00963 9.59761C6.9903 9.50058 7.00021 9.39999 7.03808 9.30858C7.07595 9.21718 7.1401 9.13907 7.22239 9.08413C7.30468 9.0292 7.40142 8.99992 7.50036 9H17.4996C17.5986 8.99992 17.6953 9.0292 17.7776 9.08413C17.8599 9.13907 17.924 9.21718 17.9619 9.30858C17.9998 9.39999 18.0097 9.50058 17.9904 9.59761C17.971 9.69465 17.9234 9.78377 17.8534 9.85369Z"
-      fill="black"
-    />
-  </svg>
-);
-
-const EuroIcon = () => (
-  <svg
-    width="20"
-    height="20"
-    viewBox="0 0 20 20"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      fillRule="evenodd"
-      clipRule="evenodd"
-      d="M0 10C0 4.47715 4.47715 0 10 0C15.5228 0 20 4.47715 20 10C20 15.5228 15.5228 20 10 20C4.47715 20 0 15.5228 0 10ZM8.6158 7.5C9.0535 6.71823 9.8025 6 10.7498 6C11.284 6 11.819 6.23239 12.2923 6.70646C12.6824 7.09734 13.3156 7.09792 13.7065 6.70775C14.0973 6.31758 14.0979 5.68442 13.7077 5.29354C12.9274 4.51179 11.9042 4 10.7498 4C9.3289 4 8.1189 4.77025 7.29826 5.86449C6.93769 6.34528 6.64329 6.89783 6.42654 7.5H6C5.44772 7.5 5 7.94772 5 8.5C5 8.9581 5.30804 9.3443 5.72828 9.4626C5.82228 9.4891 5.91867 9.5 6.01613 9.5C5.99473 9.8304 5.99473 10.1696 6.01613 10.5C5.91867 10.5 5.82228 10.5109 5.72828 10.5374C5.30804 10.6557 5 11.0419 5 11.5C5 12.0523 5.44772 12.5 6 12.5H6.42654C6.64329 13.1022 6.93769 13.6547 7.29826 14.1355C8.1189 15.2298 9.3289 16 10.7498 16C11.9042 16 12.9274 15.4882 13.7077 14.7065C14.0979 14.3156 14.0973 13.6824 13.7065 13.2923C13.3156 12.9021 12.6824 12.9027 12.2923 13.2935C11.819 13.7676 11.284 14 10.7498 14C9.8025 14 9.0535 13.2818 8.6158 12.5H10C10.5523 12.5 11 12.0523 11 11.5C11 10.9477 10.5523 10.5 10 10.5H8.0217C7.99312 10.1735 7.99312 9.8265 8.0217 9.5H11C11.5523 9.5 12 9.0523 12 8.5C12 7.94772 11.5523 7.5 11 7.5H8.6158Z"
       fill="black"
     />
   </svg>
@@ -63,9 +48,7 @@ const BookNowButton = ({ onClick }: { onClick?: () => void }) => (
     onClick={onClick}
     className="flex items-center whitespace-nowrap cursor-pointer gap-[23px] md:gap-6 rounded-full bg-[#e84814] py-0.5 pl-[14px] md:pl-4 pr-0.5 transition-all hover:bg-[#d63f0f]"
   >
-    <span className="text-[15px] font-bold leading-[120%] text-white">
-      Book Now
-    </span>
+    <span className="text-[15px] font-bold leading-[120%] text-white">Book Now</span>
     {/* Desktop icon */}
     <div className="hidden md:flex h-11 w-11 items-center justify-center rounded-full bg-white">
       <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -83,6 +66,34 @@ const BookNowButton = ({ onClick }: { onClick?: () => void }) => (
   </button>
 );
 
+const AddToCartButton = ({ onClick, added }: { onClick?: () => void; added?: boolean }) => (
+  <button
+    onClick={onClick}
+    className={`flex items-center whitespace-nowrap cursor-pointer gap-2 rounded-full py-0.5 pl-[14px] pr-[14px] md:pl-4 md:pr-4 h-[44px] text-[15px] font-bold leading-[120%] text-white transition-all
+      ${added ? "bg-[#22a35a] hover:bg-[#1a8f4a]" : "bg-[#281d4d] hover:bg-[#1a1235]"}`}
+  >
+    {added ? (
+      <>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M20 6L9 17L4 12" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+        Added!
+      </>
+    ) : (
+      <>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M6 2L3 6V20C3 20.5304 3.21071 21.0391 3.58579 21.4142C3.96086 21.7893 4.46957 22 5 22H19C19.5304 22 20.0391 21.7893 20.4142 21.4142C20.7893 21.0391 21 20.5304 21 20V6L18 2H6Z" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M3 6H21" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M16 10C16 11.0609 15.5786 12.0783 14.8284 12.8284C14.0783 13.5786 13.0609 14 12 14C10.9391 14 9.92172 13.5786 9.17157 12.8284C8.42143 12.0783 8 11.0609 8 10" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+        Add to Cart
+      </>
+    )}
+  </button>
+);
+
+// ─── Main Component ───────────────────────────────────────────────────────────
+
 export const CourseDetailHeroSection: React.FC<Props> = ({
   className,
   title,
@@ -93,26 +104,26 @@ export const CourseDetailHeroSection: React.FC<Props> = ({
   images,
   imageAlt = "Course image",
   onBookClick,
-  
+  onAddToCart,
+  addedToCart = false,
   accordionItems,
 }) => {
   const [openAccordion, setOpenAccordion] = useState<string | null>(
     accordionItems[0]?.id ?? null
   );
-console.log(currency, 'currencycurrency');
 
   const toggleAccordion = (id: string) => {
     setOpenAccordion((prev) => (prev === id ? null : id));
   };
-  const [currentImage, setCurrentImage] = useState(0);
-
 
   return (
     <section className={`bg-white ${className ?? ""}`}>
       <div className="mx-auto max-w-[1920px] px-4 md:px-8 lg:px-[188px] pt-0 py-8 md:py-12 md:pt-12 flex flex-col min-h-screen">
+
         {/* ── HERO BLOCK ── */}
         <div className="flex flex-col min-[980px]:flex-row md:items-start md:justify-between gap-6 md:gap-10">
-          {/* Left: Title + Description */}
+
+          {/* Left: Title + Description + Price + Buttons */}
           <div className="flex flex-col gap-4 md:gap-6 flex-1">
             <h1 className="text-[28px] sm:text-[36px] lg:text-[48px] font-medium leading-[130%] text-[#111]">
               {title}
@@ -120,31 +131,31 @@ console.log(currency, 'currencycurrency');
             <p className="text-[15px] font-normal leading-[160%] text-[#101010] opacity-80">
               {description}
             </p>
-              {/* ── BOTTOM BOOK NOW ── */}
-        <div className="mt-6 md:mt-10">
-          <div className="flex items-center gap-3 md:justify-start justify-between">
-            <div className="flex items-center gap-2 rounded-lg bg-[#f1f1f1] px-3 py-2">
-             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="10" cy="10" r="10" fill="black"/>
- <text x="10" y="14" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
-  {currency}
-</text>
-</svg>
-              <span className="text-[15px] font-bold leading-[120%] text-black">
-                {price}
-              </span>
+
+            {/* Price + Add to Cart + Book Now (top) */}
+            <div className="mt-6 md:mt-10">
+              <div className="flex items-center gap-3 flex-wrap">
+                {/* Price badge */}
+                <div className="flex items-center gap-2 rounded-lg bg-[#f1f1f1] px-3 py-2">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="10" cy="10" r="10" fill="black" />
+                    <text x="10" y="14" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+                      {currency}
+                    </text>
+                  </svg>
+                  <span className="text-[15px] font-bold leading-[120%] text-black">{price}</span>
+                </div>
+
+                <AddToCartButton onClick={onAddToCart} added={addedToCart} />
+                <BookNowButton onClick={onBookClick} />
+              </div>
             </div>
-            <BookNowButton onClick={onBookClick} />
-          </div>
-        </div>
-            
           </div>
 
-          {/* Right: Image */}
-      
-<div className="w-full md:w-[600px] md:flex-shrink-0">
-  <CardImageSwiper images={images} />
-</div>
+          {/* Right: Image swiper */}
+          <div className="w-full md:w-[600px] md:flex-shrink-0">
+            <CardImageSwiper images={images} />
+          </div>
         </div>
 
         {/* ── DIVIDER ── */}
@@ -154,7 +165,7 @@ console.log(currency, 'currencycurrency');
         <div className="flex flex-col flex-grow">
           {accordionItems.map((item, index) => (
             <div key={item.id}>
-              {/* DESKTOP: always open, no toggle */}
+              {/* DESKTOP: always open */}
               <div className="hidden md:block py-5">
                 <h2 className="text-[24px] font-medium leading-[140%] text-[#111] mb-2">
                   {item.label}
@@ -178,24 +189,22 @@ console.log(currency, 'currencycurrency');
                 )}
               </div>
 
-              {/* Divider between sections */}
               {index < accordionItems.length - 1 && (
                 <div className="h-px w-full bg-[#e4e4e4]" />
               )}
             </div>
           ))}
-
-          {/* Trailing divider */}
           <div className="h-px w-full bg-[#e4e4e4]" />
         </div>
 
-        {/* ── BOTTOM BOOK NOW ── */}
+        {/* ── BOTTOM BUTTONS ── */}
         <div className="mt-6 md:mt-10">
-          <div className="flex items-center gap-3 md:justify-start justify-between">
-           
+          <div className="flex items-center gap-3 flex-wrap">
+            <AddToCartButton onClick={onAddToCart} added={addedToCart} />
             <BookNowButton onClick={onBookClick} />
           </div>
         </div>
+
       </div>
     </section>
   );
