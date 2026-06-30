@@ -26,6 +26,7 @@ export default async function TravelDetailPage({ params }: Props) {
   const { slug, locale } = await params;
   const { data, recommended } = await getTravelBySlug(slug, locale);
   const terms = await getTerms(locale);
+console.log(recommended, 'recommended');
 
   const price = parseFloat(data.price?.amount ?? "0");
   const currency = data.price?.currency;
@@ -118,13 +119,15 @@ export default async function TravelDetailPage({ params }: Props) {
         accordionItems={accordionItems}
       />
 
-      {recommendedTripCards.length > 0 && (
-        <RecommendedCoursesSection
-          title={recommended.headers.title}
-          description={recommended.headers.description}
-          courseCards={recommendedTripCards}
-        />
-      )}
+  {recommendedTripCards.length > 0 && (
+  <RecommendedCoursesSection
+    recommendedHeader={{
+      title: recommended.headers.title,
+      description: recommended.headers.description,
+    }}
+    courseCards={recommendedTripCards}
+  />
+)}
     </main>
   );
 }
