@@ -237,6 +237,8 @@ export const PenicheHero = ({ center }: Props) => {
                     </a>
                   )}
 
+{center.contact_fax && (
+
                   <div className="flex items-center gap-3 text-[15px] text-[#111] mb-3">
                     <svg width="20" height="23" viewBox="0 0 20 23" fill="none">
                       <path
@@ -286,6 +288,7 @@ export const PenicheHero = ({ center }: Props) => {
                     </svg>
                     {center.contact_fax}
                   </div>
+)}
                   {center.contact_email && (
                   <a
                         href={`mailto:${center.contact_email}`}

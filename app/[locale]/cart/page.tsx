@@ -108,12 +108,15 @@ const mapResolvedItem = (apiItem, storageItem, participantIds) => {
   participantIds.forEach((pid) => {
     byParticipant[pid] = createActivityParticipantData(equipmentTemplate);
   });
+  console.log(storageItem, ' storageItem?.location');
+  
   return {
     id: apiItem.id,
     apiType: apiItem.type, // "course" | "trip" | "travels"
     type: apiItem.type.toUpperCase(),
     title: apiItem.name,
     slug: apiItem.slug,
+    centerSlug:  storageItem?.location || null,
     image: apiItem.image || null,
     subtitle: getActivitySubtitle(apiItem, storageItem),
     price: parseFloat(apiItem.price?.amount ?? apiItem.price ?? 0),
@@ -207,6 +210,7 @@ const CustomDropdown = ({ label, value, onChange, options, unit, icon }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [pos, setPos] = useState({ top: 0, left: 0, width: 0 });
   const triggerRef = useRef(null);
+  const dropdownRef = useRef(null); // ← додай ref для портала
 
   const open = () => {
     if (triggerRef.current) {
@@ -218,7 +222,12 @@ const CustomDropdown = ({ label, value, onChange, options, unit, icon }) => {
 
   useEffect(() => {
     const handler = (e) => {
-      if (triggerRef.current && !triggerRef.current.contains(e.target)) setIsOpen(false);
+      if (
+        triggerRef.current && !triggerRef.current.contains(e.target) &&
+        dropdownRef.current && !dropdownRef.current.contains(e.target) // ← додай це
+      ) {
+        setIsOpen(false);
+      }
     };
     if (isOpen) document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -255,6 +264,8 @@ const CustomDropdown = ({ label, value, onChange, options, unit, icon }) => {
       {isOpen && (
         <Portal>
           <div
+                ref={dropdownRef}  // ← додай це
+
             style={{ position: "absolute", top: pos.top, left: pos.left, width: pos.width, zIndex: 99999 }}
             className="bg-white border border-[#d9d9d9] rounded-[10px] shadow-xl max-h-48 overflow-y-auto"
           >
@@ -424,6 +435,7 @@ const DatePickerField = ({ value, onChange, placeholder, allowPast = false }) =>
   const [open, setOpen] = useState(false);
   const [pos, setPos] = useState({ top: 0, left: 0, width: 0 });
   const ref = useRef(null);
+  const calendarRef = useRef(null); // ← добавили
 
   const openPicker = () => {
     if (ref.current) {
@@ -434,7 +446,14 @@ const DatePickerField = ({ value, onChange, placeholder, allowPast = false }) =>
   };
 
   useEffect(() => {
-    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    const handler = (e) => {
+      if (
+        ref.current && !ref.current.contains(e.target) &&
+        calendarRef.current && !calendarRef.current.contains(e.target) // ← добавили проверку
+      ) {
+        setOpen(false);
+      }
+    };
     if (open) document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, [open]);
@@ -466,7 +485,10 @@ const DatePickerField = ({ value, onChange, placeholder, allowPast = false }) =>
       </button>
       {open && (
         <Portal>
-          <div style={{ position: "absolute", top: pos.top, left: pos.left, width: pos.width, zIndex: 99999 }}>
+          <div
+            ref={calendarRef} // ← добавили
+            style={{ position: "absolute", top: pos.top, left: pos.left, width: pos.width, zIndex: 99999 }}
+          >
             <MiniCalendar
               selected={value}
               onSelect={(v) => { onChange(v); setOpen(false); }}
@@ -559,12 +581,12 @@ const EquipmentGrid = ({ equipment, onToggle, onSelectVariation }) => (
           <p className="text-[11px] text-[#111] leading-[130%]">{item.name}</p>
         </div>
         {/* Size/variation selector — shown when item is selected and has_size */}
-        {item.isSelected && item.hasSize && item.variations.length > 0 && (
+        {/* {item.isSelected && item.hasSize && item.variations.length > 0 && (
           <div className="mt-1.5">
             <select
               value={item.selectedVariationId || ""}
               onChange={(e) => onSelectVariation(item.id, Number(e.target.value))}
-              className="w-full text-[11px] rounded-lg border border-[#d9d9d9] px-1.5 py-1 bg-white outline-none cursor-pointer"
+              className="w-full text-[11px] text-black rounded-lg border border-[#d9d9d9] px-1.5 py-1 bg-white outline-none cursor-pointer"
             >
               <option value="">Size</option>
               {item.variations.map((v) => (
@@ -572,7 +594,7 @@ const EquipmentGrid = ({ equipment, onToggle, onSelectVariation }) => (
               ))}
             </select>
           </div>
-        )}
+        )} */}
       </div>
     ))}
   </div>
@@ -1008,6 +1030,8 @@ const buildBookingPayload = (activities, sharedParticipants, comment) => ({
     type: act.apiType,
     id: act.id,
     slug: act.slug,
+      ...(act.apiType === "course" && act.centerSlug ? { center_slug: act.centerSlug } : {}),
+
     participants: sharedParticipants.map((sp) => {
       const ad = act.byParticipant[sp.id] || createActivityParticipantData();
       return {
@@ -1034,7 +1058,7 @@ const buildBookingPayload = (activities, sharedParticipants, comment) => ({
           .filter((e) => e.isSelected)
           .map((e) => ({
             id: e.id,
-            variation_id: e.selectedVariationId,
+            // variation_id: e.selectedVariationId,
           })),
       };
     }),
@@ -1070,6 +1094,7 @@ export default function CartPage() {
     }
 
     const apiItems = storageItems.map(({ type, id }) => ({ type, id }));
+console.log(apiItems, 'apiItems');
 
     resolveCart(apiItems)
       .then((data) => {
