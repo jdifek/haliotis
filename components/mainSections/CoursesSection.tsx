@@ -266,8 +266,7 @@ export const CoursesSection: React.FC<Props> = ({
           </div>
 
           {/* Mobile controls */}
-          {!isCoursesSwiperLocked && (
-            <div className="block sm:hidden ">
+          {!isCoursesSwiperLocked && filteredCourses.length > 0 && (            <div className="block sm:hidden ">
               <CarouselControls
                 currentSlide={coursesCurrentSlide}
                 totalSlides={filteredCourses.length}

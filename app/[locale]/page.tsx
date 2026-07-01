@@ -122,7 +122,7 @@ console.log(homepageData, 'homepageData');
   const tripCards = (homepageData.sliders?.dive_trip?.entities || []).flatMap(
     (center: any) =>
       (center.dive_trips || []).map((trip: any) => ({
-        image: center.image_url || "/image 6.png",
+        image: trip.image_url || "/image 6.png",
         price: parseFloat(trip.price?.amount || 0),
         title: trip.name,
         description: trip.description || center.small_description || "",
