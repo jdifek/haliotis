@@ -106,17 +106,18 @@ const MobileDynamicDropdown = ({
 
               {/* Картинка + стрелка */}
               <div className="flex items-center gap-2">
-                {center.image && (
-                  <div className="h-[36px] w-[52px] overflow-hidden rounded-[6px] flex-shrink-0">
-                    <Image
-                      src={center.image}
-                      alt={center.label}
-                      width={52}
-                      height={36}
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                )}
+              {center.image && (
+  <div className="h-[36px] w-[52px] flex items-center justify-center flex-shrink-0">
+    <Image
+      src={center.image}
+      alt={center.label}
+      width={52}
+      height={36}
+      className="max-h-full max-w-full object-contain"
+      style={{ width: 'auto', height: 'auto' }}
+    />
+  </div>
+)}
                
               </div>
             </button>
@@ -339,17 +340,18 @@ const DynamicDropdown = ({
 
             {/* Правая часть — картинка + стрелка */}
             <div className="flex items-center gap-2">
-              {center.image && (
-                <div className="h-[32px] w-[48px] overflow-hidden rounded-[6px] flex-shrink-0">
-                  <Image
-                    src={center.image}
-                    alt={center.label}
-                    width={48}
-                    height={32}
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-              )}
+            {center.image && (
+  <div className="h-[32px] w-[48px] flex items-center justify-center flex-shrink-0">
+    <Image
+      src={center.image}
+      alt={center.label}
+      width={48}
+      height={32}
+      className="max-h-full max-w-full object-contain"
+      style={{ width: 'auto', height: 'auto' }}
+    />
+  </div>
+)}
             </div>
           </button>
         ))}

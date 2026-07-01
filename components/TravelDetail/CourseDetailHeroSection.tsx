@@ -324,7 +324,7 @@ export const CourseDetailHeroSection: React.FC<Props> = ({
         {/* ── BOTTOM BUTTONS ── */}
         <div className="mt-6 md:mt-10">
           <div className="flex items-center gap-3 flex-wrap">
-          <ButtonWithIcon
+<ButtonWithIcon
   bgColor={addedToCart ? "#22a35a" : "#281d4d"}
   className="!w-fit !gap-3 !flex-shrink-0 whitespace-nowrap"
   label={addedToCart ? "Added!" : "Add to Cart"}
