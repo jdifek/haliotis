@@ -6,6 +6,7 @@ import { ButtonWithIcon } from "../buttons/ButtonWithIcon";
 import { useMenu } from "@/app/hooks/useMenu";
 import { createTermGetter } from "@/app/utils/terms";
 import { useLocale } from "next-intl";
+import { addItemToCart } from "@/lib/cart";
 
 type AccordionItem = {
   id: string;
@@ -28,23 +29,42 @@ type Props = {
 };
 
 // ─── Cart utils ───────────────────────────────────────────────────────────────
-
-const addCourseToCart = (id: number | string, location?: string) => {
+const addCourseToCart = (
+  id: number | string,
+  location?: string,
+  title?: string,
+  price?: number,
+  currency?: string,
+  image?: string
+) => {
   try {
     const raw = localStorage.getItem("cart");
     const cart: Array<{
       type: string;
       id: number | string;
       location?: string;
+      title?: string;
+      price?: number;
+      currency?: string;
+      image?: string;
     }> = raw ? JSON.parse(raw) : [];
 
-    // Не добавлять дубликат
     const exists = cart.some(
       (item) => item.type === "course" && item.id === id
     );
     if (!exists) {
-      cart.push({ type: "course", id, ...(location ? { location } : {}) });
+      cart.push({
+        type: "course",
+        id,
+        ...(location ? { location } : {}),
+        ...(title ? { title } : {}),
+        ...(price !== undefined ? { price } : {}),
+        ...(currency ? { currency } : {}),
+        ...(image ? { image } : {}),
+      });
       localStorage.setItem("cart", JSON.stringify(cart));
+      // тригер для хедера — без нового файлу, просто кастомна подія
+      window.dispatchEvent(new Event("cart-updated"));
     }
   } catch {
     // ignore localStorage errors
@@ -268,12 +288,10 @@ export const CourseDetailHeroSection: React.FC<Props> = ({
   };
 
   const handleAddToCart = () => {
-    addCourseToCart(id, location);
+    addCourseToCart(id, location, title, price, currency, image);
     setAddedToCart(true);
-    // Сбросить состояние через 2 секунды
     setTimeout(() => setAddedToCart(false), 2000);
   };
-
   return (
     <section className={`bg-white ${className}`}>
       <div className="mx-auto max-w-[1920px] px-4 md:px-8 lg:px-[188px] pt-0 py-8 md:py-12 md:pt-12 flex flex-col gap-6 md:gap-10">

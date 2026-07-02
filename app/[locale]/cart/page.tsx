@@ -34,10 +34,17 @@ const submitBooking = async (payload) => {
     headers: { "Content-Type": "application/json", Accept: "application/json" },
     body: JSON.stringify(payload),
   });
-  if (!res.ok) throw new Error(`booking failed: ${res.status}`);
+  if (!res.ok) {
+    let detail = `booking failed: ${res.status}`;
+    try {
+      const body = await res.json();
+      if (body?.message) detail = body.message;
+      else if (body?.errors) detail = Object.values(body.errors).flat().join("; ");
+    } catch {}
+    throw new Error(detail);
+  }
   return res.json();
 };
-
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const formatDate = (isoString) => {
@@ -132,7 +139,30 @@ const mapResolvedItem = (apiItem, storageItem, participantIds) => {
 };
 
 // ─── Portal ───────────────────────────────────────────────────────────────────
+const isParticipantValid = (sp) =>
+  sp.firstName.trim() &&
+  sp.lastName.trim() &&
+  sp.dateOfBirth &&
+  sp.gender &&
+  sp.phone.trim() &&
+  sp.email.trim() &&
+  sp.height.value &&
+  sp.weight.value &&
+  sp.shoeSize.value;
 
+const isCertValid = (ad) =>
+  ad.certAgency && ad.certLevel && ad.totalDives && ad.lastDiveDate;
+
+const isFormValid = (activities, sharedParticipants) => {
+  if (!sharedParticipants.every(isParticipantValid)) return false;
+
+  return activities.every((act) => {
+    if (!act.requiresCert) return true;
+    return sharedParticipants.every((sp) =>
+      isCertValid(act.byParticipant[sp.id] || {})
+    );
+  });
+};
 const Portal = ({ children }) => {
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
@@ -603,8 +633,9 @@ const EquipmentGrid = ({ equipment, onToggle, onSelectVariation }) => (
 // ─── Measurement Field (value + optional unit) ────────────────────────────────
 
 const MeasurementField = ({ label, value, onChange, options, units }) => {
-  const unitValue = units?.length === 1 ? units[0] : (value.unitId ? units?.find((u) => u.id === value.unitId) : null);
-
+  const unitValue = value.unitId
+  ? units?.find((u) => u.id === value.unitId)
+  : units?.[0] || null;
   return (
     <div className="flex gap-1">
       <div className="flex-1">
@@ -929,7 +960,12 @@ const OrderSummary = ({
       .reduce((s, e) => s + e.price, 0);
     return total + courseTotal + equipTotal;
   }, 0);
-
+  const formValid = isFormValid(activities, sharedParticipants);
+  {!formValid && (
+    <p className="text-[12px] text-[#e84814] text-center mt-2">
+      Please fill in all required fields for every participant
+    </p>
+  )}
   return (
     <div className="bg-white rounded-2xl border border-[#e4e4e4] p-4 sticky top-4">
       <h2 className="text-[20px] font-semibold text-[#111] mb-3">Order Summary</h2>
@@ -982,7 +1018,7 @@ const OrderSummary = ({
       <div className="mb-4">
         <p className="text-[13px] font-medium text-[#111] mb-2">Additional Information</p>
         <textarea
-          className="w-full h-16 px-3 py-2 rounded-[10px] border border-[#d9d9d9] text-[14px] placeholder:text-[#999] resize-none outline-none focus:border-[#e84814] transition-colors"
+          className="w-full h-16 px-3 py-2 rounded-[10px] border border-[#d9d9d9] text-[14px] placeholder:text-[#999] text-black resize-none outline-none focus:border-[#e84814] transition-colors"
           placeholder="Comment"
           value={comment}
           onChange={(e) => setComment(e.target.value)}
@@ -1007,9 +1043,9 @@ const OrderSummary = ({
 
       <button
         onClick={onSubmit}
-        disabled={isSubmitting || !privacy || !terms}
+        disabled={isSubmitting || !privacy || !terms || !formValid}
         className={`w-full py-3 rounded-full text-white text-[15px] font-semibold transition-colors flex items-center justify-center gap-2
-          ${isSubmitting || !privacy || !terms ? "bg-[#ccc] cursor-not-allowed" : "bg-[#e84814] hover:bg-[#d63f0f] cursor-pointer"}`}
+          ${isSubmitting || !privacy || !terms || !formValid ? "bg-[#ccc] cursor-not-allowed" : "bg-[#e84814] hover:bg-[#d63f0f] cursor-pointer"}`}
       >
         {isSubmitting ? "Sending…" : "Proceed to Payment →"}
       </button>
@@ -1068,6 +1104,7 @@ const buildBookingPayload = (activities, sharedParticipants, comment) => ({
 // ─── MAIN CART PAGE ───────────────────────────────────────────────────────────
 
 export default function CartPage() {
+  
   const [activities, setActivities] = useState([]);
   const [measurements, setMeasurements] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -1084,6 +1121,26 @@ export default function CartPage() {
   const [submitError, setSubmitError] = useState(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
+  // ставимо дефолтний (перший) юніт з бекенду для height/weight/shoeSize,
+// як тільки прийшли measurements — тільки якщо unitId ще не вибраний
+useEffect(() => {
+  if (!measurements) return;
+
+  setSharedParticipants((prev) =>
+    prev.map((sp) => {
+      const next = { ...sp };
+      (["height", "weight", "shoeSize"]).forEach((field) => {
+        const apiKey = field === "shoeSize" ? "shoe_size" : field;
+        const units = measurements[apiKey];
+        if (units?.length && !next[field].unitId) {
+          next[field] = { ...next[field], unitId: units[0].id };
+        }
+      });
+      return next;
+    })
+  );
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [measurements]);
   // Load cart on mount — real API only, no mocks.
   useEffect(() => {
     const storageItems = readCartFromStorage();
@@ -1112,7 +1169,15 @@ console.log(apiItems, 'apiItems');
   }, []);
 
   const removeActivity = (id) => setActivities((prev) => prev.filter((a) => a.id !== id));
-
+  const createSharedParticipantWithDefaults = (id, measurements) => {
+    const sp = createSharedParticipant(id);
+    if (measurements) {
+      if (measurements.height?.length) sp.height.unitId = measurements.height[0].id;
+      if (measurements.weight?.length) sp.weight.unitId = measurements.weight[0].id;
+      if (measurements.shoe_size?.length) sp.shoeSize.unitId = measurements.shoe_size[0].id;
+    }
+    return sp;
+  };
   // Changing participant count adds/removes shared participants AND
   // extends/trims each activity's per-participant equipment+cert map.
   const handleCountChange = (n) => {
@@ -1124,7 +1189,7 @@ console.log(apiItems, 'apiItems');
         return [
           ...prev,
           ...Array.from({ length: c - prev.length }, (_, i) =>
-            createSharedParticipant(prev.length + i + 1)
+            createSharedParticipantWithDefaults(prev.length + i + 1, measurements)
           ),
         ];
       }
