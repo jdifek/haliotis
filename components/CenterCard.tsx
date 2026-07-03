@@ -10,6 +10,7 @@ type CenterCardProps = {
   onMoreInfoClick: () => void;
   className?: string;
   imageFull?: string;
+  panelMinHeight?: number;
 };
 
 export const CenterCard: React.FC<CenterCardProps> = ({
@@ -21,12 +22,12 @@ export const CenterCard: React.FC<CenterCardProps> = ({
   slug,
   className = "",
   imageFull,
+  panelMinHeight,
 }) => {
   return (
     <div
-      className={`group relative flex-1 min-w-[220px] h-[460px] overflow-hidden rounded-[20px] ${className}`}
+      className={`group relative w-[220px] h-[460px] overflow-hidden rounded-[20px] ${className}`}
     >
-      {/* Full-height background photo */}
       <div className="absolute inset-0">
         <img
           src={imageFull}
@@ -35,23 +36,27 @@ export const CenterCard: React.FC<CenterCardProps> = ({
         />
       </div>
 
-      {/* Small icon, top-left, overlaid on the photo */}
       {image && (
         <div className="absolute left-4 top-4 z-10">
           <Image src={image} alt="" width={86} height={86} className="h-auto w-[86px]" />
         </div>
       )}
 
-      {/* Floating color panel */}
       <div
         className="absolute inset-x-3 bottom-3 z-10 flex flex-col gap-3 rounded-[16px] p-4 sm:inset-x-5 sm:bottom-5 sm:gap-4 sm:rounded-[20px] sm:p-5"
         style={{ backgroundColor: buttonColor }}
       >
-        <div className="flex flex-col gap-2">
+       
+          <div
+          className="flex flex-col gap-2"
+          data-panel-text
+          style={{
+            minHeight: panelMinHeight ? `${panelMinHeight}px` : undefined,
+          }}
+        >
           <h3 className="text-[20px] font-medium leading-[140%] text-white sm:text-[24px]">
             {title}
           </h3>
-
           <p className="text-[14px] font-normal leading-[160%] text-white opacity-90 sm:text-[15px]">
             {description}
           </p>

@@ -6,7 +6,7 @@ import { Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-import React, { useState, useRef } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import type { Swiper as SwiperType } from "swiper";
 
 type Props = {
@@ -28,22 +28,88 @@ export const CentersSection: React.FC<Props> = ({
   centerCards,
   title,
   subtitle,
-  filter_name
+  filter_name,
 }) => {
-  const mobileRef = useRef<SwiperType | null>(null);
-  const tabletRef = useRef<SwiperType | null>(null);
-  const [mobileSlide, setMobileSlide] = useState(0);
-  const [tabletSlide, setTabletSlide] = useState(0);
+  const swiperRef = useRef<SwiperType | null>(null);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const sectionRef = useRef<HTMLElement>(null);
+  const [panelHeight, setPanelHeight] = useState<number | undefined>(undefined);
 
-  // Одна карточка на локацию (по первому вхождению title)
   const uniqueCards = centerCards.filter(
     (card, index, self) =>
       index === self.findIndex((c) => c.title === card.title)
   );
 
+  const recalc = useCallback(() => {
+    if (!sectionRef.current) return;
+  
+    const nodes = sectionRef.current.querySelectorAll<HTMLElement>(
+      "[data-panel-text]"
+    );
+  
+    // сбрасываем для замера естественной высоты
+    nodes.forEach((n) => {
+      n.style.minHeight = "0px";
+    });
+  
+    let max = 0;
+    nodes.forEach((n) => {
+      if (n.offsetParent === null) return; // скрытая ветка (grid/swiper)
+      const h = n.scrollHeight;
+      if (h > max) max = h;
+    });
+  
+    if (max > 0) {
+      // ВСЕГДА применяем итоговую высоту напрямую в DOM —
+      // не полагаемся на React re-render, который может не случиться
+      nodes.forEach((n) => {
+        n.style.minHeight = `${max}px`;
+      });
+  
+      // state держим просто для синхронизации при следующем маунте/пропсах
+      setPanelHeight((prev) => (prev === max ? prev : max));
+    }
+  }, []);
+  // двойной rAF — дожидаемся, пока браузер и Swiper закончат раскладку текущего кадра
+  const scheduleRecalc = useCallback(() => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(recalc);
+    });
+  }, [recalc]);
+
+  useEffect(() => {
+    console.log("[effect] запуск, карточек:", uniqueCards.length, "panelHeight:", panelHeight);
+  
+    scheduleRecalc();
+  
+    if (typeof document !== "undefined" && "fonts" in document) {
+      (document as any).fonts.ready.then(() => {
+        console.log("[effect] fonts.ready сработал");
+        scheduleRecalc();
+      });
+    }
+  
+    const ro = new ResizeObserver((entries) => {
+      console.log("[ResizeObserver] сработал, entries:", entries.length);
+      scheduleRecalc();
+    });
+  
+    const nodes = sectionRef.current?.querySelectorAll<HTMLElement>(
+      "[data-panel-text]"
+    );
+    console.log("[effect] вешаем observer на узлов:", nodes?.length);
+    nodes?.forEach((n) => ro.observe(n));
+  
+    window.addEventListener("resize", scheduleRecalc);
+  
+    return () => {
+      console.log("[effect] cleanup");
+      ro.disconnect();
+      window.removeEventListener("resize", scheduleRecalc);
+    };
+  }, [recalc, scheduleRecalc, uniqueCards.length, panelHeight === undefined]);
   return (
-    <section className="bg-[#f1f1f1] px-4 pb-12 md:px-8 md:pb-18.25">
-      {/* Header */}
+    <section ref={sectionRef} className="bg-[#f1f1f1] px-4 pb-12 md:px-8 md:pb-18.25">
       <div className="mb-8 flex items-start gap-4">
         <div className="flex flex-col gap-[10px]">
           <p className="text-[28px] font-medium leading-[130%] text-black sm:text-[36px] lg:text-[clamp(32px,2.5vw,42px)]">
@@ -55,65 +121,24 @@ export const CentersSection: React.FC<Props> = ({
         </div>
       </div>
 
-      {/* Mobile: Swiper 1 карточка (< 640px) */}
-      <div className="hidden max-[639px]:block">
+      {/* Swiper: от 0 до 1489px */}
+      <div className="hidden max-[1489px]:block">
         <Swiper
           className="!overflow-hidden"
           modules={[Pagination]}
           spaceBetween={16}
-          slidesPerView={1}
-          loop={uniqueCards.length > 1}
-          onSwiper={(swiper) => {
-            mobileRef.current = swiper;
-          }}
-          onSlideChange={(swiper) => setMobileSlide(swiper.realIndex)}
-          pagination={{ type: "progressbar", el: ".centers-progress-mobile" }}
-        >
-          {uniqueCards.map((card, index) => (
-            <SwiperSlide key={index} className="!h-auto">
-              <CenterCard
-                imageFull={card.imageFull}
-                className="!max-w-none"
-                image={card.image}
-                slug={card.slug}
-                title={card.title}
-                description={card.description}
-                buttonColor={card.buttonColor}
-                onMoreInfoClick={() => console.log("More info clicked")}
-              />
-            </SwiperSlide>
-          ))}
-        </Swiper>
-        <div className="mt-4">
-          <CarouselControls
-            currentSlide={mobileSlide}
-            totalSlides={uniqueCards.length}
-            onPrev={() => mobileRef.current?.slidePrev()}
-            onNext={() => mobileRef.current?.slideNext()}
-            theme="dark"
-            progressClass="centers-progress-mobile"
-          />
-        </div>
-      </div>
-
-      {/* Tablet/Desktop-до-1490: Swiper, карточек по максимуму сколько влезает */}
-      <div className="hidden min-[640px]:max-[1489px]:block">
-        <Swiper
-          className="!overflow-hidden"
-          modules={[Pagination]}
-          spaceBetween={20}
           slidesPerView="auto"
           loop={false}
           onSwiper={(swiper) => {
-            tabletRef.current = swiper;
+            swiperRef.current = swiper;
           }}
-          onSlideChange={(swiper) => setTabletSlide(swiper.realIndex)}
-          pagination={{ type: "progressbar", el: ".centers-progress-tablet" }}
+          onResize={() => scheduleRecalc()}
+          onSlideChange={(swiper) => setCurrentSlide(swiper.realIndex)}
+          pagination={{ type: "progressbar", el: ".centers-progress" }}
         >
           {uniqueCards.map((card, index) => (
-            <SwiperSlide key={index} className="!h-auto !w-[320px]">
+            <SwiperSlide key={index} className="!h-auto !w-[220px]">
               <CenterCard
-                className="!max-w-none"
                 image={card.image}
                 title={card.title}
                 slug={card.slug}
@@ -121,18 +146,19 @@ export const CentersSection: React.FC<Props> = ({
                 description={card.description}
                 buttonColor={card.buttonColor}
                 onMoreInfoClick={() => console.log("More info clicked")}
+                panelMinHeight={panelHeight}
               />
             </SwiperSlide>
           ))}
         </Swiper>
         <div className="mt-4">
           <CarouselControls
-            currentSlide={tabletSlide}
+            currentSlide={currentSlide}
             totalSlides={uniqueCards.length}
-            onPrev={() => tabletRef.current?.slidePrev()}
-            onNext={() => tabletRef.current?.slideNext()}
+            onPrev={() => swiperRef.current?.slidePrev()}
+            onNext={() => swiperRef.current?.slideNext()}
             theme="dark"
-            progressClass="centers-progress-tablet"
+            progressClass="centers-progress"
           />
         </div>
       </div>
@@ -149,6 +175,7 @@ export const CentersSection: React.FC<Props> = ({
             description={card.description}
             buttonColor={card.buttonColor}
             onMoreInfoClick={() => console.log("More info clicked")}
+            panelMinHeight={panelHeight}
           />
         ))}
       </div>

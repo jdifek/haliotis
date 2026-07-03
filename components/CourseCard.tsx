@@ -6,6 +6,7 @@ import { createPortal } from "react-dom";
 import { BookingFormModal } from "./Modals/BookingFormModal";
 import { useLocale } from "next-intl";
 import { text } from "node:stream/consumers";
+import { useMenu } from "@/app/hooks/useMenu";
 
 const ModalPortal = ({ children }: { children: React.ReactNode }) => {
   if (typeof window === "undefined") return null;
@@ -16,6 +17,7 @@ type CourseCardProps = {
   title: string;
   price: number;
     purchaseLink?: string;
+    description?: string;
 
   duration: string;
   requestBased?: boolean;
@@ -34,6 +36,7 @@ type CourseCardProps = {
   requestBased = false,
   badge,
   slug,
+  description,
   currency,
   centerSlug,
   categorySlug, // ← ДОБАВЛЕНО
@@ -41,7 +44,8 @@ type CourseCardProps = {
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const router = useRouter();
   const locale = useLocale(); // ← ДОБАВЛЕНО
-
+console.log(description, 'description');
+const menu = useMenu(locale)
 const handleCardClick = () => {
   if (purchaseLink) {
     window.open(purchaseLink, "_blank", "noopener,noreferrer");
@@ -63,8 +67,8 @@ const handleCardClick = () => {
         onClick={handleCardClick}
       >
         {/* Image Container */}
-        <div className="relative w-full overflow-hidden rounded-2xl">
-          <img src={image} alt={title} className="h-full w-full object-cover" />
+        <div className="relative w-full aspect-[4/3] overflow-hidden rounded-2xl">
+        <img src={image} alt={title} className="absolute inset-0 h-full w-full object-cover" />
 
     {badge && badge.length > 0 && (
   <div className="absolute right-3 top-3 flex flex-col items-end gap-1">
@@ -131,9 +135,14 @@ const handleCardClick = () => {
 
         {/* Content */}
         <div className="mt-2 sm:mt-3 h-[220px] md:h-[165px] rounded-2xl bg-[#f1f1f1] p-2 sm:p-3 flex flex-col justify-between">
-          <h3 className="line-clamp-5 md:line-clamp-3 text-[16px] md:text-[18px] font-[500] leading-[140%] text-black overflow-hidden">
+            <h3 className="line-clamp-5 md:line-clamp-3 text-[16px] md:text-[18px] font-[500] leading-[140%] text-black overflow-hidden">
             {title}
-          </h3>
+            </h3>
+            {description && (
+            <p className="line-clamp-3 text-[14px] md:text-[16px] leading-[140%] text-gray-700 -mt-4">
+              {description}
+            </p>
+            )}
 
           <div className="flex items-center flex-col md:flex-row justify-between gap-3 items-start md:items-center">
             <div className="flex items-center gap-2 rounded-lg bg-white px-2 md:px-3 py-1 md:py-2">
@@ -162,7 +171,7 @@ const handleCardClick = () => {
               className="flex items-center justify-between whitespace-nowrap cursor-pointer w-full md:w-[160px] rounded-full bg-[#e84814] py-0.5 pl-[14px] md:pl-4 pr-0.5 transition-all hover:bg-[#d63f0f]"
             >
               <span className="text-[15px] font-bold leading-[120%] text-white">
-                Book Now
+              {menu.terms.buy_now}
               </span>
               <div className="hidden md:flex h-11 w-11 items-center justify-center rounded-full bg-white">
                 <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">

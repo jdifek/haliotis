@@ -176,7 +176,7 @@ const categorySlug = categorySlugRaw === "all" ? undefined : categorySlugRaw;
   }
   const { data, recommended, recommendedEquipment } = courseData;
 console.log(data, 'data')
-console.log(courseData, 'courseData')
+console.log(recommendedEquipment, 'recommendedEquipment')
   const accordionItems = buildAccordionItems(data).map((item) => ({
     id: item.id,
     label: item.label,
