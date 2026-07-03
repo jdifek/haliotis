@@ -3,6 +3,8 @@ import { useState } from "react";
 import { ButtonWithIcon } from "./buttons/ButtonWithIcon";
 import { BookingFormModal } from "./Modals/BookingFormModal";
 import { createPortal } from "react-dom";
+import { useMenu } from "@/app/hooks/useMenu";
+import { useLocale } from "next-intl";
 
 export const ModalPortal = ({ children }: { children: React.ReactNode }) => {
   if (typeof window === "undefined") return null;
@@ -41,7 +43,11 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
   duration,
   borderColor = "#f49519",
 }) => {
+  const locale = useLocale()
   const [isBookingOpen, setIsBookingOpen] = useState(false);
+  const menu = useMenu(locale)
+console.log(JSON.stringify(menu.terms, null, 2), 'menu');
+
   return (
     <div className="relative">
       <div
@@ -173,7 +179,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
                   <ButtonWithIcon
                   data-book
                     className="flex-1"
-                    label="Book Now"
+                    label={menu.terms.book_now}
                     onClick={(e) => {
                       e.stopPropagation();
                       setIsBookingOpen(true); // ✅ открывает
@@ -208,7 +214,8 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
           <div className="flex items-center justify-between gap-3">
             {/* More Info Button */}
             <button className="text-[15px] font-semibold cursor-pointer leading-[160%] text-[#e84814] transition-opacity hover:opacity-80">
-              {isExpanded ? "Show less" : "More info"}
+             {menu.terms.more_info}
+            
             </button>
           </div>
         </div>

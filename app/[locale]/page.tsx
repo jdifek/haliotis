@@ -126,7 +126,7 @@ console.log(homepageData, 'homepageData');
         price: parseFloat(trip.price?.amount || 0),
         title: trip.name,
         description: trip.description || center.small_description || "",
-        link: `/dive-trips/${trip.slug || trip.id}`,
+        link: `/diving/${trip.slug || trip.id}`,
         location: center.slug,
         details: trip.description
           ? `<p>${trip.description}</p>`

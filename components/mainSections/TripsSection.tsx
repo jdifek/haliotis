@@ -11,6 +11,7 @@ import { useState, useRef, useEffect } from "react";
 import type { Swiper as SwiperType } from "swiper";
 import { FilterList } from "../FilterList";
 import { ButtonWithIcon } from "../buttons/ButtonWithIcon";
+import { useRouter } from "next/navigation";
 
 type Props = {
   locations: {
@@ -47,7 +48,7 @@ export const TripsSection: React.FC<Props> = ({
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [triangleX, setTriangleX] = useState<number | null>(null);
   const [expandedCardId, setExpandedCardId] = useState<number | null>(null);
-
+const router = useRouter()
   const filteredTrips =
     selectedLocation === "all"
       ? tripCards
@@ -246,9 +247,7 @@ export const TripsSection: React.FC<Props> = ({
                       equipmentPrice={card.equipmentPrice}
                       isExpanded={expandedCardId === index}
                       onToggleExpand={() =>
-                        setExpandedCardId(
-                          expandedCardId === index ? null : index
-                        )
+                        router.push(card.link)
                       }
                       onBookClick={() => console.log("Book clicked")}
                     />

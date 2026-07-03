@@ -273,7 +273,7 @@ export const CourseDetailHeroSection: React.FC<Props> = ({
   image,
   imageAlt = "Course image",
   onBookClick,
-  accordionItems = defaultAccordionItems,
+  accordionItems ,
 }) => {
   const locale = useLocale();
   const { terms } = useMenu(locale);
@@ -302,16 +302,14 @@ export const CourseDetailHeroSection: React.FC<Props> = ({
             <h1
               className="text-[28px] sm:text-[36px] lg:text-[48px] font-medium leading-[130%] text-[#111]"
               style={{ fontFamily: "var(--font-family)" }}
-            >
-              {title}
-            </h1>
+              dangerouslySetInnerHTML={{ __html: title }}
+            />
 
             <p
               className="text-[15px] font-normal leading-[160%] text-[#101010] opacity-80"
               style={{ fontFamily: "var(--font-family)" }}
-            >
-              {description}
-            </p>
+              dangerouslySetInnerHTML={{ __html: description }}
+            />
 
             {/* Price + Book Now */}
             <div className="flex flex-wrap items-center gap-3 justify-between">

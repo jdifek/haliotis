@@ -120,7 +120,7 @@ export const CourseDetailHeroSection: React.FC<Props> = ({
         <div className="flex flex-col min-[1440px]:flex-row md:items-start md:justify-between gap-6 md:gap-10">
           {/* Left: Title + Description + Price + Buttons */}
           <div className="flex flex-col gap-4 md:gap-6 flex-1">
-            <h1 className="text-[28px] sm:text-[36px] lg:text-[48px] font-medium leading-[130%] text-[#111]">
+            <h1  className="text-[28px] sm:text-[36px] lg:text-[48px] font-medium leading-[130%] text-[#111]">
               {title}
             </h1>
             <p className="text-[15px] font-normal leading-[160%] text-[#101010] opacity-80">
