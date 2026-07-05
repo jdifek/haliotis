@@ -46,9 +46,10 @@ export const Parceiros = ({ terms,partners, title }: Props) => {
               {hasContent ? (
                 <div className="flex h-[calc(100%-8px)] w-[60%] flex-col items-center justify-center rounded-[16px] bg-[#f1f1f1] p-3 text-center sm:absolute sm:right-2 sm:w-[45%] lg:w-[364px]">
                   {partner.description && (
-                    <p className="mb-2 font-sans text-[13px] font-normal leading-[160%] text-black lg:text-[15px]">
-                      {partner.description}
-                    </p>
+                    <div
+                      className="mb-2 font-sans text-[13px] font-normal leading-[160%] text-black lg:text-[15px]"
+                      dangerouslySetInnerHTML={{ __html: partner.description }}
+                    />
                   )}
                   {partner.url && (
                     <a

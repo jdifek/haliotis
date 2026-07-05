@@ -213,12 +213,12 @@ export const PenicheHero = ({ center }: Props) => {
                   </svg>
                 </div>
               </div>
-              <div className="space-y-3 bg-white p-3 flex flex-col px-4 w-full h-[486px] rounded-r-[16px]">
-                <div className="rounded-[16px] bg-[#f1f1f1] py-[31px] px-4">
+              <div className="space-y-3 bg-white p-3 flex flex-col px-3 w-full h-[486px] rounded-r-[16px]">
+                <div className="rounded-[16px] bg-[#f1f1f1] py-[31px] px-2">
                   {center.contact_phone && (
                     <a
                       href={`tel:${center.contact_phone.trim()}`}
-                      className="flex items-center gap-3 text-[15px] text-[#111] hover:text-[#e84814] mb-3"
+                      className="flex items-center gap-2 text-[15px] text-[#111] hover:text-[#e84814] mb-3"
                     >
                       <svg
                         width="20"
@@ -239,7 +239,7 @@ export const PenicheHero = ({ center }: Props) => {
 
 {center.contact_fax && (
 
-                  <div className="flex items-center gap-3 text-[15px] text-[#111] mb-3">
+                  <div className="flex items-center gap-2 text-[15px] text-[#111] mb-3">
                     <svg width="20" height="23" viewBox="0 0 20 23" fill="none">
                       <path
                         d="M17.6909 7.24942V3.4854L14.2048 0H13.9871H6.05596V6.58339C5.49058 6.11348 4.7688 5.82459 3.97648 5.82459H3.24203C2.33888 5.82393 1.52499 6.19318 0.941503 6.78699C0.357304 7.38049 -0.000353985 8.20084 2.62909e-07 9.10196V18.8976C0.000354511 20.9795 1.69238 22.6712 3.77429 22.6719H16.2258C18.3076 22.6712 19.9993 20.9795 20 18.8976V10.7276C19.9993 9.16493 19.0465 7.82228 17.6909 7.24942ZM7.10737 1.05136H13.7695L13.8232 1.10508V3.88787H16.6067L16.6395 3.92073V6.97731C16.5037 6.96226 16.3657 6.95336 16.2258 6.95336H7.10737V1.05136ZM1.15609 9.10196C1.15609 7.94994 2.09006 7.01597 3.24203 7.01597H3.97648C5.12849 7.01597 6.06247 7.94994 6.06247 9.10196V14.4112C6.06247 15.5631 5.12849 16.4972 3.97648 16.4972H3.24203C2.09002 16.4972 1.15609 15.5631 1.15609 14.4112V9.10196ZM18.8086 18.8976C18.8086 20.3241 17.6522 21.4805 16.2257 21.4805H3.77425C2.34778 21.4805 1.19134 20.3241 1.19134 18.8976V16.7802C1.74201 17.2576 2.45795 17.5485 3.24203 17.5485H3.97648C5.70654 17.5485 7.11383 16.1412 7.11383 14.4112V13.5532V10.1362V8.14469H16.2257C17.6522 8.14469 18.8086 9.30114 18.8086 10.7276V18.8976Z"
@@ -292,7 +292,7 @@ export const PenicheHero = ({ center }: Props) => {
                   {center.contact_email && (
                   <a
                         href={`mailto:${center.contact_email}`}
-                        className="flex items-center gap-3 text-[15px] text-[#111] hover:text-[#e84814] underline"
+                        className="flex items-center gap-2 text-[15px] text-[#111] hover:text-[#e84814] underline"
                   >
                     <svg width="20" height="16" viewBox="0 0 20 16" fill="none">
                       <path
