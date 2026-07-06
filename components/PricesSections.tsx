@@ -409,8 +409,11 @@ console.log(pricesData, 'pricesData');
       </section>
 
       {/* ── Specialized Maintenance Services ── */}
-      <SpecializedMaintenanceSection pricesData={pricesData} activeTabId={activeTabId ?? ""} />
-      {/* ── Fills ── */}
+      <SpecializedMaintenanceSection
+  pricesData={pricesData}
+  activeTabId={activeTabId ?? ""}
+  excludeTypeId={defaultType?.id}
+/>      {/* ── Fills ── */}
       <FillsSection pricesData={pricesData} />
     </>
   );
@@ -422,12 +425,15 @@ console.log(pricesData, 'pricesData');
 function SpecializedMaintenanceSection({
   pricesData,
   activeTabId,
+  excludeTypeId,
 }: {
   pricesData: PricesData | null;
   activeTabId: string;
+  excludeTypeId?: number;
 }) {
-  const maintenanceType = pricesData?.service_types.find((t) => t.display_type === "information");
-
+  const maintenanceType = pricesData?.service_types.find(
+    (t) => t.display_type === "information" && t.id !== excludeTypeId
+  );
   const maintenanceCategories = (pricesData?.categories ?? [])
     .filter((c) => c.service_type_id === maintenanceType?.id)
     .sort((a, b) => a.position - b.position);
