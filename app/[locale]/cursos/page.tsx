@@ -67,6 +67,7 @@ type CoursesApiResponse = {
 async function fetchCourses(params: {
   centerId: number;
   categoryId?: string | null;
+  locale: string;
   page: number;
   attachCategory?: boolean;
 }): Promise<CoursesApiResponse> {
@@ -74,6 +75,7 @@ async function fetchCourses(params: {
   url.searchParams.set("center", String(params.centerId));
   url.searchParams.set("page", String(params.page));
   url.searchParams.set("per_page", "12");
+  url.searchParams.set("lang", params.locale);
 
   if (params.categoryId) {
     url.searchParams.set("category", params.categoryId);
@@ -178,6 +180,7 @@ useEffect(() => {
         categoryId: selectedCategoryId,
         page: currentPage,
         attachCategory: true,
+        locale: locale
       });
 
       setCourses(resp.data);
