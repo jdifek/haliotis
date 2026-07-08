@@ -213,7 +213,7 @@ console.log(recommendedEquipment, 'recommendedEquipment')
 const currency = (data.price as any)?.currency ?? "€";     
   return (
     <main className="min-h-screen bg-white relative pt-4 md:pt-6">
-      <div className="px-4 md:px-8 lg:px-[188px]">
+      <div className="px-[21px] md:px-30 lg:px-[30px]">
         <Breadcrumbs
           className="mb-6 md:mb-8"
          items={[

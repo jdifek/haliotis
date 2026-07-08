@@ -312,8 +312,8 @@ export const CourseDetailHeroSection: React.FC<Props> = ({
             />
 
             {/* Price + Book Now */}
-            <div className="flex flex-wrap items-center gap-3 justify-between">
-  <div className="flex items-center gap-2 rounded-lg bg-[#f1f1f1] px-3 py-2 flex-shrink-0">
+            <div className="flex flex-wrap items-center gap-3  md:justify-start">
+  <div className="flex items-center gap-2 rounded-lg bg-[#f1f1f1] px-3 py-3 flex-shrink-0">
     <svg
       width="20"
       height="20"
