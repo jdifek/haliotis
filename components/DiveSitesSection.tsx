@@ -1,7 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
+import { useEffect, useRef, useState } from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import { CarouselControls } from "@/components/CarouselControls";
+import type { Swiper as SwiperType } from "swiper";
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type DiveSite = {
@@ -151,27 +156,25 @@ const RatingDots = ({
 
 // ─── Video block ──────────────────────────────────────────────────────────────
 
-const VideoBlock = ({ src, cover, isMobile }: { src?: string; cover?: string; isMobile: boolean }) => {
+type MediaSlide = {
+  type: "image" | "video";
+  imageDesktop?: string;
+  imageMobile?: string;
+  videoUrl?: string;
+  videoCover?: string;
+};
+
+const VideoSlide = ({ src, cover }: { src: string; cover?: string }) => {
   const [isLoaded, setIsLoaded] = useState(!cover);
 
-  if (!src) return null;
-
   return (
-    <div
-      className="w-full overflow-hidden relative flex items-center justify-center"
-      style={{
-        borderRadius: 16,
-        height: isMobile ? 210 : 671,
-        background: "#0d1b35",
-      }}
-    >
+    <div className="relative h-full w-full flex items-center justify-center">
       {!isLoaded && cover ? (
         <>
           <img
             src={cover}
             alt="Video cover"
             className="w-full h-full object-cover"
-            style={{ borderRadius: 16 }}
             loading="lazy"
           />
           <button
@@ -190,10 +193,88 @@ const VideoBlock = ({ src, cover, isMobile }: { src?: string; cover?: string; is
           src={src}
           width="100%"
           height="100%"
-          style={{ borderRadius: 16 }}
           allowFullScreen
           loading="lazy"
         />
+      )}
+    </div>
+  );
+};
+
+const MediaBlock = ({ media, isMobile }: { media: MediaSlide[]; isMobile: boolean }) => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const swiperRef = useRef<SwiperType | null>(null);
+
+  if (!media || media.length === 0) return null;
+
+  const isMultiple = media.length > 1;
+
+  return (
+    <div
+      className="w-full relative"
+      style={{
+        borderRadius: 16,
+        height: isMobile ? 210 : 671,
+        background: "#0d1b35",
+      }}
+    >
+      <div className="absolute inset-0 overflow-hidden" style={{ borderRadius: 16 }}>
+        {isMultiple ? (
+          <Swiper
+            modules={[Navigation]}
+            spaceBetween={0}
+            slidesPerView={1}
+            loop
+            onSwiper={(swiper) => { swiperRef.current = swiper; }}
+            onSlideChange={(swiper) => setCurrentSlide(swiper.realIndex)}
+            className="h-full w-full"
+          >
+            {media.map((slide, index) => (
+              <SwiperSlide key={index} className="h-full">
+                {slide.type === "video" && slide.videoUrl ? (
+                  <VideoSlide src={slide.videoUrl} cover={slide.videoCover} />
+                ) : (
+                  <img
+                    src={
+                      (isMobile ? slide.imageMobile : slide.imageDesktop) ||
+                      slide.imageDesktop ||
+                      slide.imageMobile
+                    }
+                    alt=""
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                )}
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        ) : media[0].type === "video" && media[0].videoUrl ? (
+          <VideoSlide src={media[0].videoUrl} cover={media[0].videoCover} />
+        ) : (
+          <img
+            src={
+              (isMobile ? media[0].imageMobile : media[0].imageDesktop) ||
+              media[0].imageDesktop ||
+              media[0].imageMobile
+            }
+            alt=""
+            className="w-full h-full object-cover"
+            loading="lazy"
+          />
+        )}
+      </div>
+
+      {isMultiple && (
+        <div className="absolute right-4 bottom-4 z-10">
+          <CarouselControls
+            currentSlide={currentSlide}
+            totalSlides={media.length}
+            onPrev={() => swiperRef.current?.slidePrev()}
+            onNext={() => swiperRef.current?.slideNext()}
+            progressClass="media-progress"
+            theme="light"
+          />
+        </div>
       )}
     </div>
   );
@@ -339,7 +420,7 @@ const DiveSiteCard = ({ site }: { site: DiveSite }) => {
 <span dangerouslySetInnerHTML={{ __html: site.description }} />            </p>
 
           </div>
-<VideoBlock src={site.videoSrc} cover={site.videoCover} isMobile={true} />
+<MediaBlock media={site.media} isMobile={true} />
         </div>
 
         {/* Desktop: всегда раскрыто */}
@@ -358,8 +439,8 @@ const DiveSiteCard = ({ site }: { site: DiveSite }) => {
           >
           <span dangerouslySetInnerHTML={{ __html: site.description }} />
           </p>
-<VideoBlock src={site.videoSrc} cover={site.videoCover} isMobile={false} />
-        </div>
+          <MediaBlock media={site.media} isMobile={false} />
+          </div>
       </div>
     </div>
   );
@@ -414,20 +495,31 @@ const DiveSitesSection = ({ regions, locations }: DiveSitesSectionProps) => {
         id: String(region.id),
         label: region.name,
         sites: locations
-          .filter((loc) => regionIds.includes(loc.region_id))
-          .map(
-            (loc): DiveSite => ({
-              id: String(loc.id),
-              name: loc.name,
-              fishes: loc.fish_level,
-              difficulty: loc.difficulty_level,
-              maxDepth: `${parseFloat(loc.max_depth)} meters`,
-              padiLevel: loc.certification,
-              description: loc.description,
-              videoSrc: normalizeVideoUrl(loc.video_url),
-              videoCover: loc.video_cover,
-            })
-          ),
+        .filter((loc) => regionIds.includes(loc.region_id))
+        .map(
+          (loc): DiveSite => ({
+            id: String(loc.id),
+            name: loc.name,
+            fishes: loc.fish_level,
+            difficulty: loc.difficulty_level,
+            maxDepth: `${parseFloat(loc.max_depth)} meters`,
+            padiLevel: loc.certification,
+            description: loc.description,
+            // видео — приоритет, идёт первым; фото — после, порядок между собой сохраняется
+            media: [...loc.media]
+              .filter((m) =>
+                m.type === "video" ? !!m.videoUrl : !!(m.imageDesktop || m.imageMobile)
+              )
+              .sort((a, b) => {
+                if (a.type === b.type) return 0;
+                return a.type === "video" ? -1 : 1;
+              })
+              .map((m) => ({
+                ...m,
+                videoUrl: m.videoUrl ? normalizeVideoUrl(m.videoUrl) : undefined,
+              })),
+          })
+        ),
       };
     })
     .filter((tab) => tab.sites.length > 0);
