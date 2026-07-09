@@ -26,7 +26,7 @@ export const CenterCard: React.FC<CenterCardProps> = ({
 }) => {
   return (
     <div
-      className={`group relative w-[220px] h-[460px] overflow-hidden rounded-[20px] ${className}`}
+      className={`group relative w-[240px] h-[460px] overflow-hidden rounded-[20px] ${className}`}
     >
       <div className="absolute inset-0">
         <img

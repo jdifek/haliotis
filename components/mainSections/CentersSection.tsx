@@ -83,7 +83,7 @@ export const CentersSection: React.FC<Props> = ({
     scheduleRecalc();
   
     if (typeof document !== "undefined" && "fonts" in document) {
-      (document as any).fonts.ready.then(() => {
+      (document).fonts.ready.then(() => {
         console.log("[effect] fonts.ready сработал");
         scheduleRecalc();
       });
@@ -121,64 +121,64 @@ export const CentersSection: React.FC<Props> = ({
         </div>
       </div>
 
-      {/* Swiper: от 0 до 1489px */}
-      <div className="hidden max-[1489px]:block">
-        <Swiper
-          className="!overflow-hidden"
-          modules={[Pagination]}
-          spaceBetween={16}
-          slidesPerView="auto"
-          loop={false}
-          onSwiper={(swiper) => {
-            swiperRef.current = swiper;
-          }}
-          onResize={() => scheduleRecalc()}
-          onSlideChange={(swiper) => setCurrentSlide(swiper.realIndex)}
-          pagination={{ type: "progressbar", el: ".centers-progress" }}
-        >
-          {uniqueCards.map((card, index) => (
-            <SwiperSlide key={index} className="!h-auto !w-[220px]">
-              <CenterCard
-                image={card.image}
-                title={card.title}
-                slug={card.slug}
-                imageFull={card.imageFull}
-                description={card.description}
-                buttonColor={card.buttonColor}
-                onMoreInfoClick={() => console.log("More info clicked")}
-                panelMinHeight={panelHeight}
-              />
-            </SwiperSlide>
-          ))}
-        </Swiper>
-        <div className="mt-4">
-          <CarouselControls
-            currentSlide={currentSlide}
-            totalSlides={uniqueCards.length}
-            onPrev={() => swiperRef.current?.slidePrev()}
-            onNext={() => swiperRef.current?.slideNext()}
-            theme="dark"
-            progressClass="centers-progress"
-          />
-        </div>
-      </div>
+   {/* Swiper: от 0 до 1489px */}
+<div className="hidden max-[1605px]:block">
+  <Swiper
+    className="!overflow-hidden"
+    modules={[Pagination]}
+    spaceBetween={16}
+    slidesPerView="auto"
+    loop={false}
+    onSwiper={(swiper) => {
+      swiperRef.current = swiper;
+    }}
+    onResize={() => scheduleRecalc()}
+    onSlideChange={(swiper) => setCurrentSlide(swiper.realIndex)}
+    pagination={{ type: "progressbar", el: ".centers-progress" }}
+  >
+    {uniqueCards.map((card, index) => (
+      <SwiperSlide key={index} className="!h-auto !w-[240px]">
+        <CenterCard
+          image={card.image}
+          title={card.title}
+          slug={card.slug}
+          imageFull={card.imageFull}
+          description={card.description}
+          buttonColor={card.buttonColor}
+          onMoreInfoClick={() => console.log("More info clicked")}
+          panelMinHeight={panelHeight}
+        />
+      </SwiperSlide>
+    ))}
+  </Swiper>
+  <div className="mt-4">
+    <CarouselControls
+      currentSlide={currentSlide}
+      totalSlides={uniqueCards.length}
+      onPrev={() => swiperRef.current?.slidePrev()}
+      onNext={() => swiperRef.current?.slideNext()}
+      theme="dark"
+      progressClass="centers-progress"
+    />
+  </div>
+</div>
 
-      {/* Desktop: статичная сетка только от 1490px */}
-      <div className="hidden min-[1490px]:flex min-[1490px]:flex-wrap min-[1490px]:gap-5">
-        {uniqueCards.map((card, index) => (
-          <CenterCard
-            key={index}
-            image={card.image}
-            slug={card.slug}
-            imageFull={card.imageFull}
-            title={card.title}
-            description={card.description}
-            buttonColor={card.buttonColor}
-            onMoreInfoClick={() => console.log("More info clicked")}
-            panelMinHeight={panelHeight}
-          />
-        ))}
-      </div>
+{/* Desktop: статичная сетка только от 1490px */}
+<div className="hidden min-[1606px]:flex min-[1606px]:flex-wrap min-[1606px]:justify-center min-[1606px]:gap-5">
+  {uniqueCards.map((card, index) => (
+    <CenterCard
+      key={index}
+      image={card.image}
+      slug={card.slug}
+      imageFull={card.imageFull}
+      title={card.title}
+      description={card.description}
+      buttonColor={card.buttonColor}
+      onMoreInfoClick={() => console.log("More info clicked")}
+      panelMinHeight={panelHeight}
+    />
+  ))}
+</div>
     </section>
   );
 };
