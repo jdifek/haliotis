@@ -134,12 +134,14 @@ export const RecommendedEquipmentSection: React.FC<Props> = ({
               <SwiperSlide key={item.id}>
                 <CourseCard
                   image={item.image}
+                  id={+item.id}
                   title={item.name}
                   description={item.description}
                   price={Number(item.price.amount)}
                   currency={item.price.currency}
                   duration="false"
                   requestBased={false}
+                  buyNow={true}
                   purchaseLink={item.purchase_link}
                 />
               </SwiperSlide>

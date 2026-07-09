@@ -87,6 +87,7 @@ console.log(recommendedCourses, 'recommendedCourses');
       />
 
       <BookingFormModal
+      itemId={courseId}
         isOpen={isBookingOpen}
         onClose={() => setIsBookingOpen(false)}
         courseTitle={courseTitle}
