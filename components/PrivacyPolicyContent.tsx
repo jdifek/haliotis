@@ -128,7 +128,7 @@ export default function PrivacyPolicyContent({ data }: PrivacyPolicyContentProps
   const [firstTab, ...restTabs] = tabs;
 
   // Image: use API url if provided, else local asset
-  const imageSrc = data.image_url ?? "/privacy-lock.png";
+  const imageSrc = data.image_url ?? "";
 console.log(data, 'data');
 
   // Если нет ни body, ни tabs - показываем сообщение

@@ -100,7 +100,7 @@ console.log(homepageData, 'homepageData');
       price: course.price?.amount || 0,
       duration: course.duration_label || "On request",
       requestBased: !course.duration_label,
-      badge: course.label?.name || "Course",
+    badge: course.labels?.length > 0 ? course.labels : [],
       location: center.slug,
     }))
   );
@@ -122,11 +122,11 @@ console.log(homepageData, 'homepageData');
   const tripCards = (homepageData.sliders?.dive_trip?.entities || []).flatMap(
     (center: any) =>
       (center.dive_trips || []).map((trip: any) => ({
-        image: center.image_url || "/image 6.png",
+        image: trip.image_url || "/image 6.png",
         price: parseFloat(trip.price?.amount || 0),
         title: trip.name,
         description: trip.description || center.small_description || "",
-        link: `/dive-trips/${trip.slug || trip.id}`,
+        link: `/diving/${trip.slug || trip.id}`,
         location: center.slug,
         details: trip.description
           ? `<p>${trip.description}</p>`

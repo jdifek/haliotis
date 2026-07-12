@@ -2,6 +2,11 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { ButtonWithIcon } from "../buttons/ButtonWithIcon";
+import { useMenu } from "@/app/hooks/useMenu";
+import { createTermGetter } from "@/app/utils/terms";
+import { useLocale } from "next-intl";
+import { addItemToCart } from "@/lib/cart";
 
 type AccordionItem = {
   id: string;
@@ -11,15 +16,62 @@ type AccordionItem = {
 
 type Props = {
   className?: string;
+  id: number | string; // ← новое: ID курса
+  location?: string; // ← новое: локация для localStorage
   title: string;
   description: string;
-  currency: string
+  currency: string;
   price: number;
   image: string;
   imageAlt?: string;
   onBookClick?: () => void;
   accordionItems?: AccordionItem[];
 };
+
+// ─── Cart utils ───────────────────────────────────────────────────────────────
+const addCourseToCart = (
+  id: number | string,
+  location?: string,
+  title?: string,
+  price?: number,
+  currency?: string,
+  image?: string
+) => {
+  try {
+    const raw = localStorage.getItem("cart");
+    const cart: Array<{
+      type: string;
+      id: number | string;
+      location?: string;
+      title?: string;
+      price?: number;
+      currency?: string;
+      image?: string;
+    }> = raw ? JSON.parse(raw) : [];
+
+    const exists = cart.some(
+      (item) => item.type === "course" && item.id === id
+    );
+    if (!exists) {
+      cart.push({
+        type: "course",
+        id,
+        ...(location ? { location } : {}),
+        ...(title ? { title } : {}),
+        ...(price !== undefined ? { price } : {}),
+        ...(currency ? { currency } : {}),
+        ...(image ? { image } : {}),
+      });
+      localStorage.setItem("cart", JSON.stringify(cart));
+      // тригер для хедера — без нового файлу, просто кастомна подія
+      window.dispatchEvent(new Event("cart-updated"));
+    }
+  } catch {
+    // ignore localStorage errors
+  }
+};
+
+// ─── Icons ────────────────────────────────────────────────────────────────────
 
 const ChevronIcon = ({ open }: { open: boolean }) => (
   <svg
@@ -39,12 +91,10 @@ const ChevronIcon = ({ open }: { open: boolean }) => (
   </svg>
 );
 
-
 const BookNowButton = ({ onClick }: { onClick?: () => void }) => (
   <button
     onClick={onClick}
-    className="flex items-center whitespace-nowrap cursor-pointer gap-[23px] md:gap-6 rounded-full bg-[#e84814] py-0.5 pl-[14px] md:pl-4 pr-0.5 transition-all hover:bg-[#d63f0f]"
-  >
+    className="flex items-center whitespace-nowrap flex-shrink-0 cursor-pointer gap-[23px] md:gap-6 rounded-full bg-[#e84814] py-0.5 pl-[14px] md:pl-4 pr-0.5 transition-all hover:bg-[#d63f0f]"  >
     <span className="text-[15px] font-bold leading-[120%] text-white">
       Book Now
     </span>
@@ -90,11 +140,17 @@ const defaultAccordionItems: AccordionItem[] = [
     content: (
       <p className="text-[15px] font-normal leading-[160%] text-[#101010] opacity-80">
         See the contents of the respective courses:{" "}
-        <a href="#" className="underline decoration-skip-ink-none text-[#e84814]">
+        <a
+          href="#"
+          className="underline decoration-skip-ink-none text-[#e84814]"
+        >
           PADI Advanced Open Water Diver
         </a>{" "}
         e{" "}
-        <a href="#" className="underline decoration-skip-ink-none text-[#e84814]">
+        <a
+          href="#"
+          className="underline decoration-skip-ink-none text-[#e84814]"
+        >
           PADI Underwater Naturalist
         </a>
       </p>
@@ -107,8 +163,15 @@ const defaultAccordionItems: AccordionItem[] = [
       <div className="text-[15px] font-normal leading-[160%] text-[#101010] opacity-80">
         <p>Merge of the two courses, including the following fases:</p>
         <ul className="list-disc pl-5 mt-1">
-          <li>Knowledge development (theoretical modules carried out via eLearning).</li>
-          <li>Open water dives where you will do 6 dives in the sea, 2 of which were dedicated to the Underwater Naturalist course in Sesimbra, held over three days.</li>
+          <li>
+            Knowledge development (theoretical modules carried out via
+            eLearning).
+          </li>
+          <li>
+            Open water dives where you will do 6 dives in the sea, 2 of which
+            were dedicated to the Underwater Naturalist course in Sesimbra, held
+            over three days.
+          </li>
         </ul>
       </div>
     ),
@@ -118,9 +181,25 @@ const defaultAccordionItems: AccordionItem[] = [
     label: "Duration",
     content: (
       <div className="text-[15px] font-normal leading-[160%] text-[#101010] opacity-80 flex flex-col gap-3">
-        <p>The diving courses are held over three days, which can be scheduled on pre-defined dates or on any date arranged with the participants, either during working hours or after work hours. We offer diving courses with just one participant without any additional cost.</p>
-        <p>You should contact us in advance to clarify any doubts, enroll in the course, and gain access to study materials.</p>
-        <p>The meeting point is at our center at 9:00 AM, with return between 11:00 AM and 12:00 PM. The schedule may change, as we also have an afternoon departure at 2:00 PM, with return between 3:00 PM and 4:00 PM. Transportation between the dive center and the dock is provided in our vans, and the trips to the dive spots are made in our boats (Rigid inflatable boats). After the dives, you can take a hot shower at our facilities.</p>
+        <p>
+          The diving courses are held over three days, which can be scheduled on
+          pre-defined dates or on any date arranged with the participants,
+          either during working hours or after work hours. We offer diving
+          courses with just one participant without any additional cost.
+        </p>
+        <p>
+          You should contact us in advance to clarify any doubts, enroll in the
+          course, and gain access to study materials.
+        </p>
+        <p>
+          The meeting point is at our center at 9:00 AM, with return between
+          11:00 AM and 12:00 PM. The schedule may change, as we also have an
+          afternoon departure at 2:00 PM, with return between 3:00 PM and 4:00
+          PM. Transportation between the dive center and the dock is provided in
+          our vans, and the trips to the dive spots are made in our boats (Rigid
+          inflatable boats). After the dives, you can take a hot shower at our
+          facilities.
+        </p>
       </div>
     ),
   },
@@ -130,7 +209,10 @@ const defaultAccordionItems: AccordionItem[] = [
     content: (
       <div className="text-[15px] font-normal leading-[160%] text-[#101010] opacity-80">
         <p>
-          <a href="#" className="underline decoration-skip-ink-none text-[#e84814]">
+          <a
+            href="#"
+            className="underline decoration-skip-ink-none text-[#e84814]"
+          >
             PADI (Junior) Open Water Diver
           </a>{" "}
           or equivalent certification from another scuba diving agency.
@@ -144,11 +226,24 @@ const defaultAccordionItems: AccordionItem[] = [
     label: "Included",
     content: (
       <div className="text-[15px] font-normal leading-[160%] text-[#101010] opacity-80 flex flex-col gap-3">
-        <p>Unlimited access to the online eLearning course in the selected language (Languages available - Advanced: English, Portuguese, French, Spanish, among others and Languages available - Underwater Naturalist: English), including knowledge reviews, quizzes and final exam.</p>
-        <p>Your scuba diving training include all the necessary scuba diving equipment, snack, water between dives and insurance.</p>
         <p>
-          Specialised equipment hire is not included in the price of the standard course. In such cases, please consult the prices of the extras at -{" "}
-          <a href="https://haliotis.pt/en/precos/sesimbra" className="underline decoration-skip-ink-none text-[#e84814]">
+          Unlimited access to the online eLearning course in the selected
+          language (Languages available - Advanced: English, Portuguese, French,
+          Spanish, among others and Languages available - Underwater Naturalist:
+          English), including knowledge reviews, quizzes and final exam.
+        </p>
+        <p>
+          Your scuba diving training include all the necessary scuba diving
+          equipment, snack, water between dives and insurance.
+        </p>
+        <p>
+          Specialised equipment hire is not included in the price of the
+          standard course. In such cases, please consult the prices of the
+          extras at -{" "}
+          <a
+            href="https://haliotis.pt/en/precos/sesimbra"
+            className="underline decoration-skip-ink-none text-[#e84814]"
+          >
             https://haliotis.pt/en/precos/sesimbra
           </a>
         </p>
@@ -160,7 +255,8 @@ const defaultAccordionItems: AccordionItem[] = [
     label: "Assigned",
     content: (
       <p className="text-[15px] font-normal leading-[160%] text-[#101010] opacity-80">
-        International digital certifications PADI Advanced Open Water Diver and PADI Underwater Naturalist.
+        International digital certifications PADI Advanced Open Water Diver and
+        PADI Underwater Naturalist.
       </p>
     ),
   },
@@ -168,6 +264,8 @@ const defaultAccordionItems: AccordionItem[] = [
 
 export const CourseDetailHeroSection: React.FC<Props> = ({
   className,
+  id,
+  location,
   title,
   description,
   currency,
@@ -175,53 +273,155 @@ export const CourseDetailHeroSection: React.FC<Props> = ({
   image,
   imageAlt = "Course image",
   onBookClick,
-  accordionItems = defaultAccordionItems,
+  accordionItems ,
 }) => {
+  const locale = useLocale();
+  const { terms } = useMenu(locale);
+  const t = createTermGetter(terms);
+
   // State only used on mobile
   const [openAccordion, setOpenAccordion] = useState<string | null>("content");
+  const [addedToCart, setAddedToCart] = useState(false);
 
-  const toggleAccordion = (id: string) => {
-    setOpenAccordion((prev) => (prev === id ? null : id));
+  const toggleAccordion = (accordionId: string) => {
+    setOpenAccordion((prev) => (prev === accordionId ? null : accordionId));
   };
 
-  console.log(description, 'descriptiondescription');
-  
+  const handleAddToCart = () => {
+    addCourseToCart(id, location, title, price, currency, image);
+    setAddedToCart(true);
+    setTimeout(() => setAddedToCart(false), 2000);
+  };
   return (
     <section className={`bg-white ${className}`}>
       <div className="mx-auto max-w-[1920px] px-4 md:px-8 lg:px-[188px] pt-0 py-8 md:py-12 md:pt-12 flex flex-col gap-6 md:gap-10">
         {/* ── HERO BLOCK ── */}
-        <div className="flex flex-col min-[980px]:flex-row md:items-start md:justify-between gap-6 md:gap-10">
+        <div className="flex flex-col min-[1440px]:flex-row md:items-start md:justify-between gap-6 md:gap-10">
           {/* Left: Title + Description + Price + Book */}
           <div className="flex flex-col gap-4 md:gap-6 flex-1">
             <h1
               className="text-[28px] sm:text-[36px] lg:text-[48px] font-medium leading-[130%] text-[#111]"
               style={{ fontFamily: "var(--font-family)" }}
-            >
-              {title}
-            </h1>
+              dangerouslySetInnerHTML={{ __html: title }}
+            />
 
             <p
               className="text-[15px] font-normal leading-[160%] text-[#101010] opacity-80"
               style={{ fontFamily: "var(--font-family)" }}
-            >
-              {description}
-            </p>
+              dangerouslySetInnerHTML={{ __html: description }}
+            />
 
             {/* Price + Book Now */}
-            <div className="flex items-center gap-3 md:justify-start justify-between">
-             <div className="flex items-center gap-2 rounded-lg bg-[#f1f1f1] px-3 py-2">
-  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="10" cy="10" r="10" fill="black"/>
-    <text x="10" y="14" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
-      {currency}
-    </text>
+            <div className="flex flex-wrap items-center gap-3  md:justify-start">
+  <div className="flex items-center gap-2 rounded-lg bg-[#f1f1f1] px-3 py-3 flex-shrink-0">
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 20 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <circle cx="10" cy="10" r="10" fill="black" />
+      <text
+        x="10"
+        y="14"
+        textAnchor="middle"
+        fill="white"
+        fontSize="12"
+        fontWeight="700"
+      >
+        {currency}
+      </text>
+    </svg>
+    <span className="text-[15px] font-bold leading-[120%] text-black">
+      {price}
+    </span>
+  </div>
+
+  <div className="flex items-center gap-3 flex-wrap flex-shrink-0">
+    <ButtonWithIcon
+      bgColor={addedToCart ? "#22a35a" : "#281d4d"}
+      className="!w-fit !gap-3 !flex-shrink-0 whitespace-nowrap"
+      label={
+        addedToCart
+          ? t("added_to_cart", "Added!")
+          : t("add_to_cart", "Add to Cart")
+      }
+      onClick={handleAddToCart}
+      icon={
+        addedToCart ? (
+          // Галочка когда добавлено
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M20 6L9 17L4 12"
+              stroke="#22a35a"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        ) : (
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M6 2L3 6V20C3 20.5304 3.21071 21.0391 3.58579 21.4142C3.96086 21.7893 4.46957 22 5 22H19C19.5304 22 20.0391 21.7893 20.4142 21.4142C20.7893 21.0391 21 20.5304 21 20V6L18 2H6Z"
+              stroke="#281D4D"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M3 6H21"
+              stroke="#281D4D"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M16 10C16 11.0609 15.5786 12.0783 14.8284 12.8284C14.0783 13.5786 13.0609 14 12 14C10.9391 14 9.92172 13.5786 9.17157 12.8284C8.42143 12.0783 8 11.0609 8 10"
+              stroke="#281D4D"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        )
+      }
+    />
+
+<ButtonWithIcon
+  bgColor="#e84814"
+  className="!w-fit !gap-3 !flex-shrink-0 whitespace-nowrap"
+  label="Book Now"
+  onClick={onBookClick}
+  icon={
+    <svg
+    width="44"
+    height="44"
+    viewBox="0 0 44 44"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <rect width="44" height="44" rx="22" fill="white" />
+    <path
+      d="M27.9624 23.293C28.8861 22.3501 30.3835 22.3501 31.3072 23.293C32.2309 24.2358 32.2309 25.7642 31.3072 26.707L27.2341 30.8645C27.1332 30.9675 27.0021 31.1066 26.8434 31.2195L26.843 31.2191C26.7172 31.3088 26.5813 31.383 26.4381 31.4402C26.2583 31.5122 26.0727 31.5468 25.9326 31.5754L23.9487 31.9805C23.6275 32.046 23.2955 31.9435 23.0639 31.707C22.8322 31.4706 22.7317 31.1318 22.796 30.8039L23.1928 28.7789C23.2209 28.6358 23.2543 28.4461 23.3249 28.2625C23.3809 28.1164 23.4537 27.9777 23.5415 27.8492L23.6283 27.7332C23.718 27.6223 23.8136 27.5277 23.8893 27.4504L27.9624 23.293ZM29.9219 24.707C29.7634 24.5453 29.5063 24.5453 29.3478 24.707L25.2747 28.8645C25.2078 28.9328 25.175 28.9665 25.1519 28.9918C25.1513 28.9924 25.1505 28.9928 25.15 28.9934C25.1497 28.9943 25.1498 28.9955 25.1496 28.9965C25.1418 29.0301 25.1325 29.0767 25.114 29.1711L25.0053 29.725L25.5484 29.6145C25.6408 29.5956 25.6865 29.5861 25.7194 29.5781C25.7203 29.5779 25.7213 29.5775 25.7221 29.5773C25.7227 29.5768 25.7234 29.5764 25.724 29.5758C25.7488 29.5522 25.7818 29.5187 25.8488 29.4504L29.9219 25.293C30.0803 25.1312 30.0803 24.8688 29.9219 24.707ZM19.8377 26C20.3787 26 20.8174 26.4478 20.8174 27C20.8174 27.5523 20.3788 28 19.8377 28H16.8986C16.3575 28 15.9189 27.5523 15.9189 27C15.9189 26.4477 16.3575 26 16.8986 26H19.8377ZM23.2667 22C23.8077 22 24.2464 22.4478 24.2464 23C24.2464 23.5523 23.8078 24 23.2667 24H16.8986C16.3575 24 15.9189 23.5523 15.9189 23C15.9189 22.4477 16.3575 22 16.8986 22H23.2667ZM29.6348 20H13.9594V27.8C13.9594 28.3764 13.9601 28.7487 13.9828 29.032C14.0045 29.3036 14.0415 29.4045 14.0662 29.4539L14.1041 29.523C14.1848 29.6572 14.2953 29.7701 14.4267 29.8523L14.4944 29.891L14.5419 29.9117C14.6025 29.934 14.7081 29.9595 14.9078 29.9762C15.1853 29.9993 15.55 30 16.1148 30H19.8377C20.3788 30 20.8174 30.4477 20.8174 31C20.8174 31.5523 20.3788 32 19.8377 32H16.1148C15.5823 32 15.124 32.0009 14.7482 31.9695C14.3608 31.9372 13.9754 31.8659 13.6047 31.673V31.6727C13.0517 31.385 12.602 30.9264 12.3203 30.3621C12.1314 29.9837 12.0615 29.5903 12.0299 29.1949C11.9992 28.8113 12 28.3435 12 27.8V18.2C12 17.6565 11.9992 17.1887 12.0299 16.8051C12.0615 16.4097 12.1314 16.0163 12.3203 15.6379C12.6021 15.0735 13.0517 14.6146 13.6047 14.327C13.9754 14.1342 14.3608 14.0628 14.7482 14.0305C15.0771 14.003 15.4692 14.0011 15.9189 14.0008V13C15.9189 12.4477 16.3575 12 16.8986 12C17.4396 12 17.8783 12.4477 17.8783 13V14H25.716V13C25.716 12.4477 26.1546 12 26.6957 12C27.2368 12 27.6754 12.4477 27.6754 13V14.0008C28.1251 14.0011 28.5171 14.003 28.8461 14.0305C29.2334 14.0628 29.6189 14.1341 29.9896 14.327C30.5424 14.6145 30.9918 15.0735 31.2735 15.6379C31.4624 16.0163 31.5328 16.4097 31.5644 16.8051C31.5951 17.1887 31.5943 17.6565 31.5943 18.2V20C31.5943 20.5523 31.1556 21 30.6145 21C30.0735 21 29.6348 20.5523 29.6348 20ZM16.1148 16C15.55 16 15.1853 16.0007 14.9078 16.0238C14.6417 16.046 14.5429 16.0838 14.4944 16.109C14.3101 16.2048 14.1601 16.3579 14.0662 16.5461C14.0415 16.5956 14.0045 16.6964 13.9828 16.968C13.9628 17.2171 13.9606 17.535 13.9602 18H29.6341C29.6336 17.535 29.6314 17.2171 29.6115 16.968C29.5897 16.6964 29.5527 16.5955 29.5281 16.5461C29.446 16.3816 29.321 16.2437 29.1676 16.1477L29.0998 16.109C29.0514 16.0838 28.9526 16.046 28.6865 16.0238C28.4089 16.0007 28.0442 16 27.4795 16H16.1148Z"
+      fill="black"
+    />
   </svg>
-  <span className="text-[15px] font-bold leading-[120%] text-black">
-    {price}
-  </span>
+  }
+/>  </div>
 </div>
-              <BookNowButton onClick={onBookClick} />
-            </div>
           </div>
 
           {/* Right: Image */}
@@ -238,6 +438,7 @@ export const CourseDetailHeroSection: React.FC<Props> = ({
 
         {/* ── DIVIDER ── */}
         <div className="h-px bg-[#e4e4e4] -mx-4 md:-mx-8 lg:-mx-[188px]" />
+
         {/* ── CONTENT SECTIONS ──
             Desktop: all sections always visible, no chevrons, plain headings
             Mobile:  accordion, one open at a time, with chevrons

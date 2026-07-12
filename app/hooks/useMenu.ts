@@ -135,9 +135,7 @@ export function useMenu(locale: string): UseMenuResult {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    console.log(`useMenu: Fetching menu data for locale "${locale}"`);
     if (_cache[locale]) {
-      console.log(`useMenu: Cache hit for locale "${locale}"`);
       setMenuData(_cache[locale]);
       setLoading(false);
       return;
@@ -148,21 +146,18 @@ export function useMenu(locale: string): UseMenuResult {
     fetchMenuData(locale)
       .then((data) => {
         if (!cancelled) {
-          console.log(`useMenu: Successfully fetched menu data for locale "${locale}"`);
           setMenuData(data);
           setLoading(false);
         }
       })
       .catch((err) => {
         if (!cancelled) {
-          console.error(`useMenu: Error fetching menu data for locale "${locale}":`, err);
           setError(err.message ?? "Unknown error");
           setLoading(false);
         }
       });
 
     return () => {
-      console.log(`useMenu: Cleanup for locale "${locale}"`);
       cancelled = true;
     };
   }, [locale]);
@@ -177,14 +172,6 @@ export function useMenu(locale: string): UseMenuResult {
 
   const terms = menuData?.terms ?? {};
 
-  console.log(`useMenu: Returning data for locale "${locale}"`, {
-    menuData,
-    divingCenters,
-    colorBySlug,
-    terms,
-    loading,
-    error,
-  });
 
   return { menuData, divingCenters, colorBySlug, terms, loading, error };
 }

@@ -43,6 +43,9 @@ export const CoursesSection: React.FC<Props> = ({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const coursesSwiperRef = useRef<SwiperType | null>(null);
   const [coursesCurrentSlide, setCoursesCurrentSlide] = useState(0);
+  // true, если слайдов меньше (или равно), чем помещается на экране —
+  // в этом случае свайп невозможен и кнопки/прогрессбар не нужны
+  const [isCoursesSwiperLocked, setIsCoursesSwiperLocked] = useState(false);
 
   const filteredCourses =
     selectedLocation === "all"
@@ -169,14 +172,16 @@ export const CoursesSection: React.FC<Props> = ({
               </p>
             </div>
             <div className="hidden sm:block">
-              <CarouselControls
-                currentSlide={coursesCurrentSlide}
-                totalSlides={filteredCourses.length}
-                onPrev={() => coursesSwiperRef.current?.slidePrev()}
-                onNext={() => coursesSwiperRef.current?.slideNext()}
-                theme="dark"
-                progressClass="courses-progress"
-              />
+              {!isCoursesSwiperLocked && (
+                <CarouselControls
+                  currentSlide={coursesCurrentSlide}
+                  totalSlides={filteredCourses.length}
+                  onPrev={() => coursesSwiperRef.current?.slidePrev()}
+                  onNext={() => coursesSwiperRef.current?.slideNext()}
+                  theme="dark"
+                  progressClass="courses-progress"
+                />
+              )}
             </div>
           </div>
 
@@ -187,11 +192,19 @@ export const CoursesSection: React.FC<Props> = ({
               slidesPerView={2}
               slidesPerGroup={2}
               loop={false}
+              watchOverflow={true}
               onSwiper={(swiper) => {
                 coursesSwiperRef.current = swiper;
+                setIsCoursesSwiperLocked(swiper.isLocked);
               }}
               onSlideChange={(swiper) => {
                 setCoursesCurrentSlide(swiper.realIndex);
+              }}
+              onResize={(swiper) => {
+                setIsCoursesSwiperLocked(swiper.isLocked);
+              }}
+              onBreakpoint={(swiper) => {
+                setIsCoursesSwiperLocked(swiper.isLocked);
               }}
               pagination={{
                 type: "progressbar",
@@ -253,16 +266,17 @@ export const CoursesSection: React.FC<Props> = ({
           </div>
 
           {/* Mobile controls */}
-          <div className="block sm:hidden ">
-            <CarouselControls
-              currentSlide={coursesCurrentSlide}
-              totalSlides={filteredCourses.length}
-              onPrev={() => coursesSwiperRef.current?.slidePrev()}
-              onNext={() => coursesSwiperRef.current?.slideNext()}
-              theme="dark"
-              progressClass="courses-progress"
-            />
-          </div>
+          {!isCoursesSwiperLocked && filteredCourses.length > 0 && (            <div className="block sm:hidden ">
+              <CarouselControls
+                currentSlide={coursesCurrentSlide}
+                totalSlides={filteredCourses.length}
+                onPrev={() => coursesSwiperRef.current?.slidePrev()}
+                onNext={() => coursesSwiperRef.current?.slideNext()}
+                theme="dark"
+                progressClass="courses-progress"
+              />
+            </div>
+          )}
         </div>
       </div>
     </section>

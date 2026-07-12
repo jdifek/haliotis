@@ -17,7 +17,14 @@ type Language = {
   default: boolean;
   icon: string;
 };
-
+type CartLocalItem = {
+  type: "course" | "trip" | "travels";
+  id: number | string;
+  title?: string;
+  price?: number;
+  currency?: string;
+  image?: string;
+};
 const MobileDynamicDropdown = ({
   item,
   centersData,
@@ -47,7 +54,10 @@ const MobileDynamicDropdown = ({
 
   // ==================== CENTERS MOBILE ====================
   if (isCenters) {
-    console.log("centersData в дропдауне:", centersData.map(c => ({ id: c.id, url: c.url })));
+    console.log(
+      "centersData в дропдауне:",
+      centersData.map((c) => ({ id: c.id, url: c.url }))
+    );
 
     return (
       <div
@@ -107,17 +117,17 @@ const MobileDynamicDropdown = ({
               {/* Картинка + стрелка */}
               <div className="flex items-center gap-2">
                 {center.image && (
-                  <div className="h-[36px] w-[52px] overflow-hidden rounded-[6px] flex-shrink-0">
+                  <div className="h-[36px] w-[52px] flex items-center justify-center flex-shrink-0">
                     <Image
                       src={center.image}
                       alt={center.label}
                       width={52}
                       height={36}
-                      className="h-full w-full object-cover"
+                      className="max-h-full max-w-full object-contain"
+                      style={{ width: "auto", height: "auto" }}
                     />
                   </div>
                 )}
-               
               </div>
             </button>
           ))}
@@ -340,13 +350,14 @@ const DynamicDropdown = ({
             {/* Правая часть — картинка + стрелка */}
             <div className="flex items-center gap-2">
               {center.image && (
-                <div className="h-[32px] w-[48px] overflow-hidden rounded-[6px] flex-shrink-0">
+                <div className="h-[32px] w-[48px] flex items-center justify-center flex-shrink-0">
                   <Image
                     src={center.image}
                     alt={center.label}
                     width={48}
                     height={32}
-                    className="h-full w-full object-cover"
+                    className="max-h-full max-w-full object-contain"
+                    style={{ width: "auto", height: "auto" }}
                   />
                 </div>
               )}
@@ -388,12 +399,7 @@ const DynamicDropdown = ({
                 ) : (
                   // Плейсхолдер если нет картинки
                   <div className="h-[78px] w-[78px] rounded-xl bg-white/10 flex items-center justify-center">
-                    <svg
-                      width="32"
-                      height="32"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                    >
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
                       <path
                         d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"
                         fill="rgba(255,255,255,0.3)"
@@ -442,11 +448,44 @@ export const Header: React.FC<{
   logoAlt: string;
 }> = ({ locale, logoUrl, logoAlt }) => {
   const pathname = usePathname();
-const [isCartHovered, setIsCartHovered] = useState(false);
+
+  const cartRef = useRef<HTMLDivElement>(null);
+
+  const [cartItems, setCartItems] = useState<CartLocalItem[]>([]);
+
+  const loadCartFromStorage = () => {
+    try {
+      const raw = localStorage.getItem("cart");
+      const parsed = raw ? JSON.parse(raw) : [];
+      setCartItems(Array.isArray(parsed) ? parsed : []);
+    } catch {
+      setCartItems([]);
+    }
+  };
+
+  useEffect(() => {
+    loadCartFromStorage();
+    window.addEventListener("cart-updated", loadCartFromStorage);
+    window.addEventListener("storage", loadCartFromStorage); // синхронізація між вкладками
+    return () => {
+      window.removeEventListener("cart-updated", loadCartFromStorage);
+      window.removeEventListener("storage", loadCartFromStorage);
+    };
+  }, []);
+
+  const cartTotal = cartItems.reduce((sum, item) => sum + (item.price || 0), 0);
+  const cartCurrency = cartItems[0]?.currency || "€";
+
+  const handleRemoveFromCart = (type: string, id: number | string) => {
+    const next = cartItems.filter((i) => !(i.type === type && i.id === id));
+    localStorage.setItem("cart", JSON.stringify(next));
+    setCartItems(next);
+  };
+  const [isCartHovered, setIsCartHovered] = useState(false);
 
   // ← единственный источник данных меню, кэшируется глобально
   const { menuData } = useMenu(locale);
-const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const [selectedLang, setSelectedLang] = useState(locale.toUpperCase());
@@ -491,12 +530,12 @@ const [isCartOpen, setIsCartOpen] = useState(false);
     () => pathname.split("/").filter(Boolean)[0] ?? ""
   );
   const [isScrolled, setIsScrolled] = useState(false);
-const router = useRouter();
-const localizeUrl = (url: string) => {
-  if (/^\/[a-z]{2}(\/|$)/.test(url)) return url;
-  return `/${locale}${url}`;
-}; 
-const centersData = (() => {
+  const router = useRouter();
+  const localizeUrl = (url: string) => {
+    if (/^\/[a-z]{2}(\/|$)/.test(url)) return url;
+    return `/${locale}${url}`;
+  };
+  const centersData = (() => {
     const centrosItem = menuData?.data.main.find((item) =>
       item.children?.some((child: any) => child.link_type === "dive_center")
     );
@@ -513,39 +552,39 @@ const centersData = (() => {
     );
 
     return orderedChildren
-  .map((child: any) => {
-    const c = centerBySlug[child.slug];
-    if (!c) return null;
-    return {
-      id: c.slug,
-      label: c.name.toUpperCase(),
-      color: c.color,
-      image: c.center_icon_url ?? "",
-      url: localizeUrl(child.url ?? `/centros/${child.slug}`),
-      new_tab: child.new_tab ?? false,
-    };
-  })
-  .filter((c): c is NonNullable<typeof c> => c !== null);
+      .map((child: any) => {
+        const c = centerBySlug[child.slug];
+        if (!c) return null;
+        return {
+          id: c.slug,
+          label: c.name.toUpperCase(),
+          color: c.color,
+          image: c.center_icon_url ?? "",
+          url: localizeUrl(child.url ?? `/centros/${child.slug}`),
+          new_tab: child.new_tab ?? false,
+        };
+      })
+      .filter((c): c is NonNullable<typeof c> => c !== null);
   })();
- const navItems = (menuData?.data.main ?? []).map((item) => {
-  const firstCenterSlug = centersData[0]?.id ?? "";
-  const isCourseCategory = item.link_type === "course_category";
+  const navItems = (menuData?.data.main ?? []).map((item) => {
+    const firstCenterSlug = centersData[0]?.id ?? "";
+    const isCourseCategory = item.link_type === "course_category";
 
-  const rawUrl = isCourseCategory
-    ? `/cursos/${item.slug}/${firstCenterSlug}`
-    : (item.url ?? `/${item.slug || ""}`);
+    const rawUrl = isCourseCategory
+      ? `/cursos/${item.slug}/${firstCenterSlug}`
+      : item.url ?? `/${item.slug || ""}`;
 
-  return {
-    id: item.slug ?? item.label.toLowerCase().replace(/\s+/g, "-"),
-    label: item.label,
-    hasDropdown: (item.children?.length ?? 0) > 0,
-    dropdownType: (item.children?.length ?? 0) > 0 ? "dropdown" : null,
-    href: localizeUrl(rawUrl),
-    children: item.children,
-    rawItem: item,
-  };
-});
-  
+    return {
+      id: item.slug ?? item.label.toLowerCase().replace(/\s+/g, "-"),
+      label: item.label,
+      hasDropdown: (item.children?.length ?? 0) > 0,
+      dropdownType: (item.children?.length ?? 0) > 0 ? "dropdown" : null,
+      href: localizeUrl(rawUrl),
+      children: item.children,
+      rawItem: item,
+    };
+  });
+
   // Находим пункт меню, у которого дети имеют картинки и их много
   // (точно так же, как мы определяем dropdownType = 'courses')
   // Находим пункт "Cursos" по наличию большого количества детей + menu_layout === "list"
@@ -558,22 +597,22 @@ const centersData = (() => {
     );
     return hasChildren && isListLayout && hasNoCenter;
   });
- const coursesData = (coursesMenuItem?.children ?? []).map((course) => {
-  const isCourseCategory = course.link_type === "course_category";
-  const firstCenterSlug = centersData[0]?.id ?? "";
+  const coursesData = (coursesMenuItem?.children ?? []).map((course) => {
+    const isCourseCategory = course.link_type === "course_category";
+    const firstCenterSlug = centersData[0]?.id ?? "";
 
-  const builtUrl = isCourseCategory
-    ? `/cursos/${course.slug}/${firstCenterSlug}`
-    : (course.url ?? "/cursos");
+    const builtUrl = isCourseCategory
+      ? `/cursos/${course.slug}/${firstCenterSlug}`
+      : course.url ?? "/cursos";
 
-  return {
-    id: course.slug ?? course.label.toLowerCase().replace(/\s+/g, "-"),
-    label: course.label,
-    image: course.img_url ?? "",
-    url: localizeUrl(builtUrl),
-    new_tab: course.new_tab ?? false, // просто как было
-  };
-});
+    return {
+      id: course.slug ?? course.label.toLowerCase().replace(/\s+/g, "-"),
+      label: course.label,
+      image: course.img_url ?? "",
+      url: localizeUrl(builtUrl),
+      new_tab: course.new_tab ?? false, // просто как было
+    };
+  });
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 0);
     window.addEventListener("scroll", handleScroll);
@@ -585,10 +624,10 @@ const centersData = (() => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const coursesRef = useRef<HTMLDivElement>(null);
   const langRef = useRef<HTMLDivElement>(null);
- const langButtonRef = useRef<HTMLButtonElement>(null);
+  const langButtonRef = useRef<HTMLButtonElement>(null);
   const [langButtonWidth, setLangButtonWidth] = useState<number | null>(null);
 
-const handleToMain = () => router.push(`/${locale}`);
+  const handleToMain = () => router.push(`/${locale}`);
   const switchLocale = (newLocale: string) => {
     const pathWithoutLocale =
       pathname.replace(new RegExp(`^/${locale}`), "") || "/";
@@ -616,20 +655,28 @@ const handleToMain = () => router.push(`/${locale}`);
         (langRef.current && langRef.current.contains(target)) ||
         (langButtonRef.current && langButtonRef.current.contains(target));
 
-      // ← добавляем
       const isInsideSocial =
         socialRef.current && socialRef.current.contains(target);
 
-      if (
-        !isInsideDropdown &&
-        !isInsideButton &&
-        !isInsideLang &&
-        !isInsideSocial
-      ) {
+      const isInsideCart = cartRef.current && cartRef.current.contains(target);
+
+      // Кожен дропдаун закривається незалежно від інших —
+      // клік на іншу кнопку більше не "рятує" кошик від закриття
+      if (!isInsideDropdown && !isInsideButton) {
         setOpenDropdown(null);
         setMobileOpenDropdown(null);
+      }
+
+      if (!isInsideLang) {
         setIsLangMenuOpen(false);
-        setOpenSocial(null); // ← добавляем
+      }
+
+      if (!isInsideSocial) {
+        setOpenSocial(null);
+      }
+
+      if (!isInsideCart) {
+        setIsCartOpen(false);
       }
     };
 
@@ -687,365 +734,502 @@ const handleToMain = () => router.push(`/${locale}`);
     label: string;
     icon: React.ReactNode;
   }[];
- 
 
   return (
     <>
-     <header className="sticky top-0 z-[100000]">
-  {/* Фон на уровне header */}
-  {(!isTransparentInitially || isScrolled) && (
-    <div className="absolute inset-0 bg-[#281d4d] -z-10" />
-  )}
-  
-  <div className="relative px-5 pb-[clamp(8px,1vw,16px)]">
-    {/* Нижняя граница */}
-    <div className="absolute left-5 right-5 bottom-0 border-b border-[rgba(255,255,255,0.2)]" />
-    
-    {/* Контент */}
-    <div className="flex items-center justify-between gap-4 pt-[clamp(12px,2vw,20px)]">
-          <div
-            onClick={handleToMain}
-            className="relative cursor-pointer flex-shrink-0 xl:hidden"
-          >
-            <Image
-              src={logoUrl}
-              alt={logoAlt}
-              width={173}
-              height={41}
-              className="h-[41px] w-auto"
-            />
-          </div>
-          <div
-            onClick={handleToMain}
-            className="relative cursor-pointer flex-shrink-0 hidden xl:block"
-          >
-            <Image
-              src={logoUrl}
-              alt={logoAlt}
-              width={158}
-              height={25}
-              className="h-[clamp(18px,1.4vw,24px)] w-auto"
-            />
-          </div>
-          {/* Desktop Nav */}
-          {/* Desktop Nav */}
-          <nav className="relative hidden rounded-xl bg-black/10 px-[clamp(8px,1vw,16px)] py-[clamp(10px,0.9vw,16.5px)] xl:flex">
-<div className="flex w-full flex-wrap items-center content-center justify-center gap-x-[clamp(8px,1.4vw,28px)] gap-y-1">
-              {" "}
-              {navItems.map((item) => (
-                <div key={item.id} className="relative">
-                  <button
-                    ref={(el) => {
-                      if (item.hasDropdown && el) {
-                        dropdownButtonRefs.current[item.id] = el;
-                      }
-                    }}
-                    onClick={() => {
-                      setActiveNav(item.id);
-                      if (item.hasDropdown) {
-                        setOpenDropdown(
-                          openDropdown !== item.id ? item.id : null
-                        );
-                      } else if (item.href) {
-                        router.push(item.href);
-                      }
-                    }}
-                    className={`relative flex cursor-pointer items-center whitespace-nowrap uppercase transition-all ${
-                      pathname === `/${item.id}`
-                        ? "text-[16px] font-bold uppercase leading-[120%]"
-                        : "text-[15px] font-medium uppercase leading-[120%]"
-                    }`}
-                  >
-                    <span className="relative inline-flex items-center gap-[6px]">
-                      {openDropdown === item.id && (
-                        <span
-                          className="absolute inset-x-[-8px] inset-y-[-8px] rounded-[8px] bg-white pointer-events-none"
-                          aria-hidden="true"
-                        />
-                      )}
-                      <p
-                        className={`relative z-10 ${
-                          openDropdown === item.id ? "text-black" : "text-white"
-                        }`}
-                      >
-                        {item.label}
-                      </p>
-                      {item.hasDropdown && (
-                        <svg
-                          width="20"
-                          height="20"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          className={`transition-transform xl:h-6 xl:w-6 relative z-10 ${
-                            openDropdown === item.id ? "rotate-180" : ""
+      <header className="sticky top-0 z-[100000]">
+        {/* Фон на уровне header */}
+        {(!isTransparentInitially || isScrolled) && (
+          <div className="absolute inset-0 bg-[#281d4d] -z-10" />
+        )}
+
+        <div className="relative px-5 pb-[clamp(8px,1vw,16px)]">
+          {/* Нижняя граница */}
+          <div className="absolute left-5 right-5 bottom-0 border-b border-[rgba(255,255,255,0.2)]" />
+
+          {/* Контент */}
+          <div className="flex items-center justify-between gap-4 pt-[clamp(12px,2vw,20px)]">
+            <div
+              onClick={handleToMain}
+              className="relative cursor-pointer flex-shrink-0 xl:hidden"
+            >
+              <Image
+                src={logoUrl}
+                alt={logoAlt}
+                width={173}
+                height={41}
+                className="h-[41px] w-auto"
+              />
+            </div>
+            <div
+              onClick={handleToMain}
+              className="relative cursor-pointer flex-shrink-0 hidden xl:block"
+            >
+              <Image
+                src={logoUrl}
+                alt={logoAlt}
+                width={158}
+                height={25}
+                className="h-[clamp(18px,1.4vw,24px)] w-auto"
+              />
+            </div>
+            {/* Desktop Nav */}
+            {/* Desktop Nav */}
+            <nav className="relative hidden rounded-xl bg-black/10 px-[clamp(8px,1vw,16px)] py-[clamp(10px,0.9vw,16.5px)] xl:flex">
+              <div className="flex w-full flex-wrap items-center content-center justify-center gap-x-[clamp(8px,1.4vw,28px)] gap-y-1">
+                {" "}
+                {navItems.map((item) => (
+                  <div key={item.id} className="relative">
+                    <button
+                      ref={(el) => {
+                        if (item.hasDropdown && el) {
+                          dropdownButtonRefs.current[item.id] = el;
+                        }
+                      }}
+                      onClick={() => {
+                        setActiveNav(item.id);
+                        if (item.hasDropdown) {
+                          setOpenDropdown(
+                            openDropdown !== item.id ? item.id : null
+                          );
+                        } else if (item.href) {
+                          router.push(item.href);
+                        }
+                      }}
+                      className={`relative flex cursor-pointer items-center whitespace-nowrap uppercase transition-all ${
+                        pathname === `/${item.id}`
+                          ? "text-[16px] font-bold uppercase leading-[120%]"
+                          : "text-[15px] font-medium uppercase leading-[120%]"
+                      }`}
+                    >
+                      <span className="relative inline-flex items-center gap-[6px]">
+                        {openDropdown === item.id && (
+                          <span
+                            className="absolute inset-x-[-8px] inset-y-[-8px] rounded-[8px] bg-white pointer-events-none"
+                            aria-hidden="true"
+                          />
+                        )}
+                        <p
+                          className={`relative z-10 ${
+                            openDropdown === item.id
+                              ? "text-black"
+                              : "text-white"
                           }`}
                         >
-                          <path
-                            d="M17.8534 9.85369L12.8537 14.8534C12.8073 14.8999 12.7522 14.9367 12.6915 14.9619C12.6308 14.9871 12.5657 15 12.5 15C12.4343 15 12.3692 14.9871 12.3085 14.9619C12.2478 14.9367 12.1927 14.8999 12.1463 14.8534L7.14663 9.85369C7.07663 9.78377 7.02895 9.69465 7.00963 9.59761C6.9903 9.50058 7.00021 9.39999 7.03808 9.30858C7.07595 9.21718 7.1401 9.13907 7.22239 9.08413C7.30468 9.0292 7.40142 8.99992 7.50036 9H17.4996C17.5986 8.99992 17.6953 9.0292 17.7776 9.08413C17.8599 9.13907 17.924 9.21718 17.9619 9.30858C17.9998 9.39999 18.0097 9.50058 17.9904 9.59761C17.971 9.69465 17.9234 9.78377 17.8534 9.85369Z"
-                            fill={openDropdown === item.id ? "black" : "white"}
+                          {item.label}
+                        </p>
+                        {item.hasDropdown && (
+                          <svg
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            className={`transition-transform xl:h-6 xl:w-6 relative z-10 ${
+                              openDropdown === item.id ? "rotate-180" : ""
+                            }`}
+                          >
+                            <path
+                              d="M17.8534 9.85369L12.8537 14.8534C12.8073 14.8999 12.7522 14.9367 12.6915 14.9619C12.6308 14.9871 12.5657 15 12.5 15C12.4343 15 12.3692 14.9871 12.3085 14.9619C12.2478 14.9367 12.1927 14.8999 12.1463 14.8534L7.14663 9.85369C7.07663 9.78377 7.02895 9.69465 7.00963 9.59761C6.9903 9.50058 7.00021 9.39999 7.03808 9.30858C7.07595 9.21718 7.1401 9.13907 7.22239 9.08413C7.30468 9.0292 7.40142 8.99992 7.50036 9H17.4996C17.5986 8.99992 17.6953 9.0292 17.7776 9.08413C17.8599 9.13907 17.924 9.21718 17.9619 9.30858C17.9998 9.39999 18.0097 9.50058 17.9904 9.59761C17.971 9.69465 17.9234 9.78377 17.8534 9.85369Z"
+                              fill={
+                                openDropdown === item.id ? "black" : "white"
+                              }
+                            />
+                          </svg>
+                        )}
+                      </span>
+
+                      {activeNav === item.id &&
+                        !openDropdown &&
+                        pathname === `/${item.id}` && (
+                          <div
+                            className="absolute -bottom-[16.5px] left-0 right-0 mx-auto h-0.5 bg-[#e84814]"
+                            style={{
+                              width: "100%",
+                              border: "1px solid #e84814",
+                            }}
                           />
-                        </svg>
-                      )}
-                    </span>
+                        )}
+                    </button>
 
-                    {activeNav === item.id &&
-                      !openDropdown &&
-                      pathname === `/${item.id}` && (
-                        <div
-                          className="absolute -bottom-[16.5px] left-0 right-0 mx-auto h-0.5 bg-[#e84814]"
-                          style={{ width: "100%", border: "1px solid #e84814" }}
-                        />
-                      )}
-                  </button>
-
-                  {/* Универсальный дропдаун без хардкода */}
-                  {item.hasDropdown && openDropdown === item.id && (
-                   <DynamicDropdown
-  item={item}
-  centersData={centersData}
-  coursesData={coursesData}
-  selectedCenter={selectedCenter}        // ← добавить
-  setSelectedCenter={setSelectedCenter}  // ← добавить
-  dropdownRef={dropdownRef}
-  coursesRef={coursesRef}
-  setOpenDropdown={setOpenDropdown}
-  router={router}                        // ← добавить
-/>
-                  )}
-                </div>
-              ))}
-            </div>
-          </nav>
-          {/* Desktop Right Panel */}
-     {/* Cart Button + Dropdown */}
-<div className="relative hidden xl:flex">
- 
-<button
-  className="flex items-center gap-2 flex-shrink-0 rounded-lg cursor-pointer transition-all"
-  style={{
-    width: 131,
-    height: 44,
-    background: isCartOpen ? '#e84814' : isCartHovered ? 'rgba(255,255,255,0.1)' : 'transparent',
-    border: '1px solid rgba(255,255,255,0.12)',
-    padding: '10px 14px',
-  }}
-  onClick={() => setIsCartOpen(!isCartOpen)}
-  onMouseEnter={() => setIsCartHovered(true)}
-  onMouseLeave={() => setIsCartHovered(false)}
->
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-      <path d="M6 2L3 6V20C3 20.5304 3.21071 21.0391 3.58579 21.4142C3.96086 21.7893 4.46957 22 5 22H19C19.5304 22 20.0391 21.7893 20.4142 21.4142C20.7893 21.0391 21 20.5304 21 20V6L18 2H6Z" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-      <path d="M3 6H21" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-      <path d="M16 10C16 11.0609 15.5786 12.0783 14.8284 12.8284C14.0783 13.5786 13.0609 14 12 14C10.9391 14 9.92172 13.5786 9.17157 12.8284C8.42143 12.0783 8 11.0609 8 10" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
-    <span style={{ fontFamily: 'var(--font-family)', fontWeight: 700, fontSize: 15, lineHeight: '120%', color: '#fff' }}>
-      €2,395
-    </span>
-    <span
-      className="flex items-center justify-center rounded-full text-[11px] font-bold flex-shrink-0"
-      style={{
-        width: 16,
-        height: 16,
-        minWidth: 16,
-        background: isCartOpen ? '#fff' : '#e84814',
-        color: isCartOpen ? '#e84814' : '#fff',
-      }}
-    >
-      2
-    </span>
-  </button>
-
-  {isCartOpen && (
-    <div
-      className="absolute top-full mt-2 right-0 z-50"
-      style={{
-        width: 502,
-        background: '#1f1443',
-        border: '1px solid #534580',
-        borderRadius: '20px 8px 20px 20px',
-      }}
-    >
-      {/* Header */}
-      <div
-        className="flex items-end pb-3 justify-between px-5"
-        style={{ borderBottom: '1px solid #534580', height: 65 }}
-      >
-        <span style={{ fontFamily: 'var(--font-family)', fontWeight: 500, fontSize: 24, lineHeight: '130%', color: '#fff' }}>
-          Your Cart
-        </span>
-        <span style={{ fontFamily: 'var(--font-family)', fontWeight: 400, fontSize: 15, lineHeight: '160%', color: '#cfcfcf' }}>
-          3 activities · 5 participants
-        </span>
-      </div>
-
-      {/* Items */}
-      <div className="flex flex-col">
-        {[
-          { id: 1, image: '/bg.png', title: 'PADI Open Water Diver — Madeira', type: 'Travel', participants: 2, date: 'Jun 14', price: 459 },
-          { id: 2, image: '/bg.png', title: 'PADI Open Water Diver — Madeira', type: 'Course', participants: 2, date: 'Jul 3', price: 459 },
-        ].map((item) => (
-          <div
-            key={item.id}
-            className="flex items-center gap-3 px-5 py-[10px]"
-            style={{ borderBottom: '1px solid #534580' }}
-          >
-            {/* Image */}
-            <div style={{ borderRadius: 10, width: 65, height: 60, overflow: 'hidden', flexShrink: 0, background: '#2a1f5e' }}>
-              {item.image && (
-                <img src={item.image} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              )}
-            </div>
-
-            {/* Info */}
-            <div className="flex flex-col gap-1 flex-1">
-              <span style={{ fontFamily: 'var(--font-family)', fontWeight: 400, fontSize: 16, lineHeight: '140%', color: '#fff' }}>
-                {item.title}
-              </span>
-              <div className="flex items-center gap-2">
+                    {/* Универсальный дропдаун без хардкода */}
+                    {item.hasDropdown && openDropdown === item.id && (
+                      <DynamicDropdown
+                        item={item}
+                        centersData={centersData}
+                        coursesData={coursesData}
+                        selectedCenter={selectedCenter} // ← добавить
+                        setSelectedCenter={setSelectedCenter} // ← добавить
+                        dropdownRef={dropdownRef}
+                        coursesRef={coursesRef}
+                        setOpenDropdown={setOpenDropdown}
+                        router={router} // ← добавить
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+            </nav>
+            {/* Desktop Right Panel */}
+            {/* Cart Button + Dropdown */}
+            <div className="relative hidden xl:flex" ref={cartRef}>
+              <button
+                className="flex items-center gap-2 flex-shrink-0 rounded-lg cursor-pointer transition-all"
+                style={{
+                  height: 44,
+                  background: isCartOpen
+                    ? "#e84814"
+                    : isCartHovered
+                    ? "rgba(255,255,255,0.1)"
+                    : "transparent",
+                  border: "1px solid rgba(255,255,255,0.12)",
+                  padding: "10px 14px",
+                }}
+                onClick={() => setIsCartOpen(!isCartOpen)}
+                onMouseEnter={() => setIsCartHovered(true)}
+                onMouseLeave={() => setIsCartHovered(false)}
+              >
+                <svg
+                  width="24"
+                  height="24"
+                  className="flex-shrink-0"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <path
+                    d="M6 2L3 6V20C3 20.5304 3.21071 21.0391 3.58579 21.4142C3.96086 21.7893 4.46957 22 5 22H19C19.5304 22 20.0391 21.7893 20.4142 21.4142C20.7893 21.0391 21 20.5304 21 20V6L18 2H6Z"
+                    stroke="white"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M3 6H21"
+                    stroke="white"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M16 10C16 11.0609 15.5786 12.0783 14.8284 12.8284C14.0783 13.5786 13.0609 14 12 14C10.9391 14 9.92172 13.5786 9.17157 12.8284C8.42143 12.0783 8 11.0609 8 10"
+                    stroke="white"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
                 <span
                   style={{
-                    borderRadius: 5,
-                    padding: '2px 5px',
-                    fontFamily: 'var(--font-family)',
-                    fontWeight: 400,
+                    fontFamily: "var(--font-family)",
+                    fontWeight: 700,
                     fontSize: 15,
-                    lineHeight: '160%',
-                    background: item.type === 'Travel' ? 'rgba(232, 72, 20, 0.2)' : 'rgba(160, 197, 46, 0.2)',
-                    color: item.type === 'Travel' ? '#e84814' : '#a0c52e',
+                    lineHeight: "120%",
+                    color: "#fff",
                   }}
                 >
-                  {item.type}
+                  {cartCurrency}
+                  {cartTotal.toLocaleString("en", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
                 </span>
-                <span style={{ fontFamily: 'var(--font-family)', fontWeight: 400, fontSize: 15, lineHeight: '160%', color: '#cfcfcf' }}>
-                  {item.participants} participants · {item.date}
-                </span>
-              </div>
-            </div>
-
-            {/* Price */}
-            <span style={{ fontFamily: 'var(--font-family)', fontWeight: 500, fontSize: 19, lineHeight: '140%', color: '#fff' }}>
-              €{item.price}
-            </span>
-
-            {/* Remove */}
-            <button className="hover:opacity-80 transition-opacity cursor-pointer">
-              <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
-                <g opacity="0.5">
-                  <path d="M8.75 8.75L21.25 21.25M8.75 21.25L21.25 8.75" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </g>
-              </svg>
-            </button>
-          </div>
-        ))}
-      </div>
-
-      {/* Total */}
-      <div
-        className="flex items-center justify-between px-5"
-        style={{ padding: '10px 20px 0', height: 41 }}
-      >
-        <span style={{ fontFamily: 'var(--font-family)', fontWeight: 500, fontSize: 24, lineHeight: '130%', color: '#fff' }}>
-          Total price
-        </span>
-        <span style={{ fontFamily: 'var(--font-family)', fontWeight: 500, fontSize: 24, lineHeight: '130%', color: '#fff' }}>
-          €2,395
-        </span>
-      </div>
-
-      {/* Buttons */}
-      <div className="flex items-center gap-3 px-5 py-4">
-        <Link href="/cart">
-          <button
-            style={{
-              border: '1px solid #534580',
-              borderRadius: 1000,
-              padding: '2px 16px',
-              width: 226,
-              height: 48,
-              background: '#1f1443',
-              fontFamily: 'var(--font-family)',
-              fontWeight: 700,
-              fontSize: 15,
-              lineHeight: '120%',
-              color: '#cfcfcf',
-              cursor: 'pointer',
-            }}
-          >
-            View cart
-          </button>
-        </Link>
-        <button
-          style={{
-            borderRadius: 1000,
-            padding: '2px 16px',
-            width: 226,
-            height: 48,
-            background: '#e84814',
-            fontFamily: 'var(--font-family)',
-            fontWeight: 700,
-            fontSize: 15,
-            lineHeight: '120%',
-            color: '#fff',
-            cursor: 'pointer',
-          }}
-        >
-          Checkout
-        </button>
-      </div>
-    </div>
-  )}
-</div>
-          <div className="hidden flex-shrink-0 rounded-xl bg-black/10 p-1 xl:flex">
-            <div className="flex items-center gap-[clamp(2px,0.4vw,8px)] px-[clamp(2px,0.3vw,8px)]">
-              {/* ЯЗЫ К — был и должен быть */}
-              <div className="relative">
-                <button
-                  ref={langButtonRef}
-                  onClick={() => {
-                    if (langButtonRef.current && !isLangMenuOpen) {
-                      setLangButtonWidth(langButtonRef.current.offsetWidth);
-                    }
-                    setIsLangMenuOpen(!isLangMenuOpen);
+                <span
+                  className="flex items-center justify-center rounded-full text-[11px] font-bold flex-shrink-0"
+                  style={{
+                    width: 16,
+                    height: 16,
+                    minWidth: 16,
+                    background: isCartOpen ? "#fff" : "#e84814",
+                    color: isCartOpen ? "#e84814" : "#fff",
                   }}
-                  className="flex items-center justify-center gap-[clamp(4px,0.4vw,8px)] rounded-lg border border-black/12 bg-white cursor-pointer hover:bg-gray-100 px-[clamp(8px,0.9vw,14px)] py-[clamp(6px,0.6vw,10px)] text-[clamp(12px,0.85vw,15px)] font-bold text-black"
                 >
-                  {selectedLang}
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    className={`transition-transform xl:h-6 xl:w-6 ${
-                      isLangMenuOpen ? "rotate-180" : ""
-                    }`}
-                  >
-                    <path
-                      d="M17.8534 9.85369L12.8537 14.8534C12.8073 14.8999 12.7522 14.9367 12.6915 14.9619C12.6308 14.9871 12.5657 15 12.5 15C12.4343 15 12.3692 14.9871 12.3085 14.9619C12.2478 14.9367 12.1927 14.8999 12.1463 14.8534L7.14663 9.85369C7.07663 9.78377 7.02895 9.69465 7.00963 9.59761C6.9903 9.50058 7.00021 9.39999 7.03808 9.30858C7.07595 9.21718 7.1401 9.13907 7.22239 9.08413C7.30468 9.0292 7.40142 8.99992 7.50036 9H17.4996C17.5986 8.99992 17.6953 9.0292 17.7776 9.08413C17.8599 9.13907 17.924 9.21718 17.9619 9.30858C17.9998 9.39999 18.0097 9.50058 17.9904 9.59761C17.971 9.69465 17.9234 9.78377 17.8534 9.85369Z"
-                      fill="black"
-                    />
-                  </svg>
-                </button>
-                {isLangMenuOpen && (
+                  {cartItems.length}
+                </span>
+              </button>
+
+              {isCartOpen && (
+                <div
+                  className="absolute top-full mt-2 right-0 z-50"
+                  style={{
+                    width: 502,
+                    background: "#1f1443",
+                    border: "1px solid #534580",
+                    borderRadius: "20px 8px 20px 20px",
+                  }}
+                >
+                  {/* Header */}
                   <div
-                    ref={langRef}
-                    className="absolute left-0 top-full mt-2 flex flex-col rounded-[10px] border-2 border-white shadow-lg"
-                    style={{
-                      width: langButtonWidth ? `${langButtonWidth}px` : "75px",
-                      background: "rgba(0, 3, 38, 0.5)",
-                      backdropFilter: "blur(10px)",
-                    }}
+                    className="flex items-end pb-3 justify-between px-5"
+                    style={{ borderBottom: "1px solid #534580", height: 65 }}
                   >
-                    {languages
-                      .filter((l) => l?.prefix)
-                      .map((lang, index) => (
-                        <button
-                          key={lang.prefix}
-                          onClick={() => {
-                            setSelectedLang(lang.prefix.toUpperCase());
-                            switchLocale(lang.prefix);
-                            setIsLangMenuOpen(false);
+                    <span
+                      style={{
+                        fontFamily: "var(--font-family)",
+                        fontWeight: 500,
+                        fontSize: 24,
+                        lineHeight: "130%",
+                        color: "#fff",
+                      }}
+                    >
+                      Your Cart
+                    </span>
+                    <span
+                      style={{
+                        fontFamily: "var(--font-family)",
+                        fontWeight: 400,
+                        fontSize: 15,
+                        lineHeight: "160%",
+                        color: "#cfcfcf",
+                      }}
+                    >
+                      {cartItems.length}{" "}
+                      {cartItems.length === 1 ? "item" : "items"}
+                    </span>
+                  </div>
+
+                  {/* Items */}
+                  <div className="flex flex-col">
+                    {cartItems.length === 0 && (
+                      <div
+                        className="px-5 py-6 text-center"
+                        style={{ color: "#cfcfcf", fontSize: 14 }}
+                      >
+                        Your cart is empty
+                      </div>
+                    )}
+                    {cartItems.map((item) => (
+                      <div
+                        key={`${item.type}-${item.id}`}
+                        className="flex items-center gap-3 px-5 py-[10px]"
+                        style={{ borderBottom: "1px solid #534580" }}
+                      >
+                        <div
+                          style={{
+                            borderRadius: 10,
+                            width: 65,
+                            height: 60,
+                            overflow: "hidden",
+                            flexShrink: 0,
+                            background: "#2a1f5e",
                           }}
-                          className={`flex h-[40px] w-full cursor-pointer items-center justify-center text-[15px] font-semibold transition-colors
+                        >
+                          {item.image && (
+                            <img
+                              src={item.image}
+                              alt={item.title}
+                              style={{
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "cover",
+                              }}
+                            />
+                          )}
+                        </div>
+
+                        <div className="flex flex-col gap-1 flex-1">
+                          <span
+                            style={{
+                              fontFamily: "var(--font-family)",
+                              fontWeight: 400,
+                              fontSize: 16,
+                              lineHeight: "140%",
+                              color: "#fff",
+                            }}
+                          >
+                            {item.title || "Untitled"}
+                          </span>
+                          <span
+                            style={{
+                              width: "fit-content",
+                              borderRadius: 5,
+                              padding: "2px 5px",
+                              fontFamily: "var(--font-family)",
+                              fontWeight: 400,
+                              fontSize: 15,
+                              lineHeight: "160%",
+                              background:
+                                item.type === "travels"
+                                  ? "rgba(232, 72, 20, 0.2)"
+                                  : "rgba(160, 197, 46, 0.2)",
+                              color:
+                                item.type === "travels" ? "#e84814" : "#a0c52e",
+                            }}
+                          >
+                            {item.type === "travels"
+                              ? "Travel"
+                              : item.type === "course"
+                              ? "Course"
+                              : "Trip"}
+                          </span>
+                        </div>
+
+                        <span
+                          style={{
+                            fontFamily: "var(--font-family)",
+                            fontWeight: 500,
+                            fontSize: 19,
+                            lineHeight: "140%",
+                            color: "#fff",
+                          }}
+                        >
+                          {item.currency || "€"}
+                          {item.price ?? 0}
+                        </span>
+
+                        <button
+                          onClick={() =>
+                            handleRemoveFromCart(item.type, item.id)
+                          }
+                          className="hover:opacity-80 transition-opacity cursor-pointer"
+                        >
+                          <svg
+                            width="30"
+                            height="30"
+                            viewBox="0 0 30 30"
+                            fill="none"
+                          >
+                            <g opacity="0.5">
+                              <path
+                                d="M8.75 8.75L21.25 21.25M8.75 21.25L21.25 8.75"
+                                stroke="white"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </g>
+                          </svg>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div
+                    className="flex items-center justify-between px-5"
+                    style={{ padding: "10px 20px 0", height: 41 }}
+                  >
+                    <span
+                      style={{
+                        fontFamily: "var(--font-family)",
+                        fontWeight: 500,
+                        fontSize: 24,
+                        lineHeight: "130%",
+                        color: "#fff",
+                      }}
+                    >
+                      Total price
+                    </span>
+                    <span
+                      style={{
+                        fontFamily: "var(--font-family)",
+                        fontWeight: 500,
+                        fontSize: 24,
+                        lineHeight: "130%",
+                        color: "#fff",
+                      }}
+                    >
+                      {cartCurrency}
+                      {cartTotal.toLocaleString("en", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </span>
+                  </div>
+
+                  {/* Buttons */}
+                  <div className="flex items-center gap-3 px-5 py-4">
+                    <Link onClick={() => setIsCartOpen(false)} href="/cart">
+                      <button
+                        style={{
+                          border: "1px solid #534580",
+                          borderRadius: 1000,
+                          padding: "2px 16px",
+                          width: 226,
+                          height: 48,
+                          background: "#1f1443",
+                          fontFamily: "var(--font-family)",
+                          fontWeight: 700,
+                          fontSize: 15,
+                          lineHeight: "120%",
+                          color: "#cfcfcf",
+                          cursor: "pointer",
+                        }}
+                      >
+                        View cart
+                      </button>
+                    </Link>
+                    <button
+                      style={{
+                        borderRadius: 1000,
+                        padding: "2px 16px",
+                        width: 226,
+                        height: 48,
+                        background: "#e84814",
+                        fontFamily: "var(--font-family)",
+                        fontWeight: 700,
+                        fontSize: 15,
+                        lineHeight: "120%",
+                        color: "#fff",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Checkout
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="hidden flex-shrink-0 rounded-xl bg-black/10 p-1 xl:flex">
+              <div className="flex items-center gap-[clamp(2px,0.4vw,8px)] px-[clamp(2px,0.3vw,8px)]">
+                {/* ЯЗЫ К — был и должен быть */}
+                <div className="relative">
+                  <button
+                    ref={langButtonRef}
+                    onClick={() => {
+                      if (langButtonRef.current && !isLangMenuOpen) {
+                        setLangButtonWidth(langButtonRef.current.offsetWidth);
+                      }
+                      setIsLangMenuOpen(!isLangMenuOpen);
+                    }}
+                    className="flex items-center justify-center gap-[clamp(4px,0.4vw,8px)] rounded-lg border border-black/12 bg-white cursor-pointer hover:bg-gray-100 px-[clamp(8px,0.9vw,14px)] py-[clamp(6px,0.6vw,10px)] text-[clamp(12px,0.85vw,15px)] font-bold text-black"
+                  >
+                    {selectedLang}
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      className={`transition-transform xl:h-6 xl:w-6 ${
+                        isLangMenuOpen ? "rotate-180" : ""
+                      }`}
+                    >
+                      <path
+                        d="M17.8534 9.85369L12.8537 14.8534C12.8073 14.8999 12.7522 14.9367 12.6915 14.9619C12.6308 14.9871 12.5657 15 12.5 15C12.4343 15 12.3692 14.9871 12.3085 14.9619C12.2478 14.9367 12.1927 14.8999 12.1463 14.8534L7.14663 9.85369C7.07663 9.78377 7.02895 9.69465 7.00963 9.59761C6.9903 9.50058 7.00021 9.39999 7.03808 9.30858C7.07595 9.21718 7.1401 9.13907 7.22239 9.08413C7.30468 9.0292 7.40142 8.99992 7.50036 9H17.4996C17.5986 8.99992 17.6953 9.0292 17.7776 9.08413C17.8599 9.13907 17.924 9.21718 17.9619 9.30858C17.9998 9.39999 18.0097 9.50058 17.9904 9.59761C17.971 9.69465 17.9234 9.78377 17.8534 9.85369Z"
+                        fill="black"
+                      />
+                    </svg>
+                  </button>
+                  {isLangMenuOpen && (
+                    <div
+                      ref={langRef}
+                      className="absolute left-0 top-full mt-2 flex flex-col rounded-[10px] border-2 border-white shadow-lg"
+                      style={{
+                        width: langButtonWidth
+                          ? `${langButtonWidth}px`
+                          : "75px",
+                        background: "rgba(0, 3, 38, 0.5)",
+                        backdropFilter: "blur(10px)",
+                      }}
+                    >
+                      {languages
+                        .filter((l) => l?.prefix)
+                        .map((lang, index) => (
+                          <button
+                            key={lang.prefix}
+                            onClick={() => {
+                              setSelectedLang(lang.prefix.toUpperCase());
+                              switchLocale(lang.prefix);
+                              setIsLangMenuOpen(false);
+                            }}
+                            className={`flex h-[40px] w-full cursor-pointer items-center justify-center text-[15px] font-semibold transition-colors
                 ${
                   selectedLang === lang.prefix.toUpperCase()
                     ? "text-[#e84814]"
@@ -1058,101 +1242,106 @@ const handleToMain = () => router.push(`/${locale}`);
                     ? "rounded-b-[8px]"
                     : ""
                 }`}
-                          style={{
-                            background:
-                              selectedLang === lang.prefix.toUpperCase()
-                                ? "#111d9e"
-                                : "transparent",
-                          }}
-                        >
-                          {lang.prefix.toUpperCase()}
-                        </button>
-                      ))}
-                  </div>
-                )}
-              </div>
-
-              {/* СОЦСЕТИ */}
-              <div
-                ref={socialRef}
-                className="flex items-center gap-[clamp(2px,0.4vw,8px)]"
-              >
-                {/* Facebook */}
-                <div className="relative">
-                  <button
-                    onClick={() =>
-                      setOpenSocial(
-                        openSocial === "facebook" ? null : "facebook"
-                      )
-                    }
-                    className="rounded-lg p-2 flex items-center gap-1 hover:bg-white/10 transition-all"
-                  >
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                      <path
-                        d="M9.99996 1.69995C5.41663 1.69995 1.66663 5.44162 1.66663 10.05C1.66663 14.2166 4.71663 17.675 8.69996 18.3V12.4666H6.58329V10.05H8.69996V8.20828C8.69996 6.11662 9.94163 4.96662 11.85 4.96662C12.7583 4.96662 13.7083 5.12495 13.7083 5.12495V7.18328H12.6583C11.625 7.18328 11.3 7.82495 11.3 8.4833V10.05H13.6166L13.2416 12.4666H11.3V18.3C13.2636 17.9898 15.0518 16.9879 16.3415 15.475C17.6313 13.9621 18.3378 12.038 18.3333 10.05C18.3333 5.44162 14.5833 1.69995 9.99996 1.69995Z"
-                        fill="white"
-                      />
-                    </svg>
-                    <svg
-                      width="12"
-                      height="12"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      className={`transition-transform ${
-                        openSocial === "facebook" ? "rotate-180" : ""
-                      }`}
-                    >
-                      <path
-                        d="M17.8534 9.85369L12.8537 14.8534C12.8073 14.8999 12.7522 14.9367 12.6915 14.9619C12.6308 14.9871 12.5657 15 12.5 15C12.4343 15 12.3692 14.9871 12.3085 14.9619C12.2478 14.9367 12.1927 14.8999 12.1463 14.8534L7.14663 9.85369C7.07663 9.78377 7.02895 9.69465 7.00963 9.59761C6.9903 9.50058 7.00021 9.39999 7.03808 9.30858C7.07595 9.21718 7.1401 9.13907 7.22239 9.08413C7.30468 9.0292 7.40142 8.99992 7.50036 9H17.4996C17.5986 8.99992 17.6953 9.0292 17.7776 9.08413C17.8599 9.13907 17.924 9.21718 17.9619 9.30858C17.9998 9.39999 18.0097 9.50058 17.9904 9.59761C17.971 9.69465 17.9234 9.78377 17.8534 9.85369Z"
-                        fill="white"
-                      />
-                    </svg>
-                  </button>
-                  {openSocial === "facebook" && (
-                    <div
-                      className="absolute right-0 top-full mt-2 flex flex-col rounded-[10px] border-2 border-white shadow-lg overflow-hidden z-50"
-                      style={{
-                        minWidth: "180px",
-                        background: "rgba(0, 3, 38, 0.5)",
-                        backdropFilter: "blur(10px)",
-                      }}
-                    >
-                      {centersData.map((center, index) => {
-                        const dc = menuData?.diving_centers.find(
-                          (c) => c.slug === center.id
-                        );
-                        if (!dc?.contact_facebook) return null;
-                        return (
-                          <a
-                            key={center.id}
-                            href={dc.contact_facebook}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={() => setOpenSocial(null)}
-                            className={`flex h-[44px] items-center gap-[10px] px-[14px] text-white transition-all hover:bg-[#111d9e] ${
-                              index === 0 ? "rounded-t-[8px]" : ""
-                            } ${
-                              index === centersData.length - 1
-                                ? "rounded-b-[8px]"
-                                : ""
-                            }`}
+                            style={{
+                              background:
+                                selectedLang === lang.prefix.toUpperCase()
+                                  ? "#111d9e"
+                                  : "transparent",
+                            }}
                           >
-                            <span
-                              className="w-2 h-2 rounded-full flex-shrink-0"
-                              style={{ background: center.color }}
-                            />
-                            <span className="text-[14px] font-medium">
-                              {center.label}
-                            </span>
-                          </a>
-                        );
-                      })}
+                            {lang.prefix.toUpperCase()}
+                          </button>
+                        ))}
                     </div>
                   )}
                 </div>
 
-                {/* YouTube */}
-                {/* <div className="relative">
+                {/* СОЦСЕТИ */}
+                <div
+                  ref={socialRef}
+                  className="flex items-center gap-[clamp(2px,0.4vw,8px)]"
+                >
+                  {/* Facebook */}
+                  <div className="relative">
+                    <button
+                      onClick={() =>
+                        setOpenSocial(
+                          openSocial === "facebook" ? null : "facebook"
+                        )
+                      }
+                      className="rounded-lg p-2 flex items-center gap-1 hover:bg-white/10 transition-all"
+                    >
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 20 20"
+                        fill="none"
+                      >
+                        <path
+                          d="M9.99996 1.69995C5.41663 1.69995 1.66663 5.44162 1.66663 10.05C1.66663 14.2166 4.71663 17.675 8.69996 18.3V12.4666H6.58329V10.05H8.69996V8.20828C8.69996 6.11662 9.94163 4.96662 11.85 4.96662C12.7583 4.96662 13.7083 5.12495 13.7083 5.12495V7.18328H12.6583C11.625 7.18328 11.3 7.82495 11.3 8.4833V10.05H13.6166L13.2416 12.4666H11.3V18.3C13.2636 17.9898 15.0518 16.9879 16.3415 15.475C17.6313 13.9621 18.3378 12.038 18.3333 10.05C18.3333 5.44162 14.5833 1.69995 9.99996 1.69995Z"
+                          fill="white"
+                        />
+                      </svg>
+                      <svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        className={`transition-transform ${
+                          openSocial === "facebook" ? "rotate-180" : ""
+                        }`}
+                      >
+                        <path
+                          d="M17.8534 9.85369L12.8537 14.8534C12.8073 14.8999 12.7522 14.9367 12.6915 14.9619C12.6308 14.9871 12.5657 15 12.5 15C12.4343 15 12.3692 14.9871 12.3085 14.9619C12.2478 14.9367 12.1927 14.8999 12.1463 14.8534L7.14663 9.85369C7.07663 9.78377 7.02895 9.69465 7.00963 9.59761C6.9903 9.50058 7.00021 9.39999 7.03808 9.30858C7.07595 9.21718 7.1401 9.13907 7.22239 9.08413C7.30468 9.0292 7.40142 8.99992 7.50036 9H17.4996C17.5986 8.99992 17.6953 9.0292 17.7776 9.08413C17.8599 9.13907 17.924 9.21718 17.9619 9.30858C17.9998 9.39999 18.0097 9.50058 17.9904 9.59761C17.971 9.69465 17.9234 9.78377 17.8534 9.85369Z"
+                          fill="white"
+                        />
+                      </svg>
+                    </button>
+                    {openSocial === "facebook" && (
+                      <div
+                        className="absolute right-0 top-full mt-2 flex flex-col rounded-[10px] border-2 border-white shadow-lg overflow-hidden z-50"
+                        style={{
+                          minWidth: "180px",
+                          background: "rgba(0, 3, 38, 0.5)",
+                          backdropFilter: "blur(10px)",
+                        }}
+                      >
+                        {centersData.map((center, index) => {
+                          const dc = menuData?.diving_centers.find(
+                            (c) => c.slug === center.id
+                          );
+                          if (!dc?.contact_facebook) return null;
+                          return (
+                            <a
+                              key={center.id}
+                              href={dc.contact_facebook}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={() => setOpenSocial(null)}
+                              className={`flex h-[44px] items-center gap-[10px] px-[14px] text-white transition-all hover:bg-[#111d9e] ${
+                                index === 0 ? "rounded-t-[8px]" : ""
+                              } ${
+                                index === centersData.length - 1
+                                  ? "rounded-b-[8px]"
+                                  : ""
+                              }`}
+                            >
+                              <span
+                                className="w-2 h-2 rounded-full flex-shrink-0"
+                                style={{ background: center.color }}
+                              />
+                              <span className="text-[14px] font-medium">
+                                {center.label}
+                              </span>
+                            </a>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* YouTube */}
+                  {/* <div className="relative">
                   <button
                     onClick={() =>
                       setOpenSocial(openSocial === "youtube" ? null : "youtube")
@@ -1223,104 +1412,113 @@ const handleToMain = () => router.push(`/${locale}`);
                   )}
                 </div> */}
 
-                {/* Tripadvisor */}
-                <div className="relative">
-                  <button
-                    onClick={() =>
-                      setOpenSocial(
-                        openSocial === "instagram" ? null : "instagram"
-                      )
-                    }
-                    className="rounded-lg p-2 flex items-center gap-1 hover:bg-white/10 transition-all"
-                  >
-                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <path d="M14.6827 9.28867C13.7645 9.28867 13.0208 10.033 13.0208 10.9505C13.0208 11.868 13.7652 12.6124 14.6827 12.6124C15.6008 12.6124 16.3445 11.868 16.3445 10.9505C16.3445 10.6443 16.262 10.358 16.1177 10.1118L16.122 10.1199C15.8295 9.61992 15.2945 9.28867 14.6827 9.28867ZM5.31703 9.28867C4.39891 9.28867 3.65516 10.033 3.65516 10.9505C3.65516 11.868 4.39953 12.6124 5.31703 12.6124C6.23516 12.6124 6.97891 11.868 6.97891 10.9505C6.97891 10.6443 6.89641 10.358 6.75203 10.1118L6.75641 10.1199C6.46391 9.61992 5.92891 9.28867 5.31703 9.28867ZM14.6827 7.78117C14.6833 7.78117 14.6833 7.78117 14.6839 7.78117C16.4339 7.78117 17.8527 9.19992 17.8527 10.9499C17.8527 12.6999 16.4339 14.1187 14.6839 14.1187C12.9339 14.1187 11.5152 12.6999 11.5152 10.9499C11.5152 10.3668 11.6727 9.82055 11.947 9.35117L11.9389 9.36617C12.4964 8.4118 13.5158 7.7818 14.6827 7.78117ZM5.31703 7.7793C7.06766 7.7793 8.48703 9.19867 8.48703 10.9493C8.48703 12.6999 7.06766 14.1193 5.31703 14.1193C3.56641 14.1193 2.14703 12.6999 2.14703 10.9493C2.14703 10.3655 2.30453 9.81867 2.57953 9.3493L2.57141 9.3643C3.12953 8.40992 4.14953 7.7793 5.31703 7.7793ZM10.0014 5.51305C11.2714 5.51367 12.4802 5.77305 13.5789 6.24117L13.5189 6.21867C11.5358 6.89992 10.1145 8.69992 10.0014 10.8468L10.0008 10.8593C9.88828 8.69992 8.46641 6.8993 6.51953 6.2293L6.48328 6.21867C7.52203 5.77367 8.73141 5.51492 10.0008 5.5143L10.0014 5.51305ZM10.0064 3.98242C10.0052 3.98242 10.0033 3.98242 10.002 3.98242C7.77391 3.98242 5.70641 4.6693 3.99953 5.84367L4.03516 5.82055H0.628906L2.16203 7.48805C1.21953 8.34805 0.630781 9.58117 0.630781 10.9518C0.630781 13.538 2.72766 15.6349 5.31391 15.6349C6.54578 15.6349 7.66641 15.1593 8.50266 14.3818L8.49953 14.3843L10.0008 16.018L11.502 14.3855C12.3352 15.1599 13.4558 15.6355 14.6877 15.6355C17.2745 15.6355 19.3714 13.5387 19.3714 10.9518C19.3714 9.58117 18.7827 8.34742 17.8439 7.49117L17.8402 7.48805L19.3733 5.82055H15.9758C14.3052 4.66992 12.2383 3.98305 10.0102 3.98305C10.0083 3.98305 10.007 3.98305 10.0052 3.98305L10.0064 3.98242Z" fill="white" />
-</svg>
-                    <svg
-                      width="12"
-                      height="12"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      className={`transition-transform ${
-                        openSocial === "instagram" ? "rotate-180" : ""
-                      }`}
+                  {/* Tripadvisor */}
+                  <div className="relative">
+                    <button
+                      onClick={() =>
+                        setOpenSocial(
+                          openSocial === "instagram" ? null : "instagram"
+                        )
+                      }
+                      className="rounded-lg p-2 flex items-center gap-1 hover:bg-white/10 transition-all"
                     >
-                      <path
-                        d="M17.8534 9.85369L12.8537 14.8534C12.8073 14.8999 12.7522 14.9367 12.6915 14.9619C12.6308 14.9871 12.5657 15 12.5 15C12.4343 15 12.3692 14.9871 12.3085 14.9619C12.2478 14.9367 12.1927 14.8999 12.1463 14.8534L7.14663 9.85369C7.07663 9.78377 7.02895 9.69465 7.00963 9.59761C6.9903 9.50058 7.00021 9.39999 7.03808 9.30858C7.07595 9.21718 7.1401 9.13907 7.22239 9.08413C7.30468 9.0292 7.40142 8.99992 7.50036 9H17.4996C17.5986 8.99992 17.6953 9.0292 17.7776 9.08413C17.8599 9.13907 17.924 9.21718 17.9619 9.30858C17.9998 9.39999 18.0097 9.50058 17.9904 9.59761C17.971 9.69465 17.9234 9.78377 17.8534 9.85369Z"
-                        fill="white"
-                      />
-                    </svg>
-                  </button>
-                  {openSocial === "instagram" && (
-                    <div
-                      className="absolute right-0 top-full mt-2 flex flex-col rounded-[10px] border-2 border-white shadow-lg overflow-hidden z-50"
-                      style={{
-                        minWidth: "180px",
-                        background: "rgba(0, 3, 38, 0.5)",
-                        backdropFilter: "blur(10px)",
-                      }}
-                    >
-                      {centersData.map((center, index) => {
-                        const dc = menuData?.diving_centers.find(
-                          (c) => c.slug === center.id
-                        );
-                        if (!dc?.contact_tripadvisor) return null;
-                        return (
-                          <a
-                            key={center.id}
-                            href={dc.contact_tripadvisor}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={() => setOpenSocial(null)}
-                            className={`flex h-[44px] items-center gap-[10px] px-[14px] text-white transition-all hover:bg-[#111d9e] ${
-                              index === 0 ? "rounded-t-[8px]" : ""
-                            } ${
-                              index === centersData.length - 1
-                                ? "rounded-b-[8px]"
-                                : ""
-                            }`}
-                          >
-                            <span
-                              className="w-2 h-2 rounded-full flex-shrink-0"
-                              style={{ background: center.color }}
-                            />
-                            <span className="text-[14px] font-medium">
-                              {center.label}
-                            </span>
-                          </a>
-                        );
-                      })}
-                    </div>
-                  )}
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 20 20"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M14.6827 9.28867C13.7645 9.28867 13.0208 10.033 13.0208 10.9505C13.0208 11.868 13.7652 12.6124 14.6827 12.6124C15.6008 12.6124 16.3445 11.868 16.3445 10.9505C16.3445 10.6443 16.262 10.358 16.1177 10.1118L16.122 10.1199C15.8295 9.61992 15.2945 9.28867 14.6827 9.28867ZM5.31703 9.28867C4.39891 9.28867 3.65516 10.033 3.65516 10.9505C3.65516 11.868 4.39953 12.6124 5.31703 12.6124C6.23516 12.6124 6.97891 11.868 6.97891 10.9505C6.97891 10.6443 6.89641 10.358 6.75203 10.1118L6.75641 10.1199C6.46391 9.61992 5.92891 9.28867 5.31703 9.28867ZM14.6827 7.78117C14.6833 7.78117 14.6833 7.78117 14.6839 7.78117C16.4339 7.78117 17.8527 9.19992 17.8527 10.9499C17.8527 12.6999 16.4339 14.1187 14.6839 14.1187C12.9339 14.1187 11.5152 12.6999 11.5152 10.9499C11.5152 10.3668 11.6727 9.82055 11.947 9.35117L11.9389 9.36617C12.4964 8.4118 13.5158 7.7818 14.6827 7.78117ZM5.31703 7.7793C7.06766 7.7793 8.48703 9.19867 8.48703 10.9493C8.48703 12.6999 7.06766 14.1193 5.31703 14.1193C3.56641 14.1193 2.14703 12.6999 2.14703 10.9493C2.14703 10.3655 2.30453 9.81867 2.57953 9.3493L2.57141 9.3643C3.12953 8.40992 4.14953 7.7793 5.31703 7.7793ZM10.0014 5.51305C11.2714 5.51367 12.4802 5.77305 13.5789 6.24117L13.5189 6.21867C11.5358 6.89992 10.1145 8.69992 10.0014 10.8468L10.0008 10.8593C9.88828 8.69992 8.46641 6.8993 6.51953 6.2293L6.48328 6.21867C7.52203 5.77367 8.73141 5.51492 10.0008 5.5143L10.0014 5.51305ZM10.0064 3.98242C10.0052 3.98242 10.0033 3.98242 10.002 3.98242C7.77391 3.98242 5.70641 4.6693 3.99953 5.84367L4.03516 5.82055H0.628906L2.16203 7.48805C1.21953 8.34805 0.630781 9.58117 0.630781 10.9518C0.630781 13.538 2.72766 15.6349 5.31391 15.6349C6.54578 15.6349 7.66641 15.1593 8.50266 14.3818L8.49953 14.3843L10.0008 16.018L11.502 14.3855C12.3352 15.1599 13.4558 15.6355 14.6877 15.6355C17.2745 15.6355 19.3714 13.5387 19.3714 10.9518C19.3714 9.58117 18.7827 8.34742 17.8439 7.49117L17.8402 7.48805L19.3733 5.82055H15.9758C14.3052 4.66992 12.2383 3.98305 10.0102 3.98305C10.0083 3.98305 10.007 3.98305 10.0052 3.98305L10.0064 3.98242Z"
+                          fill="white"
+                        />
+                      </svg>
+                      <svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        className={`transition-transform ${
+                          openSocial === "instagram" ? "rotate-180" : ""
+                        }`}
+                      >
+                        <path
+                          d="M17.8534 9.85369L12.8537 14.8534C12.8073 14.8999 12.7522 14.9367 12.6915 14.9619C12.6308 14.9871 12.5657 15 12.5 15C12.4343 15 12.3692 14.9871 12.3085 14.9619C12.2478 14.9367 12.1927 14.8999 12.1463 14.8534L7.14663 9.85369C7.07663 9.78377 7.02895 9.69465 7.00963 9.59761C6.9903 9.50058 7.00021 9.39999 7.03808 9.30858C7.07595 9.21718 7.1401 9.13907 7.22239 9.08413C7.30468 9.0292 7.40142 8.99992 7.50036 9H17.4996C17.5986 8.99992 17.6953 9.0292 17.7776 9.08413C17.8599 9.13907 17.924 9.21718 17.9619 9.30858C17.9998 9.39999 18.0097 9.50058 17.9904 9.59761C17.971 9.69465 17.9234 9.78377 17.8534 9.85369Z"
+                          fill="white"
+                        />
+                      </svg>
+                    </button>
+                    {openSocial === "instagram" && (
+                      <div
+                        className="absolute right-0 top-full mt-2 flex flex-col rounded-[10px] border-2 border-white shadow-lg overflow-hidden z-50"
+                        style={{
+                          minWidth: "180px",
+                          background: "rgba(0, 3, 38, 0.5)",
+                          backdropFilter: "blur(10px)",
+                        }}
+                      >
+                        {centersData.map((center, index) => {
+                          const dc = menuData?.diving_centers.find(
+                            (c) => c.slug === center.id
+                          );
+                          if (!dc?.contact_tripadvisor) return null;
+                          return (
+                            <a
+                              key={center.id}
+                              href={dc.contact_tripadvisor}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={() => setOpenSocial(null)}
+                              className={`flex h-[44px] items-center gap-[10px] px-[14px] text-white transition-all hover:bg-[#111d9e] ${
+                                index === 0 ? "rounded-t-[8px]" : ""
+                              } ${
+                                index === centersData.length - 1
+                                  ? "rounded-b-[8px]"
+                                  : ""
+                              }`}
+                            >
+                              <span
+                                className="w-2 h-2 rounded-full flex-shrink-0"
+                                style={{ background: center.color }}
+                              />
+                              <span className="text-[14px] font-medium">
+                                {center.label}
+                              </span>
+                            </a>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="flex items-center justify-center rounded-lg bg-white p-2 xl:hidden"
+            >
+              {isMenuOpen ? (
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M7 7L17 17M7 17L17 7"
+                    stroke="black"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              ) : (
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M4 18C3.71667 18 3.47934 17.904 3.288 17.712C3.09667 17.52 3.00067 17.2827 3 17C2.99934 16.7173 3.09534 16.48 3.288 16.288C3.48067 16.096 3.718 16 4 16H20C20.2833 16 20.521 16.096 20.713 16.288C20.905 16.48 21.0007 16.7173 21 17C20.9993 17.2827 20.9033 17.5203 20.712 17.713C20.5207 17.9057 20.2833 18.0013 20 18H4ZM4 13C3.71667 13 3.47934 12.904 3.288 12.712C3.09667 12.52 3.00067 12.2827 3 12C2.99934 11.7173 3.09534 11.48 3.288 11.288C3.48067 11.096 3.718 11 4 11H20C20.2833 11 20.521 11.096 20.713 11.288C20.905 11.48 21.0007 11.7173 21 12C20.9993 12.2827 20.9033 12.5203 20.712 12.713C20.5207 12.9057 20.2833 13.0013 20 13H4ZM4 8C3.71667 8 3.47934 7.904 3.288 7.712C3.09667 7.52 3.00067 7.28267 3 7C2.99934 6.71733 3.09534 6.48 3.288 6.288C3.48067 6.096 3.718 6 4 6H20C20.2833 6 20.521 6.096 20.713 6.288C20.905 6.48 21.0007 6.71733 21 7C20.9993 7.28267 20.9033 7.52033 20.712 7.713C20.5207 7.90567 20.2833 8.00133 20 8H4Z"
+                    fill="black"
+                  />
+                </svg>
+              )}
+            </button>
           </div>
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="flex items-center justify-center rounded-lg bg-white p-2 xl:hidden"
-          >
-            {isMenuOpen ? (
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M7 7L17 17M7 17L17 7"
-                  stroke="black"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            ) : (
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M4 18C3.71667 18 3.47934 17.904 3.288 17.712C3.09667 17.52 3.00067 17.2827 3 17C2.99934 16.7173 3.09534 16.48 3.288 16.288C3.48067 16.096 3.718 16 4 16H20C20.2833 16 20.521 16.096 20.713 16.288C20.905 16.48 21.0007 16.7173 21 17C20.9993 17.2827 20.9033 17.5203 20.712 17.713C20.5207 17.9057 20.2833 18.0013 20 18H4ZM4 13C3.71667 13 3.47934 12.904 3.288 12.712C3.09667 12.52 3.00067 12.2827 3 12C2.99934 11.7173 3.09534 11.48 3.288 11.288C3.48067 11.096 3.718 11 4 11H20C20.2833 11 20.521 11.096 20.713 11.288C20.905 11.48 21.0007 11.7173 21 12C20.9993 12.2827 20.9033 12.5203 20.712 12.713C20.5207 12.9057 20.2833 13.0013 20 13H4ZM4 8C3.71667 8 3.47934 7.904 3.288 7.712C3.09667 7.52 3.00067 7.28267 3 7C2.99934 6.71733 3.09534 6.48 3.288 6.288C3.48067 6.096 3.718 6 4 6H20C20.2833 6 20.521 6.096 20.713 6.288C20.905 6.48 21.0007 6.71733 21 7C20.9993 7.28267 20.9033 7.52033 20.712 7.713C20.5207 7.90567 20.2833 8.00133 20 8H4Z"
-                  fill="black"
-                />
-              </svg>
-            )}
-          </button>
-        </div>
         </div>
       </header>
 
@@ -1399,16 +1597,16 @@ const handleToMain = () => router.push(`/${locale}`);
 
                   {/* Универсальный мобильный дропдаун */}
                   {item.hasDropdown && mobileOpenDropdown === item.id && (
-                <MobileDynamicDropdown
-  item={item}
-  centersData={centersData}
-  coursesData={coursesData}
-  selectedCenter={selectedCenter}        // ← добавить
-  setSelectedCenter={setSelectedCenter}  // ← добавить
-  setMobileOpenDropdown={setMobileOpenDropdown}
-  setIsMenuOpen={setIsMenuOpen}
-  router={router}                        // ← добавить
-/>
+                    <MobileDynamicDropdown
+                      item={item}
+                      centersData={centersData}
+                      coursesData={coursesData}
+                      selectedCenter={selectedCenter} // ← добавить
+                      setSelectedCenter={setSelectedCenter} // ← добавить
+                      setMobileOpenDropdown={setMobileOpenDropdown}
+                      setIsMenuOpen={setIsMenuOpen}
+                      router={router} // ← добавить
+                    />
                   )}
                 </div>
               ))}

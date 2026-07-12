@@ -1,18 +1,45 @@
+"use client";
+
 import Image from "next/image";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import { useState, useRef } from "react";
+import type { Swiper as SwiperType } from "swiper";
 import { Breadcrumbs } from "../Breadcrumbs";
-type Props = {
-  title?: string;
-  description?: string;
-  centerName?: string;
-  bannerImage?: string;
+import { CarouselControls } from "@/components/CarouselControls";
+
+type Slide = {
+  title: string;
+  description: string;
+  desktopImage?: string;
+  mobileImage?: string;
 };
 
-export const HeroSection = ({ 
-  title = "Courses", 
-  description = "Do you want to learn how to dive or improve your knowledge and scuba skills? PADI courses and Haliotis team will provide you incredible moments!",
-  centerName,
-  bannerImage,
-}: Props) => {
+type Props = {
+  centerName?: string;
+  heroSlides?: Slide[];
+};
+
+const DEFAULT_SLIDE: Slide = {
+  title: "Courses",
+  description:
+    "Do you want to learn how to dive or improve your knowledge and scuba skills? PADI courses and Haliotis team will provide you incredible moments!",
+};
+
+export const HeroSection = ({ centerName, heroSlides }: Props) => {
+  const [heroCurrentSlide, setHeroCurrentSlide] = useState(0);
+  const heroSwiperRef = useRef<SwiperType | null>(null);
+
+  console.log(heroSlides, 'heroSlides');
+  
+  const slides: Slide[] =
+    heroSlides && heroSlides.length > 0 ? heroSlides : [DEFAULT_SLIDE];
+
+  const activeSlide = slides[heroCurrentSlide] ?? slides[0];
+
   return (
     <section className="relative h-[75vh] w-full pt-[97px]">
       {/* Breadcrumbs */}
@@ -21,33 +48,99 @@ export const HeroSection = ({
           className="mb-6 mx-5 md:mb-8"
           items={[
             { label: "Haliotis", href: "/" },
-            { label: "Courses", href: "/courses" },
+            { label: "Cursos", href: "/courses" },
             ...(centerName ? [{ label: centerName }] : []),
           ]}
           itemLabelColorWhite={true}
         />
       </div>
 
+      {/* Background */}
       <div className="absolute inset-0 z-0">
-        <div className="relative h-full w-full">
-          <Image
-            src={bannerImage || "/image 2.png"}
-            alt="Background"
-            fill
-            className="object-cover"
-            priority
+        <Swiper
+          modules={[Navigation, Pagination]}
+          spaceBetween={0}
+          slidesPerView={1}
+          loop={slides.length > 1}
+          onSwiper={(swiper) => {
+            heroSwiperRef.current = swiper;
+          }}
+          onSlideChange={(swiper) => {
+            setHeroCurrentSlide(swiper.realIndex);
+          }}
+          className="h-full w-full"
+        >
+          {slides.map((slide, index) => (
+            <SwiperSlide key={index} className="h-full">
+              <div className="relative h-full w-full">
+                {/* Десктоп */}
+                {slide.desktopImage && slide.desktopImage.trim() !== "" && (
+                  <Image
+                    key={`desktop-${index}`}
+                    src={`${slide.desktopImage}?slide=${index}`}
+                    alt="Background"
+                    fill
+                    quality={100}
+                    sizes="100vw"
+                    className="object-cover hidden lg:block"
+                    priority={index === 0}
+                  />
+                )}
+                {/* Мобилка */}
+                {slide.mobileImage && slide.mobileImage.trim() !== "" ? (
+                  <Image
+                    key={`mobile-${index}`}
+                    src={`${slide.mobileImage}?slide=${index}`}
+                    alt="Background"
+                    fill
+                    quality={100}
+                    sizes="100vw"
+                    className="object-cover lg:hidden"
+                    priority={index === 0}
+                  />
+                ) : (
+                  // фоллбэк, если mobile_image не пришёл — показываем desktop и на мобилке
+                  slide.desktopImage &&
+                  slide.desktopImage.trim() !== "" && (
+                    <Image
+                      key={`mobile-fallback-${index}`}
+                      src={`${slide.desktopImage}?slide=${index}`}
+                      alt="Background"
+                      fill
+                      quality={100}
+                      sizes="100vw"
+                      className="object-cover lg:hidden"
+                      priority={index === 0}
+                    />
+                  )
+                )}
+              </div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </div>
+
+      {/* Carousel controls внизу — только если больше 1 слайда */}
+      {slides.length > 1 && (
+        <div className="absolute right-10 bottom-10 z-[6000] lg:right-10 lg:bottom-10">
+          <CarouselControls
+            currentSlide={heroCurrentSlide}
+            totalSlides={slides.length}
+            onPrev={() => heroSwiperRef.current?.slidePrev()}
+            onNext={() => heroSwiperRef.current?.slideNext()}
+            progressClass="hero-progress"
+            theme="light"
           />
         </div>
-      </div>
+      )}
 
       {/* Content Container */}
       <div className="relative z-20 h-full">
-        {/* Hero Section */}
         <section className="container px-5 py-6">
           <div className="max-w-3xl">
             <div className="mb-12">
               <h1 className="mb-3 text-[32px] font-bold leading-tight text-white lg:text-5xl">
-                {title}
+                {activeSlide.title}
               </h1>
               <div className="mb-6">
                 <svg
@@ -66,10 +159,7 @@ export const HeroSection = ({
                     width="157"
                     height="7"
                   >
-                    <path
-                      d="M156.168 6.05303H0V0H156.168V6.05303Z"
-                      fill="white"
-                    />
+                    <path d="M156.168 6.05303H0V0H156.168V6.05303Z" fill="white" />
                   </mask>
                   <g mask="url(#mask0_1_611)">
                     <path
@@ -82,7 +172,7 @@ export const HeroSection = ({
                 </svg>
               </div>
               <p className="max-w-xl text-[16px] font-light text-white lg:text-lg">
-                {description}
+                {activeSlide.description}
               </p>
             </div>
           </div>

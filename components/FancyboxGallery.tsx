@@ -16,7 +16,7 @@ type Props = {
   totalCount?: number;
 };
 
-export function FancyboxGallery({ images, previewImage }: Props) {
+export function FancyboxGallery({ images, previewImage,totalCount }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -37,7 +37,7 @@ export function FancyboxGallery({ images, previewImage }: Props) {
 
   if (allImages.length === 0) return null;
 
-  const extraCount = allImages.length - 1;
+  const extraCount = totalCount
 
   return (
     <div ref={containerRef} className="relative w-full h-full">

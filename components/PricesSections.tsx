@@ -168,7 +168,6 @@ function PriceRow({ item }: { item: PriceRowItem }) {
               <ChevronDown color={open ? "#e84814" : "#D9D9D9"} />
             </div>
           )}
-          {!item.description && <ChevronDown />}
         </div>
       </div>
       {open && item.description && (
@@ -410,8 +409,11 @@ console.log(pricesData, 'pricesData');
       </section>
 
       {/* ── Specialized Maintenance Services ── */}
-      <SpecializedMaintenanceSection pricesData={pricesData} activeTabId={activeTabId ?? ""} />
-      {/* ── Fills ── */}
+      <SpecializedMaintenanceSection
+  pricesData={pricesData}
+  activeTabId={activeTabId ?? ""}
+  excludeTypeId={defaultType?.id}
+/>      {/* ── Fills ── */}
       <FillsSection pricesData={pricesData} />
     </>
   );
@@ -423,12 +425,15 @@ console.log(pricesData, 'pricesData');
 function SpecializedMaintenanceSection({
   pricesData,
   activeTabId,
+  excludeTypeId,
 }: {
   pricesData: PricesData | null;
   activeTabId: string;
+  excludeTypeId?: number;
 }) {
-  const maintenanceType = pricesData?.service_types.find((t) => t.display_type === "maintenance");
-
+  const maintenanceType = pricesData?.service_types.find(
+    (t) => t.display_type === "information" && t.id !== excludeTypeId
+  );
   const maintenanceCategories = (pricesData?.categories ?? [])
     .filter((c) => c.service_type_id === maintenanceType?.id)
     .sort((a, b) => a.position - b.position);
@@ -439,7 +444,7 @@ function SpecializedMaintenanceSection({
     if (maintenanceCategories.length > 0) {
       setSelectedCategoryId(String(maintenanceCategories[0].id));
     }
-  }, [activeTabId]);
+  }, [activeTabId, maintenanceCategories]);
 
   const maintenanceFilterOptions = maintenanceCategories.map((c) => ({ id: String(c.id), label: c.name }));
   const activeCategoryName = maintenanceCategories.find((c) => String(c.id) === selectedCategoryId)?.name ?? "";

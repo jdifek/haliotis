@@ -9,6 +9,8 @@ import { SimpleCoursesSection } from "@/components/CoursesPage/SimpleCoursesSect
 import { SimpleTripsSection } from "@/components/CoursesPage/SimpleTripsSection";
 import { CenterInfoSection } from "@/components/CoursesPage/CenterInfoSection";
 import type { CenterData, CenterTabs } from "@/types/center";
+import { useMenu } from "@/app/hooks/useMenu";
+import { useLocale } from "next-intl";
 
 
 type Props = {
@@ -17,10 +19,14 @@ type Props = {
 };
 
 export default function PenichePage({ center, tabs }: Props) {
+    const locale = useLocale();
+  
+  const { terms} = useMenu(locale);
   
   const courseCards = center?.sliders?.courses?.entities?.map((course: any) => ({
     image: course.image_url || "/placeholder.png",
-    title: course.title || course.name || "Course",
+    id: course.id, 
+    title: course.title || course.name,
     currency: course.price.currency,
     price:
       typeof course.price === "object"
@@ -28,7 +34,7 @@ export default function PenichePage({ center, tabs }: Props) {
         : course.price ?? 0,
       duration: course.duration_label || "On request",
       requestBased: !course.duration_label,
-   badge: course.label?.name || "Course",
+   badge: course.labels,
     location: center.slug,
   })) ?? [];
   const tripCards =
@@ -41,7 +47,7 @@ export default function PenichePage({ center, tabs }: Props) {
         : trip.price ?? 0,
     title: trip.name || "Trip",
     description: trip.subtitle || "",
-    link: "#", // если нет ссылки в API
+    link: `/diving/${trip.slug}`, // если нет ссылки в API
     location: center.slug,
     details: trip.description || "",
     equipmentPrice: "", // пока нет в API
@@ -57,7 +63,7 @@ export default function PenichePage({ center, tabs }: Props) {
   courseCards={courseCards}
 />
       <CenterInfoSection tabs={tabs} />
-      <Parceiros partners={center.partners} />
+      <Parceiros terms={terms} title={center.partners.title} partners={center.partners.entities} />
       <div className="md:hidden mx-4 h-px border border-[#e4e4e4] mt-10" />
      <PaymentMethods
   title={center.payment_methods?.title}

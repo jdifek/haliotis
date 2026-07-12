@@ -3,7 +3,7 @@ import { ArticleCard } from "@/components/ArticleCard";
 import { Pagination } from "@/components/Pagination";
 import { Tabs } from "@/components/buttons/Tabs";
 import { ButtonWithIcon } from "@/components/buttons/ButtonWithIcon";
-import { useState, useRef, useEffect, useTransition, useCallback, useMemo } from "react";
+import { useState, useRef, useEffect, useTransition, useMemo } from "react";
 import DiveSitesSection from "@/components/DiveSitesSection";
 import { useMenu } from "@/app/hooks/useMenu";
 import { useLocale } from "next-intl";
@@ -93,8 +93,6 @@ const Diving = () => {
   const locale = useLocale();
 const params = useParams();
 const slugFromUrl = Array.isArray(params?.slug) ? params.slug[0] : undefined;
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
 
 const { terms, divingCenters, colorBySlug } = useMenu(locale);
   const t = createTermGetter(terms);
@@ -208,8 +206,10 @@ useEffect(() => {
     }
   }, [slugFromUrl, divingData]);
   const activeColor =
-    (activeTab ? colorBySlug[activeTab] : null) ?? FALLBACK_COLOR;
-const allCards = useMemo<TripCard[]>(
+   (activeTab ? colorBySlug[activeTab] : null) ?? FALLBACK_COLOR;
+console.log(divingData, 'divingData');
+
+   const allCards = useMemo<TripCard[]>(
     () =>
       (divingData?.dive_trips ?? []).map((trip) => ({
         image: trip.image_url || "",
@@ -288,31 +288,23 @@ if (slug) {
 };
   return (
     <main className="-mt-[97px]">
-      <HeroBanner
-        slides={
-          divingData?.banner?.slides?.length
-            ? divingData.banner.slides.map((s) => ({
-                image: s.desktop_image_url,
-                mobileImage: s.mobile_image_url,
-                title: s.title,
-                description: s.description,
-              }))
-            : [{ image: "" }]
-        }
-        height="h-[75vh]"
-        breadcrumbs={[
-          { label: "Haliotis", href: "/" },
-          { label: divingData?.title ?? "Diving" },
-        ]}
-      >
-        <section className="container px-5 py-6">
-          <div className="max-w-3xl">
-            <h1 className="mb-3 text-[32px] font-bold leading-tight text-white xl:text-5xl">
-              {divingData?.title || "Diving"}
-            </h1>
-          </div>
-        </section>
-      </HeroBanner>
+     <HeroBanner
+  slides={
+    divingData?.banner?.slides?.length
+      ? divingData.banner.slides.map((s) => ({
+          image: s.desktop_image_url,
+          mobileImage: s.mobile_image_url,
+          title: s.title,
+          description: s.description,
+        }))
+      : [{ image: "" }]
+  }
+  height="h-[75vh]"
+  breadcrumbs={[
+    { label: "Haliotis", href: "/" },
+    { label: divingData?.title ?? "Diving" },
+  ]}
+/>
 
       {/* Desktop tabs */}
       <section className="hidden md:flex h-[95px] bg-white justify-center items-end">
@@ -348,6 +340,8 @@ if (slug) {
                   className="grid max-[700px]:grid-cols-1 max-[1670px]:grid-cols-2 min-[1670px]:grid-cols-3 gap-5"
                 >
                   {row.map((card, colIndex) => {
+                    console.log(JSON.stringify(card), 'card');
+                    
                     const globalIndex = rowStartIndex + colIndex;
                     return (
                    <div
@@ -502,8 +496,15 @@ if (slug) {
               fish_level: loc.fish_level,
               difficulty_level: loc.difficulty_level,
               max_depth: loc.max_depth,
-              video_url: loc.banner?.slides?.[0]?.video_url ?? "",
-              video_cover: loc.banner?.slides?.[0]?.video_cover_url ?? "",
+              // ⬇️ передаём все слайды баннера как есть, сортировку/приоритет
+              // (видео вперёд) сделаем внутри DiveSitesSection
+              media: (loc.banner?.slides ?? []).map((s) => ({
+                type: s.type,
+                imageDesktop: s.desktop_image_url ?? undefined,
+                imageMobile: s.mobile_image_url ?? undefined,
+                videoUrl: s.video_url ?? undefined,
+                videoCover: s.video_cover_url ?? undefined,
+              })),
             }))
           ) ?? []
         }

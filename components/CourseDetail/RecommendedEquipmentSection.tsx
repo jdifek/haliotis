@@ -1,8 +1,8 @@
-// components/TravelDetail/RecommendedCoursesSection.tsx
 "use client";
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { CarouselControls } from "../CarouselControls";
-import { TripCard } from "../TravelTripsSection";
+import { CourseCard } from "../CourseCard";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
 import "swiper/css";
@@ -11,28 +11,30 @@ import "swiper/css/pagination";
 import React, { useState, useRef } from "react";
 import type { Swiper as SwiperType } from "swiper";
 
-type TripCardType = {
-  locationId: string;
-  images: string[];
-  price: number;
-  title: string;
-  description: string;
-  link: string;
+type EquipmentItem = {
+  id: string | number;
+  name: string;
+  image: string;
+  price: { amount: string | number; currency: string };
+  purchase_link?: string;
 };
 
 type Props = {
   className?: string;
-  recommendedHeader: {
+  headers: {
+    id: string;
+    widget: string;
+    entity: string;
     title: string;
     description: string;
   };
-  courseCards: TripCardType[];
+  equipment: EquipmentItem[];
 };
 
-export const RecommendedCoursesSection: React.FC<Props> = ({
+export const RecommendedEquipmentSection: React.FC<Props> = ({
   className,
-  courseCards,
-  recommendedHeader,
+  headers,
+  equipment,
 }) => {
   const swiperRef = useRef<SwiperType | null>(null);
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -44,28 +46,28 @@ export const RecommendedCoursesSection: React.FC<Props> = ({
 
   return (
     <section
-      className={`bg-[#f1f1f1] relative pt-4 pb-4 md:pt-6 md:pb-8 ${className ?? ""}`}
+      className={`bg-white relative px-4 py-10 md:px-[30px] lg:px-[188px] md:py-[60px] ${className ?? ""}`}
     >
-      <div className="mx-auto max-w-[1920px] px-4 md:px-8 lg:px-[188px] flex flex-col gap-[10px] md:gap-[30px]">
+      <div className="flex flex-col gap-[10px] md:gap-[30px]">
         {/* Заголовок и контролы */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div className="flex flex-col gap-[10px]">
             <h2 className="text-[28px] font-medium leading-[130%] text-black sm:text-[36px] lg:text-[clamp(32px,2.5vw,42px)]">
-              {recommendedHeader.title}
+              {headers.title}
             </h2>
             <p className="text-[15px] font-normal leading-[160%] text-[#101010] opacity-80">
-              {recommendedHeader.description}
+              {headers.description}
             </p>
           </div>
           {!isSwiperLocked && (
             <div className="hidden sm:block">
               <CarouselControls
                 currentSlide={currentSlide}
-                totalSlides={courseCards.length}
+                totalSlides={equipment.length}
                 onPrev={() => swiperRef.current?.slidePrev()}
                 onNext={() => swiperRef.current?.slideNext()}
                 theme="dark"
-                progressClass="recommended-travels-progress"
+                progressClass="recommended-equipment-progress"
               />
             </div>
           )}
@@ -95,42 +97,53 @@ export const RecommendedCoursesSection: React.FC<Props> = ({
             }}
             pagination={{
               type: "progressbar",
-              el: ".recommended-travels-progress",
+              el: ".recommended-equipment-progress",
             }}
             breakpoints={{
               0: {
-                slidesPerView: 1,
+                slidesPerView: 2,
                 spaceBetween: 10,
               },
               640: {
-                slidesPerView: 1,
+                slidesPerView: 2,
                 spaceBetween: 15,
               },
               768: {
-                slidesPerView: 1,
+                slidesPerView: 2,
                 slidesPerGroup: 1,
                 spaceBetween: 20,
               },
               1024: {
-                slidesPerView: 1,
+                slidesPerView: 2,
                 slidesPerGroup: 1,
                 spaceBetween: 30,
               },
               1495: {
-                slidesPerView: 1,
+                slidesPerView: 3,
                 slidesPerGroup: 1,
                 spaceBetween: 30,
               },
               1895: {
-                slidesPerView: 1,
+                slidesPerView: 4,
                 slidesPerGroup: 1,
                 spaceBetween: 30,
               },
             }}
           >
-            {courseCards.map((card, index) => (
-              <SwiperSlide key={`${card.locationId}-${index}`}>
-                <TripCard card={card} />
+            {equipment.map((item) => (
+              <SwiperSlide key={item.id}>
+                <CourseCard
+                  image={item.image}
+                  id={+item.id}
+                  title={item.name}
+                  description={item.description}
+                  price={Number(item.price.amount)}
+                  currency={item.price.currency}
+                  duration="false"
+                  requestBased={false}
+                  buyNow={true}
+                  purchaseLink={item.purchase_link}
+                />
               </SwiperSlide>
             ))}
           </Swiper>
@@ -141,11 +154,11 @@ export const RecommendedCoursesSection: React.FC<Props> = ({
           <div className="flex justify-center w-full sm:hidden">
             <CarouselControls
               currentSlide={currentSlide}
-              totalSlides={courseCards.length}
+              totalSlides={equipment.length}
               onPrev={() => swiperRef.current?.slidePrev()}
               onNext={() => swiperRef.current?.slideNext()}
               theme="dark"
-              progressClass="recommended-travels-progress"
+              progressClass="recommended-equipment-progress"
             />
           </div>
         )}
