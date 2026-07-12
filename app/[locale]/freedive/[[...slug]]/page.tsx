@@ -155,7 +155,7 @@ useEffect(() => { console.log('📌 activeTab changed:', activeTab); }, [activeT
     setDataLoading(true);
 
     fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/diving-category/diving?center_id=${activeCenter.id}&lang=${locale}&attach_regions=true`,
+      `${process.env.NEXT_PUBLIC_API_URL}/diving-category/freedive?center_id=${activeCenter.id}&lang=${locale}&attach_regions=true`,
       { headers: { Accept: "application/json" } }
     )
       .then((r) => r.json())
@@ -260,18 +260,18 @@ const rows = useMemo<TripCard[][]>(() => {
     setCurrentPage(1);
     setExpandedCardId(null);
     setExpandedDetails(null);
-  window.history.replaceState(null, "", `/${locale}/diving`);
+  window.history.replaceState(null, "", `/${locale}/freedive`);
   };
 
 const handleToggleExpand = (index: number, slug?: string) => {
  if (expandedCardId === index) {
   setExpandedCardId(null);
   setExpandedDetails(null);
-  window.history.replaceState(null, "", `/${locale}/diving`);
+  window.history.replaceState(null, "", `/${locale}/freedive`);
 } else {
   setExpandedCardId(index);
 if (slug) {
-  window.history.replaceState(null, "", `/${locale}/diving/${slug}`);
+  window.history.replaceState(null, "", `/${locale}/freedive/${slug}`);
 }
 
     if (slug) {
