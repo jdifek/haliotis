@@ -3,8 +3,7 @@
 import { CarouselControls } from "@/components/CarouselControls";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination } from "swiper/modules";
-import "swiper/css";
+import { Navigation, Pagination, Autoplay } from "swiper/modules";import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { useState, useRef } from "react";
@@ -26,19 +25,29 @@ export const HeroSection: React.FC<Props> = ({ heroSlides }) => {
     <section className="relative h-[678px] w-full pt-[97px]">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
-        <Swiper
-          modules={[Navigation, Pagination]}
-          spaceBetween={0}
-          slidesPerView={1}
-          loop={true}
-          onSwiper={(swiper) => {
-            heroSwiperRef.current = swiper;
-          }}
-          onSlideChange={(swiper) => {
-            setHeroCurrentSlide(swiper.realIndex);
-          }}
-          className="h-full w-full"
-        >
+      <Swiper
+  modules={[Navigation, Pagination, Autoplay]}
+  spaceBetween={0}
+  slidesPerView={1}
+  loop={heroSlides.length > 1}
+  autoplay={
+    heroSlides.length > 1
+      ? {
+          delay: 5000,
+          disableOnInteraction: false,
+          pauseOnMouseEnter: false,
+        }
+      : false
+  }
+  onSwiper={(swiper) => {
+    heroSwiperRef.current = swiper;
+    console.log(swiper.params.autoplay);
+  }}
+  onSlideChange={(swiper) => {
+    setHeroCurrentSlide(swiper.realIndex);
+  }}
+  className="h-full w-full"
+>
           {heroSlides.map((slide, index) => (
             <SwiperSlide key={index} className="h-full">
               <div className="relative h-full w-full">

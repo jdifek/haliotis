@@ -130,7 +130,6 @@ function PriceRow({ item }: { item: PriceRowItem }) {
           border: "1px solid #d9d9d9",
           borderRadius: "10px",
           padding: "8px 12px",
-          height: "40px",
           background: open ? "#fff8f5" : "#fff",
         }}
         onClick={() => item.description && setOpen((v) => !v)}
@@ -203,7 +202,6 @@ export default function PricesSection() {
 
   const activeCenter = divingCenters.find((c) => c.slug === activeTabId) ?? null;
   const { data: pricesData, loading } = usePrices(activeCenter?.id ?? null, locale);
-console.log(pricesData, 'pricesData');
 
   const tabs = divingCenters.map((c) => ({ id: c.slug, label: c.name, color: c.color }));
 
@@ -304,39 +302,24 @@ console.log(pricesData, 'pricesData');
         </div>
 
         {loading ? (
-          <>
-            {/* Desktop skeleton */}
-            <div className="hidden xl:flex gap-20 items-start">
-              <div className="flex flex-col gap-2" style={{ width: "395px", flexShrink: 0 }}>
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="animate-pulse rounded-[10px] bg-white" style={{ height: "40px", opacity: 1 - i * 0.1 }} />
-                ))}
-              </div>
-              <div style={{ width: "757px", flexShrink: 0 }}>
-                <div className="animate-pulse rounded-[24px] bg-white" style={{ height: "32px", width: "40%", marginBottom: "12px" }} />
-                <div className="flex flex-col gap-2">
-                  {Array.from({ length: 8 }).map((_, i) => (
-                    <div key={i} className="animate-pulse rounded-[10px] bg-white" style={{ height: "40px", opacity: 1 - i * 0.08 }} />
-                  ))}
-                </div>
-              </div>
+          <div className="flex flex-col min-[850px]:flex-row gap-8 min-[850px]:gap-20 justify-center">
+            <div className="flex flex-col gap-2 w-full min-[850px]:w-[395px] min-[850px]:flex-shrink-0">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="animate-pulse rounded-[10px] bg-white" style={{ height: "40px", opacity: 1 - i * 0.1 }} />
+              ))}
             </div>
-
-            {/* Mobile skeleton */}
-            <div className="flex flex-col gap-2 xl:hidden">
-              <div className="animate-pulse rounded-[10px] bg-white h-[42px]" />
-              <div className="animate-pulse rounded-[24px] bg-white h-[28px] w-1/2 mt-2" />
-              <div className="flex flex-col gap-2 mt-1">
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="animate-pulse rounded-[10px] bg-white" style={{ height: "40px", opacity: 1 - i * 0.1 }} />
+            <div className="w-full min-[850px]:flex-1 min-[850px]:min-w-0 min-[850px]:max-w-[757px]">
+              <div className="animate-pulse rounded-[24px] bg-white" style={{ height: "32px", width: "40%", marginBottom: "12px" }} />
+              <div className="flex flex-col gap-2">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <div key={i} className="animate-pulse rounded-[10px] bg-white" style={{ height: "40px", opacity: 1 - i * 0.08 }} />
                 ))}
               </div>
             </div>
-          </>
+          </div>
         ) : (
-          <div className="relative z-10">
-            {/* Mobile: stacked */}
-            <div className="flex flex-col gap-4 xl:hidden">
+          <div className="relative z-10 flex flex-col min-[850px]:flex-row gap-8 min-[850px]:gap-20 justify-center">
+            <div className="w-full min-[850px]:w-[395px] min-[850px]:flex-shrink-0">
               <FilterList
                 options={filterOptions}
                 selected={selectedCategoryId ?? ""}
@@ -344,7 +327,25 @@ console.log(pricesData, 'pricesData');
                 maxWidth="395px"
                 activeTabId={activeTabId ?? ""}
               />
-              <div style={{ background: "#fff", borderRadius: "24px", padding: "10px 15px" }}>
+            </div>
+            <div className="relative w-full min-[850px]:flex-1 min-[850px]:min-w-0 min-[850px]:max-w-[757px]">
+              {fish && (
+                <div
+                  className="hidden min-[850px]:block absolute pointer-events-none select-none"
+                  style={{ zIndex: 0, right: "-285px", top: "-20px", opacity: 0.6 }}
+                >
+                  {fish}
+                </div>
+              )}
+              <div
+                style={{
+                  background: "#fff",
+                  borderRadius: "24px",
+                  padding: "10px 15px",
+                  position: "relative",
+                  zIndex: 1,
+                }}
+              >
                 <h2
                   className="mb-3"
                   style={{ fontFamily: "var(--font-family)", fontWeight: 500, fontSize: "24px", lineHeight: "140%", color: "#111" }}
@@ -358,62 +359,18 @@ console.log(pricesData, 'pricesData');
                 </div>
               </div>
             </div>
-
-            {/* Desktop: side by side */}
-            <div className="hidden xl:flex justify-center w-full">
-              <div className="flex gap-20 items-start">
-                <div className="w-[395px] flex-shrink-0">
-                  <FilterList
-                    options={filterOptions}
-                    selected={selectedCategoryId ?? ""}
-                    onSelect={setSelectedCategoryId}
-                    maxWidth="395px"
-                    activeTabId={activeTabId ?? ""}
-                  />
-                </div>
-                <div className="relative xl:w-[757px] flex-shrink-0">
-                  {fish && (
-                    <div
-                      className="hidden xl:block absolute pointer-events-none select-none"
-                      style={{ zIndex: 0, right: "-285px", top: "-20px", opacity: 0.6 }}
-                    >
-                      {fish}
-                    </div>
-                  )}
-                  <div
-                    style={{
-                      background: "#fff",
-                      borderRadius: "24px",
-                      padding: "10px 15px",
-                      position: "relative",
-                      zIndex: 1,
-                    }}
-                  >
-                    <h2
-                      className="mb-3"
-                      style={{ fontFamily: "var(--font-family)", fontWeight: 500, fontSize: "24px", lineHeight: "140%", color: "#111" }}
-                    >
-                      {activeCategoryName}
-                    </h2>
-                    <div className="flex flex-col gap-2">
-                      {activeServices.map((s) => (
-                        <PriceRow key={s.id} item={{ name: s.name, description: s.description, price: `€ ${s.price}` }} />
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         )}
       </section>
 
       {/* ── Specialized Maintenance Services ── */}
       <SpecializedMaintenanceSection
-  pricesData={pricesData}
-  activeTabId={activeTabId ?? ""}
-  excludeTypeId={defaultType?.id}
-/>      {/* ── Fills ── */}
+        pricesData={pricesData}
+        activeTabId={activeTabId ?? ""}
+        excludeTypeId={defaultType?.id}
+      />
+
+      {/* ── Fills ── */}
       <FillsSection pricesData={pricesData} />
     </>
   );
@@ -454,10 +411,9 @@ function SpecializedMaintenanceSection({
 
   return (
     <section className="bg-[#eaeaea] px-4 pb-12 pt-8 md:px-[30px] xl:px-[188px] md:pb-[50px] md:pt-[46px]">
-      {/* Title + description — same centering as desktop columns */}
-      <div className="mb-6 xl:mb-8">
-        {/* Mobile: plain */}
-        <div className="xl:hidden">
+      {/* Title + description — same centering as the columns below */}
+      <div className="mb-6 min-[850px]:mb-8 flex justify-center">
+        <div className="w-full max-w-[calc(395px+80px+757px)]">
           <h2 style={{ fontFamily: "var(--font-family)", fontWeight: 500, fontSize: "clamp(28px, 3vw, 42px)", lineHeight: "130%", color: "#000", marginBottom: "12px" }}>
             {pricesData?.page.specialized_maintenance.title ?? "Specialized Maintenance Services"}
           </h2>
@@ -465,46 +421,11 @@ function SpecializedMaintenanceSection({
             {pricesData?.page.specialized_maintenance.description}
           </p>
         </div>
-        {/* Desktop: mirrors the flex justify-center layout of the columns below */}
-        <div className="hidden xl:flex gap-20 justify-center">
-          <div className="w-[calc(395px+80px+757px)] flex-shrink-0">
-            <h2 style={{ fontFamily: "var(--font-family)", fontWeight: 500, fontSize: "clamp(28px, 3vw, 42px)", lineHeight: "130%", color: "#000", marginBottom: "12px" }}>
-              {pricesData?.page.specialized_maintenance.title ?? "Specialized Maintenance Services"}
-            </h2>
-            <p style={{ fontFamily: "var(--font-family)", fontWeight: 400, fontSize: "15px", lineHeight: "160%", color: "#101010", opacity: 0.8 }}>
-              {pricesData?.page.specialized_maintenance.description}
-            </p>
-          </div>
-        </div>
       </div>
 
-      {/* Mobile */}
-      <div className="flex flex-col gap-4 xl:hidden">
-        <FilterList
-          options={maintenanceFilterOptions}
-          maxWidth="395px"
-          selected={selectedCategoryId ?? ""}
-          onSelect={setSelectedCategoryId}
-          activeTabId={activeTabId}
-        />
-        <div style={{ background: "#fff", borderRadius: "24px", padding: "10px 15px" }}>
-          <h3
-            className="mb-3"
-            style={{ fontFamily: "var(--font-family)", fontWeight: 500, fontSize: "20px", lineHeight: "140%", color: "#111" }}
-          >
-            {activeCategoryName}
-          </h3>
-          <div className="flex flex-col gap-2">
-            {activeServices.map((s) => (
-              <PriceRow key={s.id} item={{ name: s.name, description: s.description, price: `€ ${s.price}` }} />
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Desktop */}
-      <div className="hidden xl:flex gap-20 items-start justify-center">
-        <div className="w-[395px] flex-shrink-0">
+      {/* Single fluid layout — no separate mobile/desktop branches */}
+      <div className="flex flex-col min-[850px]:flex-row gap-8 min-[850px]:gap-20 items-start justify-center">
+        <div className="w-full min-[850px]:w-[395px] min-[850px]:flex-shrink-0">
           <FilterList
             options={maintenanceFilterOptions}
             selected={selectedCategoryId ?? ""}
@@ -519,7 +440,7 @@ function SpecializedMaintenanceSection({
             borderRadius: "24px",
             padding: "10px 15px",
           }}
-          className="xl:w-[757px] flex-shrink-0"
+          className="w-full min-[850px]:flex-1 min-[850px]:min-w-0 min-[850px]:max-w-[757px]"
         >
           <h3
             className="mb-3"
@@ -571,7 +492,7 @@ function FillsSection({ pricesData }: { pricesData: PricesData | null }) {
   return (
     <section className="bg-white px-4 pb-12 pt-8 md:px-[30px] xl:px-[188px] md:pb-[50px] md:pt-[46px]">
       <div className="flex flex-col xl:flex-row gap-8 xl:gap-20 items-start justify-center">
-  <div className="w-full xl:w-[395px] xl:flex-shrink-0">
+        <div className="w-full xl:w-[395px] xl:flex-shrink-0">
           <h2
             style={{
               fontFamily: "var(--font-family)",
@@ -650,26 +571,26 @@ function FillsSection({ pricesData }: { pricesData: PricesData | null }) {
                       {field.name}
                     </span>
                     <input
-  type="number"
-  min="0"
-  step="0.01"
-  value={fieldValues[field.id] === undefined || fieldValues[field.id] === null ? "" : fieldValues[field.id]}
-  onChange={(e) => {
-    const val = e.target.value;
-    if (val === "") {
-      updateField(field.id, "");
-    } else if (parseFloat(val) >= 0) {
-      updateField(field.id, val);
-    }
-  }}
-  onBlur={(e) => {
-    if (e.target.value === "") {
-      updateField(field.id, "");
-    }
-  }}
-  placeholder="0"
-  style={{ width: "100px", height: "24px", textAlign: "right", fontFamily: "var(--font-family)", fontSize: "15px", color: "#111", background: "transparent", outline: "none", border: "none" }}
-/>
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={fieldValues[field.id] === undefined || fieldValues[field.id] === null ? "" : fieldValues[field.id]}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (val === "") {
+                          updateField(field.id, "");
+                        } else if (parseFloat(val) >= 0) {
+                          updateField(field.id, val);
+                        }
+                      }}
+                      onBlur={(e) => {
+                        if (e.target.value === "") {
+                          updateField(field.id, "");
+                        }
+                      }}
+                      placeholder="0"
+                      style={{ width: "100px", height: "24px", textAlign: "right", fontFamily: "var(--font-family)", fontSize: "15px", color: "#111", background: "transparent", outline: "none", border: "none" }}
+                    />
                   </div>
                 ))}
               </div>
@@ -722,36 +643,36 @@ function FillsSection({ pricesData }: { pricesData: PricesData | null }) {
       {/* Partners */}
       <div className="mt-10">
         <div className="rounded-[30px] p-4 md:p-8">
-         <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-4">
-  {[
-    "cressi-71",
-    "dan-79",
-    "lightmotion-66",
-    "mares-15",
-    "oms-28",
-    "padi-44",
-    "x",
-    "poseidon-08",
-    "razor-logo-22",
-    "retra-98",
-    "scubapro-06",
-    "shearwater-59",
-    "sitech-34",
-    "tusa-86",
-  ].map((name) => (
-    <div
-      key={name}
-      className="flex items-center justify-center flex-shrink-0"
-    >
-      <img
-        src={`/${name}.png`}
-        alt={name.replace(/-/g, " ")}
-        className="h-6 object-contain md:h-8"
-        loading="lazy"
-      />
-    </div>
-  ))}
-</div>
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-4">
+            {[
+              "cressi-71",
+              "dan-79",
+              "lightmotion-66",
+              "mares-15",
+              "oms-28",
+              "padi-44",
+              "x",
+              "poseidon-08",
+              "razor-logo-22",
+              "retra-98",
+              "scubapro-06",
+              "shearwater-59",
+              "sitech-34",
+              "tusa-86",
+            ].map((name) => (
+              <div
+                key={name}
+                className="flex items-center justify-center flex-shrink-0"
+              >
+                <img
+                  src={`/${name}.png`}
+                  alt={name.replace(/-/g, " ")}
+                  className="h-6 object-contain md:h-8"
+                  loading="lazy"
+                />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

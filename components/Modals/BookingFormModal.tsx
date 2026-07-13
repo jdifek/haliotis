@@ -375,11 +375,19 @@ const CustomDropdown = ({
 
       {isOpen && (
         <Portal>
-          <div
-            ref={dropdownRef}
-            style={{ position: "fixed", top: pos.top, left: pos.left, width: pos.width, zIndex: PORTAL_Z }}
-            className="bg-white border border-[#d9d9d9] rounded-[10px] shadow-xl max-h-48 overflow-y-auto"
-          >
+         <div
+  ref={dropdownRef}
+  style={{
+    position: "fixed",
+    top: pos.top,
+    left: pos.left,
+    minWidth: pos.width,
+    width: "max-content",
+    maxWidth: 260,
+    zIndex: PORTAL_Z,
+  }}
+  className="bg-white border border-[#d9d9d9] rounded-[10px] shadow-xl max-h-48 overflow-y-auto"
+>
             {options.map((option) => (
               <button
                 type="button"
@@ -432,18 +440,18 @@ const MeasurementField = ({
         />
       </div>
       {units.length > 1 ? (
-        <div className="w-[86px] flex-shrink-0">
-          <CustomDropdown
-            label="Unit"
-            value={unitValue}
-            onChange={(title) => {
-              const u = units.find((x) => x.title === title);
-              onChange({ ...value, unitId: u ? u.id : value.unitId });
-            }}
-            options={units.map((u) => u.title)}
-          />
-        </div>
-      ) : units.length === 1 ? (
+  <div className="w-[86px] flex-shrink-0">
+    <CustomDropdown
+      label="Unit"
+      value={unitValue}
+      onChange={(title) => {
+        const u = units.find((x) => x.title === title);
+        onChange({ ...value, unitId: u ? u.id : value.unitId });
+      }}
+      options={units.map((u) => u.title)}
+    />
+  </div>
+) : units.length === 1 ? (
         <div className="flex items-center px-2 text-[13px] text-[#999] border border-[#d9d9d9] rounded-[10px] bg-white whitespace-nowrap flex-shrink-0">
           {units[0].title}
         </div>
@@ -1165,14 +1173,14 @@ export const BookingFormModal: React.FC<Props> = ({
           // просто уберите "/ 100" ниже.
           const rawAmount = apiItem.price?.amount;
           setPricePerPerson(
-            typeof rawAmount === "number" ? rawAmount / 100 : fallbackPrice
+            typeof rawAmount === "number" ? rawAmount : fallbackPrice
           );
 
           const template: EquipmentItem[] = (apiItem.equipment_rent || []).map((e: any) => ({
             id: e.id,
             name: e.name,
             image: e.image || null,
-            price: typeof e.price?.amount === "number" ? e.price.amount / 100 : parseFloat(e.price ?? 0),
+            price: typeof e.price?.amount === "number" ? e.price.amount : parseFloat(e.price ?? 0),
             currency: e.price?.currency || apiItem.price?.currency || "€",
             isSelected: false,
           }));

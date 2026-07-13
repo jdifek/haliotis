@@ -293,12 +293,20 @@ const CustomDropdown = ({ label, value, onChange, options, unit, icon }) => {
       </button>
       {isOpen && (
         <Portal>
-          <div
-                ref={dropdownRef}  // ← додай це
+         <div
+      ref={dropdownRef}  // ← додай це
 
-            style={{ position: "absolute", top: pos.top, left: pos.left, width: pos.width, zIndex: 99999 }}
-            className="bg-white border border-[#d9d9d9] rounded-[10px] shadow-xl max-h-48 overflow-y-auto"
-          >
+  style={{
+    position: "absolute",
+    top: pos.top,
+    left: pos.left,
+    minWidth: pos.width,
+    width: "max-content",
+    maxWidth: 260,
+    zIndex: 99999,
+  }}
+  className="bg-white border border-[#d9d9d9] rounded-[10px] shadow-xl max-h-48 overflow-y-auto"
+>
             {options.map((option) => {
               const optKey = typeof option === "object" ? option.id : option;
               const optLabel = typeof option === "object" ? (option.title || option.name) : option;
@@ -646,16 +654,17 @@ const MeasurementField = ({ label, value, onChange, options, units }) => {
           options={options}
         />
       </div>
-      {units && units.length > 1 && (
-        <div className="w-20">
-          <CustomDropdown
-            label="Unit"
-            value={unitValue || ""}
-            onChange={(v) => onChange({ ...value, unitId: v.id })}
-            options={units}
-          />
-        </div>
-      )}
+{units && units.length > 1 && (
+  <div className="w-20">
+
+    <CustomDropdown
+      label="Unit"
+      value={unitValue || ""}
+      onChange={(v) => onChange({ ...value, unitId: v.id })}
+      options={units}
+    />
+  </div>
+)}
       {units && units.length === 1 && (
         <div className="flex items-center px-2 text-[13px] text-[#999] border border-[#d9d9d9] rounded-[10px] bg-white whitespace-nowrap flex-shrink-0">
           {units[0].title}
@@ -1286,6 +1295,12 @@ console.log(apiItems, 'apiItems');
       const payload = buildBookingPayload(activities, sharedParticipants, comment);
       await submitBooking(payload);
       setSubmitSuccess(true);
+      setActivities([]);
+      setSharedParticipants([createSharedParticipant(1)]);
+      setParticipantCount(1);
+      setPrivacy(false);
+      setTerms(false);
+      setComment("");
     } catch (err) {
       setSubmitError(err.message);
     } finally {
