@@ -109,6 +109,7 @@ const router = useRouter()
                 <ArticleCard
                   bgTextBlock={"!bg-[#F1F1F1]"}
                   image={card.image}
+                  id={+card.id}
                   price={card.price}
                   title={card.title}
                   description={card.description}

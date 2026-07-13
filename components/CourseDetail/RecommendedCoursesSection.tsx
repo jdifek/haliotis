@@ -131,6 +131,7 @@ export const RecommendedCoursesSection: React.FC<Props> = ({
               <SwiperSlide key={index}>
                 <CourseCard
                   slug={card.slug}
+                  id={card.id}
                   centerSlug={card.location}
                   image={card.image}
                   title={card.title}

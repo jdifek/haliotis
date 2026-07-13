@@ -216,6 +216,7 @@ console.log(divingData, 'divingData');
         image: trip.image_url || "",
         price: Number(trip.price?.amount || 0),
         title: trip.name,
+        id: trip.id,
         description: trip.description || "",
         link: "#",
         details: trip.description || "",
@@ -404,6 +405,7 @@ if (slug) {
                           borderColor={activeColor}
                           bgTextBlock="!bg-[#ffffff]"
                           image={card.image}
+                          id={card.id}
                           price={card.price}
                           title={card.title}
                           description={card.description}

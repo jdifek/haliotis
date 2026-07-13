@@ -19,6 +19,7 @@ type RecommendedCourse = {
   title: string;
   currency: string;
   price: number;
+  id: number;
   duration: string;
   requestBased: boolean;
   badge: string;

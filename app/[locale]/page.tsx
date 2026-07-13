@@ -55,7 +55,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const homepageData = await getHomepageData(locale);
 
   return {
-    title: homepageData?.title || "Haliotis Diving Center",
+    title: homepageData?.title || "r",
     description:
       homepageData?.seo?.meta_description ||
       "Professional diving courses and equipment for all skill levels",
@@ -92,9 +92,10 @@ console.log(homepageData, 'homepageData');
     homepageData.sliders?.courses?.diving_centers || []
   ).flatMap((center: any) =>
     (center.courses || []).map((course: any) => ({
-      image: course.image_url || "/Rectangle 8.png",
+      image: course.image_url || "",
       title: course.name,
       slug: course.slug,
+      id: course.id,
       centerSlug: center.slug,
       currency: course.price?.currency || "€",
       price: course.price?.amount || 0,
@@ -112,7 +113,7 @@ console.log(homepageData, 'homepageData');
   ).map((center: any) => ({
     image: center.icon_url,
     title: center.name,
-    imageFull: center.image_url || "/image 6.png",
+    imageFull: center.image_url || "",
     slug: center.slug,
     description: center.small_description || "",
     buttonColor: center.color || "#f49519",
@@ -122,7 +123,8 @@ console.log(homepageData, 'homepageData');
   const tripCards = (homepageData.sliders?.dive_trip?.entities || []).flatMap(
     (center: any) =>
       (center.dive_trips || []).map((trip: any) => ({
-        image: trip.image_url || "/image 6.png",
+        image: trip.image_url || "",
+        id: trip.id ,
         price: parseFloat(trip.price?.amount || 0),
         title: trip.name,
         description: trip.description || center.small_description || "",
@@ -131,13 +133,13 @@ console.log(homepageData, 'homepageData');
         details: trip.description
           ? `<p>${trip.description}</p>`
           : `<p>${center.small_description || ""}</p>`,
-        equipmentPrice: "€ 30.00",
+        equipmentPrice: "",
       }))
   );
 
   const diveTripsCards = (homepageData.sliders?.travels?.entities || []).map(
     (center: any, index: number) => ({
-      image: center.image || "/CTABackgroundImage.png",
+      image: center.image || "",
       location: center.name,
       slug: center.slug,
       currency: center.price?.currency,
@@ -155,16 +157,16 @@ console.log(homepageData, 'homepageData');
         slide && (slide.desktop_image_url || slide.mobile_image_url)
     )
     .map((slide: any) => ({
-      title: slide.title || "Find the Experience",
-      description: slide.description || "The Haliotis Diving Center...",
+      title: slide.title || "",
+      description: slide.description || "",
       desktopImage:
         slide.desktop_image_url && slide.desktop_image_url.trim() !== ""
           ? slide.desktop_image_url
-          : "/bg.png",
+          : "",
       mobileImage:
         slide.mobile_image_url && slide.mobile_image_url.trim() !== ""
           ? slide.mobile_image_url
-          : "/bg.png",
+          : "",
     }));
 
   console.log(heroSlides, "heroSlides");
@@ -185,16 +187,14 @@ console.log(homepageData, 'homepageData');
       title: slide.title || "",
       button_name: slide.button_name || "",
       description: slide.description || "",
-      image: slide.image_url || "/travel.png",
-      tag: slide.button_name || "Explore",
+      image: slide.image_url || "",
+      tag: slide.button_name || "",
       href: slide.button_url || "/",
     }));
 
-  const exploreSectionTitle = promoSlider?.title || "Dive. Learn. Explore.";
+  const exploreSectionTitle = promoSlider?.title ;
   const exploreSectionSubtitle =
-    promoSlider?.subtitle ||
-    "Courses, dive trips, and travel experiences — find the adventure that's right for you.";
-
+    promoSlider?.subtitle 
   return (
     <main className="-mt-[97px]">
       <HeroSection heroSlides={heroSlides} />

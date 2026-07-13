@@ -109,7 +109,7 @@ export const SimpleCoursesSection: React.FC<Props> = ({
             {courseCards.map((card, index) => (
               <SwiperSlide key={index}>
                 <CourseCard
-                  id={card.id}
+                  id={+card.id}
                   centerSlug={card.center_slug}
                   categorySlug={card.categorySlug}
                   slug={card.slug}

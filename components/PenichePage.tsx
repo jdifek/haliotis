@@ -39,7 +39,8 @@ export default function PenichePage({ center, tabs }: Props) {
   })) ?? [];
   const tripCards =
   center?.sliders?.dive_trip?.entities?.map((trip: any) => ({
-    image: trip.image_url || "/placeholder.png",
+    image: trip.image_url || "",
+    id: trip.id,
     currency: trip.price.currency,
     price:
       typeof trip.price === "object"
@@ -49,8 +50,9 @@ export default function PenichePage({ center, tabs }: Props) {
     description: trip.subtitle || "",
     link: `/diving/${trip.slug}`, // если нет ссылки в API
     location: center.slug,
-    details: trip.description || "",
-    equipmentPrice: "", // пока нет в API
+    details: trip.description
+          ? `<p>${trip.description}</p>`
+          : `<p>${center.small_description || ""}</p>`,    equipmentPrice: "", // пока нет в API
   })) ?? [];
   return (
     <div className="min-h-screen bg-white">

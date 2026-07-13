@@ -239,6 +239,7 @@ const router = useRouter()
                   >
                     <ArticleCard
                       image={card.image}
+                      id={card.id}
                       price={card.price}
                       title={card.title}
                       description={card.description}

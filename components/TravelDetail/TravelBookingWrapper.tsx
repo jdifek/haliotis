@@ -69,6 +69,8 @@ export function TravelBookingWrapper({ travelId, pricePerPerson, currency, ...he
         addedToCart={addedToCart}
       />
       <BookingFormModal
+      itemId={+travelId}
+      itemType='travels'
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         courseTitle={heroProps.title}

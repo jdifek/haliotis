@@ -249,6 +249,8 @@ export const CoursesSection: React.FC<Props> = ({
               {filteredCourses.map((card, index) => (
                 <SwiperSlide key={index}>
                   <CourseCard
+                                      id={+card.id}
+
                     centerSlug={card.location}
                     image={card.image}
                     slug={card.slug}

@@ -5,6 +5,7 @@ import { BookingFormModal } from "./Modals/BookingFormModal";
 import { createPortal } from "react-dom";
 import { useMenu } from "@/app/hooks/useMenu";
 import { useLocale } from "next-intl";
+import { AddToCartButton } from "./buttons/AddToCartButton";
 
 export const ModalPortal = ({ children }: { children: React.ReactNode }) => {
   if (typeof window === "undefined") return null;
@@ -12,6 +13,7 @@ export const ModalPortal = ({ children }: { children: React.ReactNode }) => {
   return createPortal(children, document.body);
 };
 type ArticleCardProps = {
+  id: number | string; // ← новое: нужно для корзины и модалки бронирования
   image: string;
   price: number;
   title: string;
@@ -26,8 +28,10 @@ type ArticleCardProps = {
   bgTextBlock?: string;
   duration?: string;
   borderColor?: string;
+  currency?: string; // ← новое: для корзины
 };
 export const ArticleCard: React.FC<ArticleCardProps> = ({
+  id,
   image,
   price,
   title,
@@ -42,11 +46,11 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
   equipmentPrice,
   duration,
   borderColor = "#f49519",
+  currency = "€",
 }) => {
   const locale = useLocale()
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const menu = useMenu(locale)
-console.log(JSON.stringify(menu.terms, null, 2), 'menu');
 
   return (
     <div className="relative">
@@ -59,7 +63,7 @@ console.log(JSON.stringify(menu.terms, null, 2), 'menu');
       >
         {/* Image */}
         <div
-          className={`h-[300px] w-full overflow-hidden rounded-3xl transition-all duration-300 box-border ${
+          className={`relative h-[300px] w-full overflow-hidden rounded-3xl transition-all duration-300 box-border ${
             isExpanded ? `border-[8px]  ` : ""
           }`}
           style={{ borderColor: borderColor }}
@@ -71,6 +75,18 @@ console.log(JSON.stringify(menu.terms, null, 2), 'menu');
             height="300"
             className="h-full w-full object-cover"
           />
+
+          {/* Кнопка "В корзину" — справа сверху */}
+          <div className="absolute right-3 top-3 z-10">
+            <AddToCartButton
+              itemType="trip"
+              id={id}
+              title={title}
+              price={price}
+              currency={currency}
+              image={image}
+            />
+          </div>
         </div>
         <div
           onClick={onToggleExpand}
@@ -138,7 +154,6 @@ console.log(JSON.stringify(menu.terms, null, 2), 'menu');
           {isExpanded && (
             <div className="lg:hidden mt-4 space-y-3">
               {/* Details */}
-            {/* Details */}
 {details && (
   <div
     className="text-[13px] leading-[160%] text-[#101010]"
@@ -250,6 +265,8 @@ console.log(JSON.stringify(menu.terms, null, 2), 'menu');
   <BookingFormModal
     isOpen={isBookingOpen}
     onClose={() => setIsBookingOpen(false)}
+    itemType="trip"
+    itemId={id}
     courseTitle={title}
     pricePerPerson={price}
   />

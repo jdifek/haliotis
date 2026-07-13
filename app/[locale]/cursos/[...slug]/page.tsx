@@ -337,7 +337,8 @@ console.log(recommendedEquipment, 'recommendedEquipment')
 
   
   const recommendedCourseCards = recommended.courses.map((course) => ({
-    image: course.image_url || "/Rectangle 8.png",
+    image: course.image_url ,
+    id: +course.id,
     title: course.name,
     price: course.price?.amount || 0,
     currency: course.price?.currency || 0,
