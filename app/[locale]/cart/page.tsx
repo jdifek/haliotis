@@ -1,7 +1,19 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useMenu } from "@/app/hooks/useMenu";
+import { useState, useRef, useEffect, createContext, useContext } from "react";
 import { createPortal } from "react-dom";
+
+// ─── Translations ─────────────────────────────────────────────────────────────
+// terms приходят из useMenu() (эндпоинт /configs/menus?lang=...), кладём в контекст,
+// чтобы не прокидывать t() через каждый уровень пропсов вручную для глубоко вложенных
+// компонентов (MiniCalendar рендерится в портале).
+
+const TranslationsContext = createContext({});
+const useT = () => {
+  const terms = useContext(TranslationsContext);
+  return (key, fallback) => terms?.[key] || fallback;
+};
 
 // ─── API ──────────────────────────────────────────────────────────────────────
 
@@ -115,15 +127,14 @@ const mapResolvedItem = (apiItem, storageItem, participantIds) => {
   participantIds.forEach((pid) => {
     byParticipant[pid] = createActivityParticipantData(equipmentTemplate);
   });
-  console.log(storageItem, ' storageItem?.location');
-  
+
   return {
     id: apiItem.id,
     apiType: apiItem.type, // "course" | "trip" | "travels"
     type: apiItem.type.toUpperCase(),
     title: apiItem.name,
     slug: apiItem.slug,
-    centerSlug:  storageItem?.location || null,
+    centerSlug: storageItem?.location || null,
     image: apiItem.image || null,
     subtitle: getActivitySubtitle(apiItem, storageItem),
     price: parseFloat(apiItem.price?.amount ?? apiItem.price ?? 0),
@@ -131,10 +142,13 @@ const mapResolvedItem = (apiItem, storageItem, participantIds) => {
     available: apiItem.available !== false,
     unavailableReason: apiItem.unavailable_reason || null,
     equipmentTemplate,
+    // Сертификация нужна для любой активности (курс, трип, тревел), где это
+    // приходит с бэка — либо явным флагом, либо через оборудование,
+    // которое требует сертификации.
     requiresCert:
       !!apiItem.requires_certification ||
       equipmentTemplate.some((e) => e.requiresCertification),
-    byParticipant, // { [participantId]: { equipment, certAgency, certLevel, totalDives, lastDiveDate } }
+    byParticipant,
   };
 };
 
@@ -240,7 +254,7 @@ const CustomDropdown = ({ label, value, onChange, options, unit, icon }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [pos, setPos] = useState({ top: 0, left: 0, width: 0 });
   const triggerRef = useRef(null);
-  const dropdownRef = useRef(null); // ← додай ref для портала
+  const dropdownRef = useRef(null);
 
   const open = () => {
     if (triggerRef.current) {
@@ -254,7 +268,7 @@ const CustomDropdown = ({ label, value, onChange, options, unit, icon }) => {
     const handler = (e) => {
       if (
         triggerRef.current && !triggerRef.current.contains(e.target) &&
-        dropdownRef.current && !dropdownRef.current.contains(e.target) // ← додай це
+        dropdownRef.current && !dropdownRef.current.contains(e.target)
       ) {
         setIsOpen(false);
       }
@@ -294,8 +308,7 @@ const CustomDropdown = ({ label, value, onChange, options, unit, icon }) => {
       {isOpen && (
         <Portal>
          <div
-      ref={dropdownRef}  // ← додай це
-
+      ref={dropdownRef}
   style={{
     position: "absolute",
     top: pos.top,
@@ -361,7 +374,8 @@ const PlaceholderInput = ({ placeholder, value, onChange, type = "text", extraBo
 const MONTHS_CAL = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const DAYS_CAL = ["S", "M", "T", "W", "T", "F", "S"];
 
-const MiniCalendar = ({ selected, onSelect, onClose, allowPast = false }) => {
+const MiniCalendar = ({ selected, onSelect, onClose, allowPast = false, yearRange, showUnavailableLegend }) => {
+  const t = useT();
   const today = new Date();
   const [viewYear, setViewYear] = useState(selected ? new Date(selected).getFullYear() : today.getFullYear());
   const [viewMonth, setViewMonth] = useState(selected ? new Date(selected).getMonth() : today.getMonth());
@@ -404,6 +418,19 @@ const MiniCalendar = ({ selected, onSelect, onClose, allowPast = false }) => {
   for (let i = 0; i < startDay; i++) cells.push(null);
   for (let d = 1; d <= daysInMonth; d++) cells.push(d);
 
+  // Year picker — по умолчанию: для allowPast (например Date of Birth) даём 100 лет назад,
+  // для будущих дат (allowPast=false) — текущий год + 5 лет вперёд.
+  const defaultMin = allowPast ? today.getFullYear() - 100 : today.getFullYear();
+  const defaultMax = allowPast ? today.getFullYear() : today.getFullYear() + 5;
+  const minYear = yearRange?.min ?? defaultMin;
+  const maxYear = yearRange?.max ?? defaultMax;
+  const years = [];
+  for (let y = maxYear; y >= minYear; y--) years.push(y);
+
+  // Легенда "Unavailable days" не имеет смысла там, где прошлые даты разрешены
+  // (например Date of Birth) — по умолчанию скрываем её в этом случае.
+  const legendVisible = showUnavailableLegend ?? !allowPast;
+
   return (
     <div className="bg-white rounded-2xl shadow-xl overflow-hidden w-full">
       <div className="flex items-end px-2 pt-3 pb-2 gap-2 overflow-x-auto bg-[#f5f5f5]" style={{ scrollbarWidth: "none" }}>
@@ -421,12 +448,23 @@ const MiniCalendar = ({ selected, onSelect, onClose, allowPast = false }) => {
           );
         })}
       </div>
-      <div className="flex items-center justify-between px-4 py-3">
-        <button onClick={prevMonth} className="w-8 h-8 flex items-center justify-center rounded-full border border-[#e4e4e4] hover:bg-[#f5f5f5] cursor-pointer">
+      <div className="flex items-center justify-between px-4 py-3 gap-2">
+        <button onClick={prevMonth} className="w-8 h-8 flex items-center justify-center rounded-full border border-[#e4e4e4] hover:bg-[#f5f5f5] cursor-pointer flex-shrink-0">
           <ChevronDown className="rotate-90 w-3 h-3 text-[#111]" />
         </button>
-        <span className="text-[15px] font-medium text-[#111]">{MONTHS_CAL[viewMonth]} {viewYear}</span>
-        <button onClick={nextMonth} className="w-8 h-8 flex items-center justify-center rounded-full border border-[#e4e4e4] hover:bg-[#f5f5f5] cursor-pointer">
+        <div className="flex items-center gap-1.5">
+          <span className="text-[15px] font-medium text-[#111]">{MONTHS_CAL[viewMonth]}</span>
+          <select
+            value={viewYear}
+            onChange={(e) => setViewYear(Number(e.target.value))}
+            className="text-[15px] font-medium text-[#111] border border-[#e4e4e4] rounded-lg pl-2 pr-1 py-0.5 outline-none cursor-pointer bg-white"
+          >
+            {years.map((y) => (
+              <option key={y} value={y}>{y}</option>
+            ))}
+          </select>
+        </div>
+        <button onClick={nextMonth} className="w-8 h-8 flex items-center justify-center rounded-full border border-[#e4e4e4] hover:bg-[#f5f5f5] cursor-pointer flex-shrink-0">
           <ChevronDown className="-rotate-90 w-3 h-3 text-[#111]" />
         </button>
       </div>
@@ -461,19 +499,21 @@ const MiniCalendar = ({ selected, onSelect, onClose, allowPast = false }) => {
           );
         })}
       </div>
-      <div className="flex items-center justify-center gap-2 pb-3">
-        <div className="w-3 h-3 rounded-full bg-[#ccc]" />
-        <span className="text-[12px] text-[#999]">Unavailable days</span>
-      </div>
+      {legendVisible && (
+        <div className="flex items-center justify-center gap-2 pb-3">
+          <div className="w-3 h-3 rounded-full bg-[#ccc]" />
+          <span className="text-[12px] text-[#999]">{t("unavailable_days", "Unavailable days")}</span>
+        </div>
+      )}
     </div>
   );
 };
 
-const DatePickerField = ({ value, onChange, placeholder, allowPast = false }) => {
+const DatePickerField = ({ value, onChange, placeholder, allowPast = false, yearRange }) => {
   const [open, setOpen] = useState(false);
   const [pos, setPos] = useState({ top: 0, left: 0, width: 0 });
   const ref = useRef(null);
-  const calendarRef = useRef(null); // ← добавили
+  const calendarRef = useRef(null);
 
   const openPicker = () => {
     if (ref.current) {
@@ -487,7 +527,7 @@ const DatePickerField = ({ value, onChange, placeholder, allowPast = false }) =>
     const handler = (e) => {
       if (
         ref.current && !ref.current.contains(e.target) &&
-        calendarRef.current && !calendarRef.current.contains(e.target) // ← добавили проверку
+        calendarRef.current && !calendarRef.current.contains(e.target)
       ) {
         setOpen(false);
       }
@@ -524,7 +564,7 @@ const DatePickerField = ({ value, onChange, placeholder, allowPast = false }) =>
       {open && (
         <Portal>
           <div
-            ref={calendarRef} // ← добавили
+            ref={calendarRef}
             style={{ position: "absolute", top: pos.top, left: pos.left, width: pos.width, zIndex: 99999 }}
           >
             <MiniCalendar
@@ -532,6 +572,7 @@ const DatePickerField = ({ value, onChange, placeholder, allowPast = false }) =>
               onSelect={(v) => { onChange(v); setOpen(false); }}
               onClose={() => setOpen(false)}
               allowPast={allowPast}
+              yearRange={yearRange}
             />
           </div>
         </Portal>
@@ -566,14 +607,14 @@ const ParticipantsCounter = ({ value, onChange }) => (
 
 // ─── Checkbox ─────────────────────────────────────────────────────────────────
 
-const CheckboxRow = ({ checked, onChange, label }) => (
+const CheckboxRow = ({ checked, onChange, label, t }) => (
   <label className="flex items-start gap-2.5 cursor-pointer">
     <div className={`w-5 h-5 rounded flex-shrink-0 border flex items-center justify-center mt-0.5 transition-colors ${checked ? "border-[#e84814]" : "border-[#d9d9d9]"} bg-white`}>
       <input type="checkbox" className="sr-only" checked={checked} onChange={(e) => onChange(e.target.checked)} />
       {checked && <CheckMark />}
     </div>
     <span className="text-[14px] text-[#111] leading-[140%]">
-      I accept <a href="#" className="text-[#e84814] underline" onClick={(e) => e.preventDefault()}>{label}</a>
+      {t("i_accept", "I accept")} <a href="#" className="text-[#e84814] underline" onClick={(e) => e.preventDefault()}>{label}</a>
     </span>
   </label>
 );
@@ -641,6 +682,7 @@ const EquipmentGrid = ({ equipment, onToggle, onSelectVariation }) => (
 // ─── Measurement Field (value + optional unit) ────────────────────────────────
 
 const MeasurementField = ({ label, value, onChange, options, units }) => {
+  const t = useT();
   const unitValue = value.unitId
   ? units?.find((u) => u.id === value.unitId)
   : units?.[0] || null;
@@ -658,7 +700,7 @@ const MeasurementField = ({ label, value, onChange, options, units }) => {
   <div className="w-20">
 
     <CustomDropdown
-      label="Unit"
+      label={t("unit_label", "Unit")}
       value={unitValue || ""}
       onChange={(v) => onChange({ ...value, unitId: v.id })}
       options={units}
@@ -681,6 +723,7 @@ const MeasurementField = ({ label, value, onChange, options, units }) => {
 
 const ParticipantBlock = ({
   shared,
+  t,
   pNum,
   activityId,
   onChangeShared,
@@ -702,6 +745,10 @@ const ParticipantBlock = ({
   const weightOptions = ["40", "50", "60", "70", "80", "90", "100", "110", "120"];
   const shoeOptions = ["36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46"];
 
+  const genderValue = shared.gender
+    ? { id: shared.gender, title: t(`gender_${shared.gender}`, shared.gender) }
+    : "";
+
   return (
     <div className="border border-[#e4e4e4] rounded-2xl bg-white overflow-hidden">
       {/* Header */}
@@ -713,7 +760,7 @@ const ParticipantBlock = ({
           <div className="w-6 h-6 rounded-full bg-[#e84814] flex items-center justify-center text-white text-[12px] font-bold flex-shrink-0">
             {pNum}
           </div>
-          <span className="text-[14px] font-semibold text-[#111]">Participant {pNum}</span>
+          <span className="text-[14px] font-semibold text-[#111]">{t("participant", "Participant")} {pNum}</span>
         </div>
         <ChevronDown className={`text-[#666] transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`} />
       </button>
@@ -723,39 +770,43 @@ const ParticipantBlock = ({
           {/* Row 1 — shared across all activities */}
           <div className="grid grid-cols-3 gap-2 mt-3">
             <PlaceholderInput
-              placeholder="First Name *"
+              placeholder={t("first_name", "First Name *")}
               value={shared.firstName}
               onChange={(v) => onChangeShared(shared.id, "firstName", v)}
               extraBorder
             />
             <PlaceholderInput
-              placeholder="Last Name *"
+              placeholder={t("last_name", "Last Name *")}
               value={shared.lastName}
               onChange={(v) => onChangeShared(shared.id, "lastName", v)}
             />
             <DatePickerField
               value={shared.dateOfBirth}
               onChange={(v) => onChangeShared(shared.id, "dateOfBirth", v)}
-              placeholder="Date of Birth"
+              placeholder={t("date_of_birth", "Date of Birth")}
               allowPast={true}
             />
           </div>
           {/* Row 2 — shared */}
           <div className="grid grid-cols-3 gap-2">
             <CustomDropdown
-              label="Select Gender *"
-              value={shared.gender}
-              onChange={(v) => onChangeShared(shared.id, "gender", v)}
-              options={["Male", "Female", "Other"]}
+              label={t("select_gender", "Select Gender *")}
+              value={genderValue}
+              onChange={(v) => onChangeShared(shared.id, "gender", v.id)}
+              options={[
+                { id: "male", title: t("gender_male", "Male") },
+                { id: "female", title: t("gender_female", "Female") },
+                { id: "other", title: t("gender_other", "Other") },
+              ]}
             />
             <PlaceholderInput
-              placeholder="Phone Number *"
+              placeholder={t("phone_number", "Phone Number *")}
               value={shared.phone}
               onChange={(v) => onChangeShared(shared.id, "phone", v)}
               type="tel"
             />
             <PlaceholderInput
-              placeholder="E-mail *"
+              placeholder={t("email_label", "E-mail *")}
               value={shared.email}
               onChange={(v) => onChangeShared(shared.id, "email", v)}
               type="email"
@@ -764,21 +815,21 @@ const ParticipantBlock = ({
           {/* Row 3 — measurements with API units (shared) */}
           <div className="grid grid-cols-3 gap-2">
             <MeasurementField
-              label="Height *"
+              label={t("height_label", "Height *")}
               value={shared.height}
               onChange={(v) => onChangeShared(shared.id, "height", v)}
               options={heightOptions}
               units={heightUnits}
             />
             <MeasurementField
-              label="Weight *"
+              label={t("weight_label", "Weight *")}
               value={shared.weight}
               onChange={(v) => onChangeShared(shared.id, "weight", v)}
               options={weightOptions}
               units={weightUnits}
             />
             <MeasurementField
-              label="Shoe Size *"
+              label={t("shoe_size_label", "Shoe Size *")}
               value={shared.shoeSize}
               onChange={(v) => onChangeShared(shared.id, "shoeSize", v)}
               options={shoeOptions}
@@ -787,7 +838,10 @@ const ParticipantBlock = ({
           </div>
 
           <p className="text-[12px] text-[#111] opacity-70 leading-[160%] mt-1">
-            The following equipment will be included in your course: 7mm wetsuit including hood and boots, mask, snorkel, fins, weights, buoyancy compensator, regulator and any other specific equipment necessary unless otherwise noted in the INCLUDED section of the course.
+            {t(
+              "equipment_included_note",
+              "The following equipment will be included in your course: 7mm wetsuit including hood and boots, mask, snorkel, fins, weights, buoyancy compensator, regulator and any other specific equipment necessary unless otherwise noted in the INCLUDED section of the course."
+            )}
           </p>
 
           {/* Equipment — specific to this activity */}
@@ -798,7 +852,7 @@ const ParticipantBlock = ({
                 className="flex items-center justify-between cursor-pointer mt-1"
               >
                 <span className="text-[13px] font-bold text-[#111]">
-                  Additional Equipment for Participant <span className="text-[#e84814]">{pNum}</span>
+                  {t("additional_equipment_for_participant", "Additional Equipment for Participant")} <span className="text-[#e84814]">{pNum}</span>
                 </span>
                 <ChevronDown className={`text-[#666] transition-transform ${equipExpanded ? "rotate-180" : ""}`} />
               </button>
@@ -813,7 +867,7 @@ const ParticipantBlock = ({
             </>
           )}
 
-          {/* Dive Certification — specific to this activity */}
+          {/* Dive Certification — required for all activities except courses (see requiresCert) */}
           {requiresCert && (
             <div className="border border-[#e84814] rounded-2xl p-3 mt-2 bg-[#fff8f6]">
               <div className="flex items-center gap-2 mb-3">
@@ -821,24 +875,24 @@ const ParticipantBlock = ({
                   <circle cx="10" cy="10" r="9" stroke="#E84814" strokeWidth="1.5" />
                   <path d="M10 6v5M10 13.5h.01" stroke="#E84814" strokeWidth="1.5" strokeLinecap="round" />
                 </svg>
-                <span className="text-[13px] font-semibold text-[#e84814]">Dive Certification — required for this activity</span>
+                <span className="text-[13px] font-semibold text-[#e84814]">{t("dive_certification_required_title", "Dive Certification — required for this activity")}</span>
               </div>
               <div className="grid grid-cols-2 gap-2 mb-2">
                 <CustomDropdown
-                  label="Certification Agency *"
+                  label={t("certification_agency", "Certification Agency *")}
                   value={activityData.certAgency || ""}
                   onChange={(v) => onChangeCert(activityId, shared.id, "certAgency", v)}
                   options={["PADI", "SSI", "NAUI", "CMAS", "SDI", "TDI"]}
                 />
                 <PlaceholderInput
-                  placeholder="Certification Level *"
+                  placeholder={t("certification_level", "Certification Level *")}
                   value={activityData.certLevel || ""}
                   onChange={(v) => onChangeCert(activityId, shared.id, "certLevel", v)}
                 />
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <PlaceholderInput
-                  placeholder="Total Dives *"
+                  placeholder={t("total_dives", "Total Dives *")}
                   value={activityData.totalDives || ""}
                   onChange={(v) => onChangeCert(activityId, shared.id, "totalDives", v)}
                   type="number"
@@ -846,7 +900,7 @@ const ParticipantBlock = ({
                 <DatePickerField
                   value={activityData.lastDiveDate || ""}
                   onChange={(v) => onChangeCert(activityId, shared.id, "lastDiveDate", v)}
-                  placeholder="Last Dive Date"
+                  placeholder={t("last_dive_date", "Last Dive Date")}
                   allowPast={true}
                 />
               </div>
@@ -856,7 +910,7 @@ const ParticipantBlock = ({
               >
                 <AlertIcon />
                 <span style={{ fontWeight: 600, fontSize: 15, lineHeight: "160%", color: "#000" }}>
-                  Dive certification is required for this activity
+                  {t("dive_certification_required_alert", "Dive certification is required for this activity")}
                 </span>
               </div>
             </div>
@@ -871,6 +925,7 @@ const ParticipantBlock = ({
 
 const ActivityCard = ({
   activity,
+  t,
   sharedParticipants,
   onRemove,
   onChangeShared,
@@ -899,7 +954,7 @@ const ActivityCard = ({
                   {activity.type}
                 </span>
                 {!activity.available && (
-                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#f5f5f5] text-[#999]">Unavailable</span>
+                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#f5f5f5] text-[#999]">{t("unavailable", "Unavailable")}</span>
                 )}
               </div>
               <h3 className="text-[14px] font-semibold text-[#111] leading-[140%]">{activity.title}</h3>
@@ -919,7 +974,7 @@ const ActivityCard = ({
           </div>
           <div className="flex items-center gap-2 mt-2">
             <span className="text-[20px] font-bold text-[#111]">{activity.currency}{activity.price}</span>
-            <span className="text-[13px] text-[#999]">/ person</span>
+            <span className="text-[13px] text-[#999]">{t("per_person", "/ person")}</span>
           </div>
         </div>
       </div>
@@ -931,6 +986,7 @@ const ActivityCard = ({
         <ParticipantBlock
           key={sp.id}
           shared={sp}
+          t={t}
           pNum={idx + 1}
           activityId={activity.id}
           onChangeShared={onChangeShared}
@@ -950,6 +1006,7 @@ const ActivityCard = ({
 
 const OrderSummary = ({
   activities,
+  t,
   sharedParticipants,
   privacy,
   setPrivacy,
@@ -970,14 +1027,10 @@ const OrderSummary = ({
     return total + courseTotal + equipTotal;
   }, 0);
   const formValid = isFormValid(activities, sharedParticipants);
-  {!formValid && (
-    <p className="text-[12px] text-[#e84814] text-center mt-2">
-      Please fill in all required fields for every participant
-    </p>
-  )}
+
   return (
     <div className="bg-white rounded-2xl border border-[#e4e4e4] p-4 sticky top-4">
-      <h2 className="text-[20px] font-semibold text-[#111] mb-3">Order Summary</h2>
+      <h2 className="text-[20px] font-semibold text-[#111] mb-3">{t("order_summary", "Order Summary")}</h2>
 
       {activities.map((act) => {
         const courseTotal = sharedParticipants.length * act.price;
@@ -994,14 +1047,14 @@ const OrderSummary = ({
             </div>
             <div className="bg-[#f5f5f5] rounded-2xl px-3 py-2 flex flex-col gap-1">
               <div className="flex justify-between text-[13px] text-[#444]">
-                <span>{sharedParticipants.length} Adults × {act.currency} {act.price}</span>
+                <span>{sharedParticipants.length} {t("adults", "Adults")} × {act.currency} {act.price}</span>
                 <span>{act.currency} {courseTotal.toFixed(2)}</span>
               </div>
               {selectedEquipByP.map((p, idx) =>
                 p.items.length > 0 && (
                   <div key={idx}>
                     <p className="text-[12px] font-semibold text-[#111] mt-1 mb-0.5">
-                      Additional Equipment for Participant <span className="text-[#e84814]">{p.name || idx + 1}</span>
+                      {t("additional_equipment_for_participant", "Additional Equipment for Participant")} <span className="text-[#e84814]">{p.name || idx + 1}</span>
                     </p>
                     {p.items.map((item) => (
                       <div key={item.id} className="flex justify-between text-[13px] text-[#444] py-0.5">
@@ -1019,25 +1072,31 @@ const OrderSummary = ({
       })}
 
       <div className="flex justify-between text-[18px] font-bold text-[#111] py-2 mb-4">
-        <span>Total price</span>
+        <span>{t("total_price", "Total price")}</span>
         <span>€ {grandTotal.toLocaleString("en", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
       </div>
 
       {/* Additional Information */}
       <div className="mb-4">
-        <p className="text-[13px] font-medium text-[#111] mb-2">Additional Information</p>
+        <p className="text-[13px] font-medium text-[#111] mb-2">{t("additional_information", "Additional Information")}</p>
         <textarea
           className="w-full h-16 px-3 py-2 rounded-[10px] border border-[#d9d9d9] text-[14px] placeholder:text-[#999] text-black resize-none outline-none focus:border-[#e84814] transition-colors"
-          placeholder="Comment"
+          placeholder={t("comment_placeholder", "Comment")}
           value={comment}
           onChange={(e) => setComment(e.target.value)}
         />
       </div>
 
       <div className="flex flex-col gap-2 mb-4">
-        <CheckboxRow checked={privacy} onChange={setPrivacy} label="Política de privacidade da Haliotis" />
-        <CheckboxRow checked={terms} onChange={setTerms} label="Termos e Condições" />
+        <CheckboxRow checked={privacy} onChange={setPrivacy} t={t} label={t("privacy_policy_label", "Política de privacidade da Haliotis")} />
+        <CheckboxRow checked={terms} onChange={setTerms} t={t} label={t("terms_conditions_label", "Termos e Condições")} />
       </div>
+
+      {!formValid && (
+        <p className="text-[12px] text-[#e84814] text-center mb-2">
+          {t("form_incomplete_note", "Please fill in all required fields for every participant")}
+        </p>
+      )}
 
       {submitError && (
         <div className="mb-3 px-3 py-2 rounded-[10px] bg-[#fff0ed] border border-[#e84814] text-[13px] text-[#e84814]">
@@ -1046,28 +1105,31 @@ const OrderSummary = ({
       )}
       {submitSuccess && (
         <div className="mb-3 px-3 py-2 rounded-[10px] bg-[#f0fff4] border border-[#4caf50] text-[13px] text-[#2e7d32]">
-          Booking submitted successfully!
+          {t("booking_success", "Booking submitted successfully!")}
         </div>
       )}
 
+      {/* FIX: после успешного сабмита кнопка блокируется через submitSuccess —
+          не зависит от того, сбрасывается ли форма/корзина, защищает от дублей заказа. */}
       <button
         onClick={onSubmit}
-        disabled={isSubmitting || !privacy || !terms || !formValid}
+        disabled={isSubmitting || !privacy || !terms || !formValid || submitSuccess}
         className={`w-full py-3 rounded-full text-white text-[15px] font-semibold transition-colors flex items-center justify-center gap-2
-          ${isSubmitting || !privacy || !terms || !formValid ? "bg-[#ccc] cursor-not-allowed" : "bg-[#e84814] hover:bg-[#d63f0f] cursor-pointer"}`}
+          ${isSubmitting || !privacy || !terms || !formValid || submitSuccess ? "bg-[#ccc] cursor-not-allowed" : "bg-[#e84814] hover:bg-[#d63f0f] cursor-pointer"}`}
       >
-        {isSubmitting ? "Sending…" : "Proceed to Payment →"}
+        {isSubmitting ? t("sending", "Sending…") : t("proceed_to_payment", "Proceed to Payment →")}
       </button>
 
       <div className="flex items-center justify-center gap-1.5 mt-2">
         <ShieldIcon />
-        <span className="text-[11px] text-[#999]">Secure checkout · SSL encrypted</span>
+        <span className="text-[11px] text-[#999]">{t("secure_checkout", "Secure checkout · SSL encrypted")}</span>
       </div>
     </div>
   );
 };
 
 // ─── Build booking payload ────────────────────────────────────────────────────
+
 
 const buildBookingPayload = (activities, sharedParticipants, comment) => ({
   comment,
@@ -1083,6 +1145,8 @@ const buildBookingPayload = (activities, sharedParticipants, comment) => ({
         first_name: sp.firstName,
         last_name: sp.lastName,
         date_of_birth: sp.dateOfBirth,
+        // gender хранится внутри как "male"/"female"/"other" (см. ParticipantBlock),
+        // капитализируем на выходе, чтобы не менять контракт с бэком.
         gender: sp.gender,
         phone: sp.phone,
         email: sp.email,
@@ -1113,7 +1177,10 @@ const buildBookingPayload = (activities, sharedParticipants, comment) => ({
 // ─── MAIN CART PAGE ───────────────────────────────────────────────────────────
 
 export default function CartPage() {
-  
+  const locale = "en"; // TODO: подставь реальную текущую локаль проекта
+
+  const { terms: apiTerms } = useMenu(locale);
+
   const [activities, setActivities] = useState([]);
   const [measurements, setMeasurements] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -1160,7 +1227,6 @@ useEffect(() => {
     }
 
     const apiItems = storageItems.map(({ type, id }) => ({ type, id }));
-console.log(apiItems, 'apiItems');
 
     resolveCart(apiItems)
       .then((data) => {
@@ -1308,10 +1374,12 @@ console.log(apiItems, 'apiItems');
     }
   };
 
+  const t = (key, fallback) => apiTerms?.[key] || fallback;
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center">
-        <p className="text-[15px] text-[#999]">Loading your cart…</p>
+        <p className="text-[15px] text-[#999]">{t("loading_cart", "Loading your cart…")}</p>
       </div>
     );
   }
@@ -1319,20 +1387,21 @@ console.log(apiItems, 'apiItems');
   if (loadError) {
     return (
       <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center">
-        <p className="text-[15px] text-[#e84814]">Could not load cart: {loadError}</p>
+        <p className="text-[15px] text-[#e84814]">{t("load_cart_error", "Could not load cart:")} {loadError}</p>
       </div>
     );
   }
 
   return (
+    <TranslationsContext.Provider value={apiTerms}>
     <div className="min-h-screen bg-[#f5f5f5]" style={{ fontFamily: "Inter, sans-serif" }}>
       <div className="max-w-[1200px] mx-auto px-4 py-8">
-        <h1 className="text-[32px] font-bold text-[#111] mb-1">Your Cart</h1>
+        <h1 className="text-[32px] font-bold text-[#111] mb-1">{t("your_cart", "Your Cart")}</h1>
         <p className="text-[14px] text-[#111] mb-4">
-          Review your selections and complete booking details for each participant.
+          {t("cart_subtitle", "Review your selections and complete booking details for each participant.")}
         </p>
         <p className="text-[13px] text-[#666] mb-6">
-          {activities.length} activities · {participantCount} participants
+          {activities.length} {t("activities", "activities")} · {participantCount} {t("participants", "participants")}
         </p>
 
         <div className="flex flex-col lg:flex-row gap-6 items-start">
@@ -1344,25 +1413,26 @@ console.log(apiItems, 'apiItems');
               <div className="flex items-center gap-2">
                 <PersonIcon />
                 <span className="text-[15px] font-semibold text-[#111]">
-                  Participants <span className="text-[#e84814]">*</span>
+                  {t("participants_label", "Participants")} <span className="text-[#e84814]">*</span>
                 </span>
               </div>
               <ParticipantsCounter value={participantCount} onChange={handleCountChange} />
               <span className="text-[13px] text-[#999] ml-2">
-                Personal details are shared across all activities below
+                {t("shared_details_note", "Personal details are shared across all activities below")}
               </span>
             </div>
 
             {activities.length === 0 ? (
               <div className="bg-white rounded-2xl border border-[#e4e4e4] p-12 text-center">
-                <p className="text-[18px] font-medium text-[#999]">Your cart is empty</p>
-                <p className="text-[14px] text-[#bbb] mt-2">Add some activities to get started</p>
+                <p className="text-[18px] font-medium text-[#999]">{t("empty_cart_title", "Your cart is empty")}</p>
+                <p className="text-[14px] text-[#bbb] mt-2">{t("empty_cart_subtitle", "Add some activities to get started")}</p>
               </div>
             ) : (
               activities.map((act) => (
                 <ActivityCard
                   key={act.id}
                   activity={act}
+                  t={t}
                   sharedParticipants={sharedParticipants}
                   onRemove={removeActivity}
                   onChangeShared={updateShared}
@@ -1379,6 +1449,7 @@ console.log(apiItems, 'apiItems');
           <div className="w-full lg:w-[360px] flex-shrink-0">
             <OrderSummary
               activities={activities}
+              t={t}
               sharedParticipants={sharedParticipants}
               privacy={privacy}
               setPrivacy={setPrivacy}
@@ -1395,5 +1466,6 @@ console.log(apiItems, 'apiItems');
         </div>
       </div>
     </div>
+    </TranslationsContext.Provider>
   );
 }
