@@ -966,11 +966,11 @@ const ActivityCard = ({
               )}
             </div>
             <button
-              onClick={() => onRemove(activity.id)}
-              className="w-8 h-8 flex items-center justify-center rounded-lg border border-[#e4e4e4] hover:bg-[#f5f5f5] cursor-pointer flex-shrink-0 transition-colors"
-            >
-              <XIcon />
-            </button>
+  onClick={() => onRemove(activity.apiType, activity.id)}
+  className="w-8 h-8 flex items-center justify-center rounded-lg border border-[#e4e4e4] hover:bg-[#f5f5f5] cursor-pointer flex-shrink-0 transition-colors"
+>
+  <XIcon />
+</button>
           </div>
           <div className="flex items-center gap-2 mt-2">
             <span className="text-[20px] font-bold text-[#111]">{activity.currency}{activity.price}</span>
@@ -1243,8 +1243,18 @@ useEffect(() => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const removeActivity = (id) => setActivities((prev) => prev.filter((a) => a.id !== id));
-  const createSharedParticipantWithDefaults = (id, measurements) => {
+  const removeActivity = (apiType, id) => {
+    setActivities((prev) => prev.filter((a) => !(a.id === id && a.apiType === apiType)));
+    try {
+      const raw = localStorage.getItem("cart");
+      const parsed = raw ? JSON.parse(raw) : [];
+      const next = Array.isArray(parsed)
+        ? parsed.filter((item) => !(item.type === apiType && item.id === id))
+        : [];
+      localStorage.setItem("cart", JSON.stringify(next));
+      window.dispatchEvent(new Event("cart-updated")); // синхронизирует Header
+    } catch {}
+  };  const createSharedParticipantWithDefaults = (id, measurements) => {
     const sp = createSharedParticipant(id);
     if (measurements) {
       if (measurements.height?.length) sp.height.unitId = measurements.height[0].id;
