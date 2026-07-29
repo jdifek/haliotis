@@ -1599,8 +1599,9 @@ export const BookingFormModal: React.FC<Props> = ({
             })
           );
           setEquipmentTemplate(template);
-          setRequiresCert(!!apiItem.requires_certification);
-
+          setRequiresCert(
+            itemType !== "course" || !!apiItem.requires_certification
+          );
           // FIX (п.4): реальные центры со slug/name из apiItem.location
           if (Array.isArray(apiItem.location) && apiItem.location.length) {
             const mapped: CenterOption[] = apiItem.location.map((l: any) => ({

@@ -146,8 +146,9 @@ const mapResolvedItem = (apiItem, storageItem, participantIds) => {
     // приходит с бэка — либо явным флагом, либо через оборудование,
     // которое требует сертификации.
     requiresCert:
-      !!apiItem.requires_certification ||
-      equipmentTemplate.some((e) => e.requiresCertification),
+    apiItem.type !== "course" ||
+    !!apiItem.requires_certification ||
+    equipmentTemplate.some((e) => e.requiresCertification),
     byParticipant,
   };
 };
@@ -1377,6 +1378,8 @@ useEffect(() => {
       setPrivacy(false);
       setTerms(false);
       setComment("");
+      localStorage.removeItem("cart");
+window.dispatchEvent(new Event("cart-updated"));
     } catch (err) {
       setSubmitError(err.message);
     } finally {
