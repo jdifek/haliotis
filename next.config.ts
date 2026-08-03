@@ -1,10 +1,14 @@
-  import createNextIntlPlugin from 'next-intl/plugin';
+import createNextIntlPlugin from 'next-intl/plugin';
 
-  const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
+const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
 
-  export default withNextIntl({
+export default withNextIntl({
   images: {
-    domains: ['cp.haliotis.website', 'cp.haliotis.space'],
+    dangerouslyAllowLocalIP: true,
+    remotePatterns: [
+      { protocol: 'https', hostname: 'cp.haliotis.website' },
+      { protocol: 'https', hostname: 'cp.haliotis.space' },
+    ],
   },
   typescript: {
     ignoreBuildErrors: true,
