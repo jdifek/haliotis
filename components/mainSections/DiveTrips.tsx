@@ -39,12 +39,19 @@ export const DiveTrips: React.FC<Props> = ({
   diveTripsCards,
   diveTripsTitile,
   equipmentData,
-  locale
+  locale,
 }) => {
   const [diveTripsCurrentSlide, setDiveTripsCurrentSlide] = useState(0);
   const diveTripswiperRef = useRef<SwiperType | null>(null);
   const { terms } = useMenu(locale);
-  console.log(terms, 'ttt');
+  console.log(terms, "ttt");
+
+  if (!diveTripsCards || diveTripsCards.length === 0) {
+    return null;
+  }
+
+  const currentTrip =
+    diveTripsCards[diveTripsCurrentSlide] ?? diveTripsCards[0];
 
   return (
     <section className="bg-[#ffff] px-4 pt-6 pb-12 md:px-[30px] md:pb-[77px]">
@@ -122,10 +129,16 @@ export const DiveTrips: React.FC<Props> = ({
               </div>
 
               <div className="mb-[16px] inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 md:mb-[20px] md:px-4 md:py-2">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="10" cy="10" r="10" fill="black"/>
- <text x="10" y="14" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
-  {diveTripsCards[diveTripsCurrentSlide].currency}
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle cx="10" cy="10" r="10" fill="black" />
+                  <text x="10" y="14" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">
+  {currentTrip.currency}
 </text>
 </svg>
                 <span
@@ -134,7 +147,7 @@ export const DiveTrips: React.FC<Props> = ({
                     lineHeight: "140%",
                   }}
                 >
-                  {diveTripsCards[diveTripsCurrentSlide].amount }
+                  {currentTrip.amount}
                 </span>
               </div>
 
@@ -144,7 +157,8 @@ export const DiveTrips: React.FC<Props> = ({
                   lineHeight: "130%",
                 }}
               >
-                {diveTripsCards[diveTripsCurrentSlide].location}
+           {currentTrip.location}
+
               </h3>
 
               <p
@@ -154,13 +168,14 @@ export const DiveTrips: React.FC<Props> = ({
                   opacity: 0.8,
                 }}
               >
-                {diveTripsCards[diveTripsCurrentSlide].description}
+              {currentTrip.description}
+
               </p>
 
               <ButtonWithIcon
-                href={`/viagens/${diveTripsCards[diveTripsCurrentSlide].slug}`}
-                width="164px"
-                label={terms.find_more || 'Find More'}
+  href={`/viagens/${currentTrip.slug}`}
+  width="164px"
+                label={terms.find_more || "Find More"}
                 textColor="text-black"
                 className="flex items-center gap-2 rounded-full bg-white px-4 py-2.5 text-sm transition-all hover:bg-gray-200 "
                 icon={

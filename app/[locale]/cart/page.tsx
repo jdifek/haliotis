@@ -1,6 +1,7 @@
 "use client";
 
 import { useMenu } from "@/app/hooks/useMenu";
+import { loadSibsWidgetScript } from "@/lib/payment";
 import { useState, useRef, useEffect, createContext, useContext } from "react";
 import { createPortal } from "react-dom";
 
@@ -185,6 +186,30 @@ const Portal = ({ children }) => {
   return createPortal(children, document.body);
 };
 
+const PaymentModal = ({ children }) => {
+  // Блокируем скролл фона, пока модалка открыта
+  useEffect(() => {
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prevOverflow; };
+  }, []);
+
+  return (
+    <Portal>
+      <div
+        className="fixed inset-0 z-[100000] flex items-center justify-center p-4"
+        style={{ background: "rgba(0,0,0,0.6)" }}
+      >
+ <div
+  className="bg-white rounded-2xl w-full max-w-[90vw] max-h-[90vh] overflow-y-auto  p-6 relative"
+  onClick={(e) => e.stopPropagation()}
+>
+  {children}
+</div>
+      </div>
+    </Portal>
+  );
+};
 // ─── Icons ────────────────────────────────────────────────────────────────────
 
 const ChevronDown = ({ className = "" }) => (
@@ -1004,7 +1029,6 @@ const ActivityCard = ({
 );
 
 // ─── Order Summary ────────────────────────────────────────────────────────────
-
 const OrderSummary = ({
   activities,
   t,
@@ -1019,6 +1043,10 @@ const OrderSummary = ({
   isSubmitting,
   submitError,
   submitSuccess,
+  payment,
+  widgetReady,
+  paymentError,
+  locale,
 }) => {
   const grandTotal = activities.reduce((total, act) => {
     const courseTotal = sharedParticipants.length * act.price;
@@ -1099,27 +1127,72 @@ const OrderSummary = ({
         </p>
       )}
 
-      {submitError && (
+{submitError && (
         <div className="mb-3 px-3 py-2 rounded-[10px] bg-[#fff0ed] border border-[#e84814] text-[13px] text-[#e84814]">
           {submitError}
         </div>
       )}
-      {submitSuccess && (
-        <div className="mb-3 px-3 py-2 rounded-[10px] bg-[#f0fff4] border border-[#4caf50] text-[13px] text-[#2e7d32]">
-          {t("booking_success", "Booking submitted successfully!")}
+      {paymentError && (
+        <div className="mb-3 px-3 py-2 rounded-[10px] bg-[#fff0ed] border border-[#e84814] text-[13px] text-[#e84814]">
+          {paymentError}
         </div>
       )}
 
-      {/* FIX: после успешного сабмита кнопка блокируется через submitSuccess —
-          не зависит от того, сбрасывается ли форма/корзина, защищает от дублей заказа. */}
-      <button
-        onClick={onSubmit}
-        disabled={isSubmitting || !privacy || !terms || !formValid || submitSuccess}
-        className={`w-full py-3 rounded-full text-white text-[15px] font-semibold transition-colors flex items-center justify-center gap-2
-          ${isSubmitting || !privacy || !terms || !formValid || submitSuccess ? "bg-[#ccc] cursor-not-allowed" : "bg-[#e84814] hover:bg-[#d63f0f] cursor-pointer"}`}
-      >
-        {isSubmitting ? t("sending", "Sending…") : t("proceed_to_payment", "Proceed to Payment →")}
-      </button>
+      {/* До создания букинга — обычная кнопка, твои стили без изменений */}
+      {!payment && (
+        <button
+          onClick={onSubmit}
+          disabled={isSubmitting || !privacy || !terms || !formValid}
+          className={`w-full py-3 rounded-full text-white text-[15px] font-semibold transition-colors flex items-center justify-center gap-2
+            ${isSubmitting || !privacy || !terms || !formValid ? "bg-[#ccc] cursor-not-allowed" : "bg-[#e84814] hover:bg-[#d63f0f] cursor-pointer"}`}
+        >
+          {isSubmitting ? t("sending", "Sending…") : t("proceed_to_payment", "Proceed to Payment →")}
+        </button>
+      )}
+
+      {/* После создания букинга кнопку меняем на форму оплаты SIBS */}
+     {/* После создания букинга — форма оплаты SIBS открывается в модалке */}
+     {payment && (
+        <PaymentModal>
+          <h3 className="text-[18px] font-semibold text-[#111] mb-3 text-center">
+            {t("complete_payment", "Complete your payment")}
+          </h3>
+
+          {submitSuccess && (
+            <div className="px-3 py-2 mb-3 rounded-[10px] bg-[#f0fff4] border border-[#4caf50] text-[13px] text-[#2e7d32]">
+              {t("booking_success_pay", "Booking created! Complete your payment below.")}
+            </div>
+          )}
+          {!widgetReady && (
+            <div className="flex items-center justify-center gap-2 py-2 text-[13px] text-[#666]">
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-black/10 border-t-[#e84814]" />
+              {t("loading_payment_methods", "Loading payment methods…")}
+            </div>
+          )}
+          {paymentError && (
+            <div className="mb-3 px-3 py-2 rounded-[10px] bg-[#fff0ed] border border-[#e84814] text-[13px] text-[#e84814]">
+              {paymentError}
+            </div>
+          )}
+
+          <form
+            className="paymentSPG"
+            spg-context={payment.form_context}
+            spg-config={JSON.stringify({
+              paymentMethodList: payment.payment_methods,
+              amount: { value: payment.amount.value, currency: payment.amount.currency },
+              language: locale,
+              redirectUrl: `${window.location.origin}/${locale}/payment/redirect`,
+            })}
+            spg-style={JSON.stringify({
+              transaction: {
+                layout: "default",
+                theme: "default",
+              },
+            })}
+          />
+        </PaymentModal>
+      )}
 
       <div className="flex items-center justify-center gap-1.5 mt-2">
         <ShieldIcon />
@@ -1190,7 +1263,6 @@ export default function CartPage() {
   // Shared participants — ONE set of personal data, reused for every activity.
   const [participantCount, setParticipantCount] = useState(1);
   const [sharedParticipants, setSharedParticipants] = useState([createSharedParticipant(1)]);
-
   const [privacy, setPrivacy] = useState(false);
   const [terms, setTerms] = useState(false);
   const [comment, setComment] = useState("");
@@ -1198,6 +1270,24 @@ export default function CartPage() {
   const [submitError, setSubmitError] = useState(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
+  // ─── Payment (SIBS) ─────────────────────────────────────────────
+  const [payment, setPayment] = useState(null);       // data.payment из ответа /bookings
+  const [widgetReady, setWidgetReady] = useState(false);
+  const [paymentError, setPaymentError] = useState(null);
+
+  // Форма с payment.form_context должна быть в DOM ДО подключения скрипта —
+  // грузим в эффекте, он сработает уже после того, как React отрендерит форму.
+  useEffect(() => {
+    if (!payment) return;
+    setWidgetReady(false);
+    setPaymentError(null);
+    const widgetUrl = `${payment.widget_script_url}?id=${payment.transaction_id}`;
+
+loadSibsWidgetScript(widgetUrl)
+  .then(() => setWidgetReady(true))
+  .catch((e) => setPaymentError(e.message || "Failed to load payment widget."));
+  }, [payment]);
+  
   // ставимо дефолтний (перший) юніт з бекенду для height/weight/shoeSize,
 // як тільки прийшли measurements — тільки якщо unitId ще не вибраний
 useEffect(() => {
@@ -1364,28 +1454,40 @@ useEffect(() => {
       )
     );
 
-  const handleSubmit = async () => {
-    setSubmitError(null);
-    setSubmitSuccess(false);
-    setIsSubmitting(true);
-    try {
-      const payload = buildBookingPayload(activities, sharedParticipants, comment);
-      await submitBooking(payload);
-      setSubmitSuccess(true);
-      setActivities([]);
-      setSharedParticipants([createSharedParticipant(1)]);
-      setParticipantCount(1);
-      setPrivacy(false);
-      setTerms(false);
-      setComment("");
-      localStorage.removeItem("cart");
-window.dispatchEvent(new Event("cart-updated"));
-    } catch (err) {
-      setSubmitError(err.message);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+    const handleSubmit = async () => {
+      setSubmitError(null);
+      setSubmitSuccess(false);
+      setIsSubmitting(true);
+      try {
+        const payload = buildBookingPayload(activities, sharedParticipants, comment);
+        const res = await submitBooking(payload);
+        const bookingData = res?.data;
+  
+        if (!bookingData?.payment) {
+          // Букинг создан, но бэкенд не смог открыть платёжную сессию (например,
+          // SIBS не сконфигурирован на сервере) — это не восстановимо на фронте,
+          // показываем ошибку и не сбрасываем форму, чтобы не потерять данные.
+          setSubmitError(
+            bookingData?.payment_error ||
+              "Payment could not be started. Please contact support."
+          );
+          setIsSubmitting(false);
+          return;
+        }
+  
+        // Букинг создан — теперь нужна оплата, поэтому форму/активности НЕ сбрасываем,
+        // они остаются видимыми пока пользователь платит в виджете ниже.
+        // Корзину в сторадже чистим сразу — заказ уже создан на бэке.
+        setPayment(bookingData.payment);
+        setSubmitSuccess(true);
+        localStorage.removeItem("cart");
+        window.dispatchEvent(new Event("cart-updated"));
+      } catch (err) {
+        setSubmitError(err.message);
+      } finally {
+        setIsSubmitting(false);
+      }
+    };
 
   const t = (key, fallback) => apiTerms?.[key] || fallback;
 
@@ -1460,7 +1562,7 @@ window.dispatchEvent(new Event("cart-updated"));
 
           {/* Right: order summary */}
           <div className="w-full lg:w-[360px] flex-shrink-0">
-            <OrderSummary
+          <OrderSummary
               activities={activities}
               t={t}
               sharedParticipants={sharedParticipants}
@@ -1474,6 +1576,10 @@ window.dispatchEvent(new Event("cart-updated"));
               isSubmitting={isSubmitting}
               submitError={submitError}
               submitSuccess={submitSuccess}
+              payment={payment}
+              widgetReady={widgetReady}
+              paymentError={paymentError}
+              locale={locale}
             />
           </div>
         </div>

@@ -21,6 +21,12 @@ export const HeroSection: React.FC<Props> = ({ heroSlides }) => {
   const [heroCurrentSlide, setHeroCurrentSlide] = useState(0);
   const heroSwiperRef = useRef<SwiperType | null>(null);
 
+  if (!heroSlides || heroSlides.length === 0) {
+    return null;
+  }
+
+  const currentSlide = heroSlides[heroCurrentSlide] ?? heroSlides[0];
+
   return (
     <section className="relative h-[678px] w-full pt-[97px]">
       {/* Background Image */}
@@ -227,9 +233,9 @@ export const HeroSection: React.FC<Props> = ({ heroSlides }) => {
         <section className="container px-5 py-6">
           <div className="max-w-3xl">
             <div className="mb-12">
-              <h1 className="mb-3 text-[32px] font-bold leading-tight text-white lg:text-5xl">
-                {heroSlides[heroCurrentSlide].title}
-              </h1>
+            <h1 className="mb-3 text-[32px] font-bold leading-tight text-white lg:text-5xl">
+  {currentSlide.title}
+</h1>
               <div className="mb-6">
                 <svg
                   width="157"
@@ -262,8 +268,8 @@ export const HeroSection: React.FC<Props> = ({ heroSlides }) => {
                 </svg>
               </div>
               <p className="max-w-xl text-[16px] font-light text-white lg:text-lg">
-                {heroSlides[heroCurrentSlide].description}
-              </p>
+  {currentSlide.description}
+</p>
             </div>
           </div>
         </section>

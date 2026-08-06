@@ -1135,9 +1135,10 @@ export const Header: React.FC<{
                   </div>
 
                   {/* Buttons */}
-                  <div className="flex items-center gap-3 px-5 py-4">
+                  <div className="flex items-center justify-end gap-3 px-5 py-4">
                     <Link onClick={() => setIsCartOpen(false)} href="/cart">
                       <button
+                      
                         style={{
                           border: "1px solid #534580",
                           borderRadius: 1000,
@@ -1156,23 +1157,7 @@ export const Header: React.FC<{
                         View cart
                       </button>
                     </Link>
-                    <button
-                      style={{
-                        borderRadius: 1000,
-                        padding: "2px 16px",
-                        width: 226,
-                        height: 48,
-                        background: "#e84814",
-                        fontFamily: "var(--font-family)",
-                        fontWeight: 700,
-                        fontSize: 15,
-                        lineHeight: "120%",
-                        color: "#fff",
-                        cursor: "pointer",
-                      }}
-                    >
-                      Checkout
-                    </button>
+                   
                   </div>
                 </div>
               )}
