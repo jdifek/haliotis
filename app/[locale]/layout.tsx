@@ -26,9 +26,18 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export async function generateStaticParams() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/configs/languages`);
-  const data = await res.json();
-  return data.data.map((lang: { prefix: string }) => ({ locale: lang.prefix }));
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/configs/languages`);
+    if (!res.ok) {
+      console.error("Failed to fetch languages:", res);
+      return [];
+    }
+    const data = await res.json();
+    return data.data.map((lang: { prefix: string }) => ({ locale: lang.prefix }));
+  } catch (error) {
+    console.error("Error fetching languages:", error);
+    return [];
+  }
 }
 
 export default async function RootLayout({

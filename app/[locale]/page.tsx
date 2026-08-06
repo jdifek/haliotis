@@ -11,16 +11,21 @@ import { DiveExploreSection } from "@/components/mainSections/DiveExploreSection
 
 // Функция для получения terms напрямую (для Server Component)
 async function getTerms(locale: string) {
+  console.log(`Fetching terms for locale: ${locale}`);
+  console.log("API URL:", process.env.NEXT_PUBLIC_API_URL);
   try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/configs/menus?lang=${locale}`
     );
 
+    console.log(`Response status for terms: ${res.status}`);
     if (!res.ok) {
+      console.error(`Failed to fetch terms for locale: ${locale}`);
       return {}; // возвращаем пустой объект если ошибка
     }
 
     const data = await res.json();
+    console.log(`Fetched terms data:`, data);
     return data?.terms || {};
   } catch (error) {
     console.error("Error fetching terms:", error);
@@ -29,21 +34,15 @@ async function getTerms(locale: string) {
 }
 
 async function getHomepageData(lang: string) {
-  try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/pages/homepage?lang=${lang}`
-    );
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/pages/homepage?lang=${lang}`;
 
-    if (!res.ok) {
-      throw new Error("Failed to fetch homepage data");
-    }
+  console.log("REQUEST:", url);
 
-    const data = await res.json();
-    return data.data;
-  } catch (error) {
-    console.error("Error fetching homepage:", error);
-    return null;
-  }
+  const res = await fetch(url);
+
+  console.log("STATUS:", res.status);
+
+  return res.json();
 }
 type Props = {
   params: Promise<{ slug: string; locale: string }>;
@@ -70,7 +69,7 @@ export default async function Home({ params }: Props) {
   const terms = await getTerms(locale);
   const t = createTermGetter(terms);
 
-  const homepageData = await getHomepageData(locale);
+  const {data: homepageData} = await getHomepageData(locale);
 console.log(homepageData, 'homepageData');
 
   if (!homepageData) {
@@ -88,6 +87,9 @@ console.log(homepageData, 'homepageData');
     ),
   ];
 
+
+  console.log(homepageData, 'homepageData');
+  
   const courseCards = (
     homepageData.sliders?.courses?.diving_centers || []
   ).flatMap((center: any) =>
@@ -151,20 +153,20 @@ console.log(homepageData, 'homepageData');
 
   console.log(homepageData, "homepageData");
 
-  const heroSlides = (homepageData.banner?.slides || [])
+  const heroSlides = (homepageData?.banner?.slides || [])
     .filter(
       (slide: any) =>
         slide && (slide.desktop_image_url || slide.mobile_image_url)
     )
     .map((slide: any) => ({
-      title: slide.title || "",
-      description: slide.description || "",
+      title: slide?.title || "",
+      description: slide?.description || "",
       desktopImage:
-        slide.desktop_image_url && slide.desktop_image_url.trim() !== ""
+        slide?.desktop_image_url && slide.desktop_image_url.trim() !== ""
           ? slide.desktop_image_url
           : "",
       mobileImage:
-        slide.mobile_image_url && slide.mobile_image_url.trim() !== ""
+        slide?.mobile_image_url && slide.mobile_image_url.trim() !== ""
           ? slide.mobile_image_url
           : "",
     }));
