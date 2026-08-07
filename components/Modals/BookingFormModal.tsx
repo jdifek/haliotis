@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
+import BookingPhoneField from "../booking/BookingPhoneField";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // LABELS — все строки собраны в одном месте. Язык — EN (как и было), структура
@@ -1166,12 +1167,12 @@ const ParticipantBlock = ({
             }}
             options={genderOptions.map((g) => g.label)}
           />
-          <PlaceholderInput
-            placeholder={LABELS.phoneNumber}
-            value={p.phone}
-            onChange={(v) => onChange(p.id, "phone", v)}
-            type="tel"
-          />
+        <BookingPhoneField
+  placeholder={LABELS.phoneNumber}
+  value={p.phone}
+  onChange={(v) => onChange(p.id, "phone", v)}
+  defaultCountry="pt"
+/>
           <PlaceholderInput
             placeholder={LABELS.email}
             value={p.email}

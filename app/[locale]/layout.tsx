@@ -6,7 +6,7 @@ import { Header } from "@/components/header";
 import { NextIntlClientProvider } from "next-intl";
 import { getSettings } from "@/lib/settings";
 import Script from "next/script";
-
+import RecaptchaProvider from "@/components/providers/RecaptchaProvider";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -86,30 +86,36 @@ export default async function RootLayout({
         )}
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        {gtmKey && (
-          <noscript>
-            <iframe
-              src={`https://www.googletagmanager.com/ns.html?id=${gtmKey}`}
-              height="0"
-              width="0"
-              style={{ display: "none", visibility: "hidden" }}
-            />
-          </noscript>
-        )}
+  {gtmKey && (
+    <noscript>
+      <iframe
+        src={`https://www.googletagmanager.com/ns.html?id=${gtmKey}`}
+        height="0"
+        width="0"
+        style={{ display: "none", visibility: "hidden" }}
+      />
+    </noscript>
+  )}
 
-        <NextIntlClientProvider locale={locale}>
-          <Header
-            locale={locale}
-            logoUrl={settings.general.logo}
-            logoAlt={settings.general.logo_alt}
-          />
-          {children}
-          <Footer
-            logoUrl={settings.general.footer_logo}
-            logoAlt={settings.general.logo_alt}
-          />
-        </NextIntlClientProvider>
-      </body>
+<RecaptchaProvider
+  siteKey={settings.google?.google_recaptcha_key ?? ""}
+>
+  <NextIntlClientProvider locale={locale}>
+    <Header
+      locale={locale}
+      logoUrl={settings.general.logo}
+      logoAlt={settings.general.logo_alt}
+    />
+
+    {children}
+
+    <Footer
+      logoUrl={settings.general.footer_logo}
+      logoAlt={settings.general.logo_alt}
+    />
+  </NextIntlClientProvider>
+</RecaptchaProvider>
+</body>
     </html>
   );
 }
