@@ -1306,7 +1306,7 @@ useEffect(() => {
       return next;
     })
   );
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
 }, [measurements]);
   // Load cart on mount — real API only, no mocks.
   useEffect(() => {
@@ -1331,7 +1331,7 @@ useEffect(() => {
       })
       .catch((err) => setLoadError(err.message))
       .finally(() => setIsLoading(false));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   const removeActivity = (apiType, id) => {
