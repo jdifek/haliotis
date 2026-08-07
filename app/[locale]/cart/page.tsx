@@ -794,7 +794,7 @@ const ParticipantBlock = ({
       {isExpanded && (
         <div className="px-4 pb-4 flex flex-col gap-2 border-t border-[#f0f0f0]">
           {/* Row 1 — shared across all activities */}
-          <div className="grid grid-cols-3 gap-2 mt-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-3">
             <PlaceholderInput
               placeholder={t("first_name", "First Name *")}
               value={shared.firstName}
@@ -814,7 +814,7 @@ const ParticipantBlock = ({
             />
           </div>
           {/* Row 2 — shared */}
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
             <CustomDropdown
               label={t("select_gender", "Select Gender *")}
               value={genderValue}
@@ -839,7 +839,7 @@ const ParticipantBlock = ({
             />
           </div>
           {/* Row 3 — measurements with API units (shared) */}
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
             <MeasurementField
               label={t("height_label", "Height *")}
               value={shared.height}
@@ -903,7 +903,7 @@ const ParticipantBlock = ({
                 </svg>
                 <span className="text-[13px] font-semibold text-[#e84814]">{t("dive_certification_required_title", "Dive Certification — required for this activity")}</span>
               </div>
-              <div className="grid grid-cols-2 gap-2 mb-2">
+              <div className="grid md:grid-cols-2 grid-cols-1  gap-2 mb-2">
                 <CustomDropdown
                   label={t("certification_agency", "Certification Agency *")}
                   value={activityData.certAgency || ""}
@@ -916,7 +916,7 @@ const ParticipantBlock = ({
                   onChange={(v) => onChangeCert(activityId, shared.id, "certLevel", v)}
                 />
               </div>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid md:grid-cols-2 grid-cols-1 gap-2">
                 <PlaceholderInput
                   placeholder={t("total_dives", "Total Dives *")}
                   value={activityData.totalDives || ""}
@@ -932,7 +932,7 @@ const ParticipantBlock = ({
               </div>
               <div
                 className="flex items-center gap-2 mt-3"
-                style={{ border: "1px solid #a0c52e", borderRadius: 10, padding: "5px 10px", height: 38, background: "#fff" }}
+                style={{ border: "1px solid #a0c52e", borderRadius: 10, padding: "5px 10px",  background: "#fff" }}
               >
                 <AlertIcon />
                 <span style={{ fontWeight: 600, fontSize: 15, lineHeight: "160%", color: "#000" }}>
