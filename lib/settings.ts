@@ -10,6 +10,7 @@ type Settings = {
   google: {
     analytics_id: string;
     tag_manager_key: string;
+    google_recaptcha_key: string;
   };
 };
 
