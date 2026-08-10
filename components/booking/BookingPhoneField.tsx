@@ -100,7 +100,7 @@ export default function BookingPhoneField({
           type="button"
           ref={triggerRef}
           onClick={() => (isOpen ? setIsOpen(false) : open())}
-          className="flex items-center gap-1 pl-2 pr-2 py-1 border-r border-[#d9d9d9] shrink-0 cursor-pointer"
+          className="flex items-center gap-1 pl-1 pr-1  border-r border-[#d9d9d9] shrink-0 cursor-pointer"
         >
           <ReactCountryFlag
             countryCode={country.iso2.toUpperCase()}
