@@ -3,11 +3,9 @@ import { ButtonWithIcon } from "@/components/buttons/ButtonWithIcon";
 import { notFound } from "next/navigation";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
+type CartStatus = "success" | "pending" | "multibanco" | "failed";
 
-type CartStatus = "success" | "pending" | "multibanco";
-
-const VALID_STATUSES: CartStatus[] = ["success", "pending", "multibanco"];
-
+const VALID_STATUSES: CartStatus[] = ["success", "pending", "multibanco", "failed"];
 type PageProps = {
   params: Promise<{ locale: string; status: string }>;
   // ← добавили: реальные реквизиты Multibanco приходят как query-параметры
@@ -29,6 +27,19 @@ const MULTIBANCO_PLACEHOLDER = {
 
 const IconSlot = ({ children }: { children: React.ReactNode }) => (
   <div className="w-14 h-14 flex items-center justify-center">{children}</div>
+);
+const FailedIconPlaceholder = () => (
+  <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="30" cy="30" r="30" fill="#F8D3C9" />
+    <circle cx="30" cy="30" r="22" fill="#E84814" />
+    <path
+      d="M22 22L38 38M22 38L38 22"
+      stroke="white"
+      strokeWidth="4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
 );
 
 const SuccessIconPlaceholder = () => (
@@ -187,6 +198,44 @@ const PendingContent = () => (
   </>
 );
 
+const FailedContent = ({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined };
+}) => {
+  const pick = (key: string) => {
+    const v = searchParams[key];
+    return Array.isArray(v) ? v[0] : v;
+  };
+  const reason = pick("reason");
+
+  return (
+    <>
+      <IconSlot>
+        <FailedIconPlaceholder />
+      </IconSlot>
+      <MainTitle>
+        Payment was not
+        <br />
+        successful.
+      </MainTitle>
+      <p className="text-[14px] text-[#666] max-w-[420px]">
+        {reason ||
+          "Your card was declined. Please check your card details or try a different payment method."}
+      </p>
+      <ButtonWithIcon
+        label="Try again"
+        href="/cart"
+        className="!w-fit !gap-3"
+        icon={
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M17.5 7.50033H6.25C4.17893 7.50033 2.5 9.17926 2.5 11.2503C2.5 13.3214 4.17893 15.0003 6.25 15.0003H10M14.1667 10.8337L17.5 7.50033L14.1667 4.16699" stroke="#E84814" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        }
+      />
+    </>
+  );
+};
 // ─── Multibanco ─────────────────────────────────────────────────────────────────
 
 const MultibancoRow = ({ label, value }: { label: string; value: string }) => (
@@ -270,9 +319,10 @@ export default async function CartStatusPage({ params, searchParams }: PageProps
 
   return (
     <StatusShell>
-      {status === "success" && <SuccessContent />}
-      {status === "pending" && <PendingContent />}
-      {status === "multibanco" && <MultibancoContent searchParams={sp} />}
-    </StatusShell>
+    {status === "success" && <SuccessContent />}
+    {status === "pending" && <PendingContent />}
+    {status === "failed" && <FailedContent searchParams={sp} />}
+    {status === "multibanco" && <MultibancoContent searchParams={sp} />}
+  </StatusShell>
   );
 }

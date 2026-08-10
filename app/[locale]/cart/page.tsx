@@ -5,7 +5,8 @@ import { loadSibsWidgetScript } from "@/lib/payment";
 import { useLocale } from "next-intl";
 import { useState, useRef, useEffect, createContext, useContext } from "react";
 import { createPortal } from "react-dom";
-import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
+import { useGoogleReCaptcha } from "react-google-recaptcha-v3"; // можно оставить, если v3 ещё где-то нужен
+import ReCAPTCHA from "react-google-recaptcha";
 import BookingPhoneField from "@/components/booking/BookingPhoneField";
 // ─── Translations ─────────────────────────────────────────────────────────────
 // terms приходят из useMenu() (эндпоинт /configs/menus?lang=...), кладём в контекст,
@@ -35,17 +36,28 @@ const readCartFromStorage = () => {
 
 const resolveCart = async (items, recaptchaToken) => {
   const res = await fetch(`${API_BASE}/cart/resolve`, {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-    Accept: "application/json",
-  },
-  body: JSON.stringify({
-    items,
-    recaptcha_token: recaptchaToken,
-  }),
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({
+      items,
+      recaptcha_token: recaptchaToken,
+    }),
   });
-}
+
+  if (!res.ok) {
+    let detail = `cart resolve failed: ${res.status}`;
+    try {
+      const body = await res.json();
+      if (body?.message) detail = body.message;
+    } catch {}
+    throw new Error(detail);
+  }
+
+  return res.json(); // ← вот чего не хватало
+};
 const submitBooking = async (payload) => {
   const res = await fetch(`${API_BASE}/bookings`, {
     method: "POST",
@@ -1057,6 +1069,7 @@ const ParticipantBlock = ({
   onSelectVariation,
   requiresCert,
   measurements,
+  agencies,
 }) => {
   const [isExpanded, setIsExpanded] = useState(pNum === 1);
   const [equipExpanded, setEquipExpanded] = useState(true);
@@ -1163,12 +1176,12 @@ const ParticipantBlock = ({
                 { id: "other", title: t("gender_other", "Other") },
               ]}
             />
-           <BookingPhoneField
-  placeholder={t("phone_number", "Phone Number *")}
-  value={shared.phone}
-  onChange={(v) => onChangeShared(shared.id, "phone", v)}
-  defaultCountry="pt"
-/>
+            <BookingPhoneField
+              placeholder={t("phone_number", "Phone Number *")}
+              value={shared.phone}
+              onChange={(v) => onChangeShared(shared.id, "phone", v)}
+              defaultCountry="pt"
+            />
             <PlaceholderInput
               placeholder={t("email_label", "E-mail *")}
               value={shared.email}
@@ -1270,9 +1283,11 @@ const ParticipantBlock = ({
               <div className="grid md:grid-cols-2 grid-cols-1  gap-2 mb-2">
                 <CustomDropdown
                   label={t("certification_agency", "Certification Agency *")}
-                  value={shared.certAgency || ""}
-                  onChange={(v) => onChangeShared(shared.id, "certAgency", v)}
-                  options={["PADI", "SSI", "NAUI", "CMAS", "SDI", "TDI"]}
+                  value={agencies.find((a) => a.id === shared.certAgency) || ""}
+                  onChange={(v) =>
+                    onChangeShared(shared.id, "certAgency", v.id)
+                  }
+                  options={agencies}
                 />
                 <PlaceholderInput
                   placeholder={t(
@@ -1330,7 +1345,6 @@ const ParticipantBlock = ({
 };
 
 // ─── Activity Card ────────────────────────────────────────────────────────────
-
 const ActivityCard = ({
   activity,
   t,
@@ -1340,6 +1354,7 @@ const ActivityCard = ({
   onToggleEquip,
   onSelectVariation,
   measurements,
+  agencies,
 }) => (
   <div className="bg-white rounded-2xl border border-[#e4e4e4] overflow-hidden mb-4">
     <div className="p-4">
@@ -1424,6 +1439,7 @@ const ActivityCard = ({
           onSelectVariation={onSelectVariation}
           requiresCert={activity.requiresCert}
           measurements={measurements}
+          agencies={agencies}
         />
       ))}
     </div>
@@ -1449,6 +1465,9 @@ const OrderSummary = ({
   widgetReady,
   paymentError,
   locale,
+  recaptchaRef, // NEW
+  captchaToken, // NEW
+  onCaptchaChange, // NEW
 }) => {
   const grandTotal = activities.reduce((total, act) => {
     const courseTotal = sharedParticipants.length * act.price;
@@ -1570,14 +1589,21 @@ const OrderSummary = ({
         />
       </div>
 
-      {!formValid && (
-        <p className="text-[12px] text-[#e84814] text-center mb-2">
-          {t(
-            "form_incomplete_note",
-            "Please fill in all required fields for every participant"
-          )}
-        </p>
+      {/* reCAPTCHA v2 — только когда не создан ещё букинг (до payment) */}
+      {!payment && (
+        <div className="mb-4 flex justify-center">
+          <ReCAPTCHA
+            ref={recaptchaRef}
+            sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_V2_SITE_KEY}
+            onChange={onCaptchaChange}
+            onExpired={() => onCaptchaChange(null)}
+          />
+        </div>
       )}
+
+  
+
+     
 
       {submitError && (
         <div className="mb-3 px-3 py-2 rounded-[10px] bg-[#fff0ed] border border-[#e84814] text-[13px] text-[#e84814]">
@@ -1590,14 +1616,15 @@ const OrderSummary = ({
         </div>
       )}
 
-      {/* До создания букинга — обычная кнопка, твои стили без изменений */}
       {!payment && (
         <button
           onClick={onSubmit}
-          disabled={isSubmitting || !privacy || !terms || !formValid}
+          disabled={
+            isSubmitting || !privacy || !terms || !formValid || !captchaToken
+          }
           className={`w-full py-3 rounded-full text-white text-[15px] font-semibold transition-colors flex items-center justify-center gap-2
             ${
-              isSubmitting || !privacy || !terms || !formValid
+              isSubmitting || !privacy || !terms || !formValid || !captchaToken
                 ? "bg-[#ccc] cursor-not-allowed"
                 : "bg-[#e84814] hover:bg-[#d63f0f] cursor-pointer"
             }`}
@@ -1698,7 +1725,7 @@ const buildBookingPayload = (activities, sharedParticipants, comment) => ({
         },
         certification: act.requiresCert
           ? {
-              agency: sp.certAgency,
+              agency_id: sp.certAgency,
               level: sp.certLevel,
               total_dives: sp.totalDives,
               last_dive_date: sp.lastDiveDate,
@@ -1722,9 +1749,11 @@ export default function CartPage() {
 
   const { terms: apiTerms } = useMenu(locale);
   const { executeRecaptcha } = useGoogleReCaptcha();
-
+  const recaptchaRef = useRef(null);
+  const [captchaToken, setCaptchaToken] = useState(null);
   const [activities, setActivities] = useState([]);
   const [measurements, setMeasurements] = useState(null);
+  const [agencies, setAgencies] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState(null);
 
@@ -1782,51 +1811,44 @@ export default function CartPage() {
   // Load cart on mount — real API only, no mocks.
   useEffect(() => {
     if (!executeRecaptcha) return;
-    
+
     const loadCart = async () => {
-    const storageItems = readCartFromStorage();
-    
-    if (storageItems.length === 0) {
-      setIsLoading(false);
-      return;
-    }
-    
-    const token = await executeRecaptcha("cart_resolve");
-    
-    const apiItems = storageItems.map(({ type, id }) => ({
-      type,
-      id,
-    }));
-    
-    resolveCart(apiItems, token)
-      .then((data) => {
-        setMeasurements(data.participant_measurements || null);
-    
-        const initialIds = [1];
-    
-        const mapped = (data.items || []).map((apiItem) => {
-          const storageItem = storageItems.find(
-            (s) =>
-              s.type === apiItem.type &&
-              s.id === apiItem.id
-          );
-    
-          return mapResolvedItem(
-            apiItem,
-            storageItem,
-            initialIds
-          );
-        });
-    
-        setActivities(mapped);
-      })
-      .catch((err) => setLoadError(err.message))
-      .finally(() => setIsLoading(false));
+      const storageItems = readCartFromStorage();
+
+      if (storageItems.length === 0) {
+        setIsLoading(false);
+        return;
+      }
+
+      const token = await executeRecaptcha("cart_resolve");
+
+      const apiItems = storageItems.map(({ type, id }) => ({
+        type,
+        id,
+      }));
+
+      resolveCart(apiItems, token)
+        .then((data) => {
+          setMeasurements(data.participant_measurements || null);
+          setAgencies(data.agencies || []);
+          const initialIds = [1];
+
+          const mapped = (data.items || []).map((apiItem) => {
+            const storageItem = storageItems.find(
+              (s) => s.type === apiItem.type && s.id === apiItem.id
+            );
+
+            return mapResolvedItem(apiItem, storageItem, initialIds);
+          });
+
+          setActivities(mapped);
+        })
+        .catch((err) => setLoadError(err.message))
+        .finally(() => setIsLoading(false));
     };
-    
+
     loadCart();
-    
-    }, [executeRecaptcha]);
+  }, [executeRecaptcha]);
 
   const removeActivity = (apiType, id) => {
     setActivities((prev) =>
@@ -1946,21 +1968,21 @@ export default function CartPage() {
   const handleSubmit = async () => {
     setSubmitError(null);
     setSubmitSuccess(false);
+
+    if (!captchaToken) {
+      setSubmitError("Please complete the reCAPTCHA.");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      const token = executeRecaptcha
-        ? await executeRecaptcha("booking")
-        : undefined;
-
       const payload = buildBookingPayload(
         activities,
         sharedParticipants,
         comment
       );
 
-      if (token) {
-        payload.recaptcha_token = token;
-      }
+      payload.recaptcha_token = captchaToken;
 
       const res = await submitBooking(payload);
       const bookingData = res?.data;
@@ -1987,6 +2009,8 @@ export default function CartPage() {
     } catch (err) {
       setSubmitError(err.message);
     } finally {
+      recaptchaRef.current?.reset(); // v2-токен одноразовый, обязательно сбрасываем
+
       setIsSubmitting(false);
     }
   };
@@ -2082,6 +2106,7 @@ export default function CartPage() {
                     onToggleEquip={toggleEquip}
                     onSelectVariation={selectVariation}
                     measurements={measurements}
+                    agencies={agencies}
                   />
                 ))
               )}
@@ -2107,6 +2132,9 @@ export default function CartPage() {
                 widgetReady={widgetReady}
                 paymentError={paymentError}
                 locale={locale}
+                recaptchaRef={recaptchaRef}
+                captchaToken={captchaToken}
+                onCaptchaChange={setCaptchaToken}
               />
             </div>
           </div>

@@ -36,13 +36,25 @@ export const PaymentRedirectClient: React.FC<{ locale: string }> = ({ locale }) 
           return;
         }
 
-        if (data.payment_status === "Success" || data.order_status === "paid") {
+     if (data.payment_status === "Success" || data.order_status === "paid") {
           router.replace(`/${locale}/cart/success`);
           return;
         }
 
-        // Pending / Declined / Partial / Timeout / что угодно ещё — общий экран "в обработке".
+        // Явно отклонённые/проваленные платежи — отдельный экран,
+        // это НЕ "в обработке", пользователю нужно попробовать снова.
+        const FAILED_STATUSES = ["Declined", "Failed", "Cancelled", "Error", "Expired"];
+        if (FAILED_STATUSES.includes(data.payment_status)) {
+          const qs = new URLSearchParams({
+            reason: data.raw?.transactionStatusDescription || "",
+          });
+          router.replace(`/${locale}/cart/failed?${qs.toString()}`);
+          return;
+        }
+
+        // Настоящий pending / partial / что-то незнакомое — общий экран "в обработке".
         router.replace(`/${locale}/cart/pending`);
+
       })
       .catch(() => {
         // Не смогли узнать статус — безопасный дефолт, не спойлерим "успех" зря.
