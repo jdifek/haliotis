@@ -1465,9 +1465,9 @@ const OrderSummary = ({
   widgetReady,
   paymentError,
   locale,
-  recaptchaRef, // NEW
-  captchaToken, // NEW
-  onCaptchaChange, // NEW
+  recaptchaRef,        // NEW
+  captchaToken,        // NEW
+  onCaptchaChange,      // NEW
 }) => {
   const grandTotal = activities.reduce((total, act) => {
     const courseTotal = sharedParticipants.length * act.price;
@@ -1576,10 +1576,7 @@ const OrderSummary = ({
           checked={privacy}
           onChange={setPrivacy}
           t={t}
-          label={t(
-            "privacy_policy_label",
-            "Política de privacidade da Haliotis"
-          )}
+          label={t("privacy_policy_label", "Política de privacidade da Haliotis")}
         />
         <CheckboxRow
           checked={terms}
@@ -1589,17 +1586,32 @@ const OrderSummary = ({
         />
       </div>
 
-      {recaptchaSiteKey && (
-  <ReCAPTCHA
-    ref={recaptchaRef}
-    sitekey={recaptchaSiteKey}
-    onChange={onCaptchaChange}
-    onExpired={() => onCaptchaChange(null)}
-  />
-)}
-  
+      {/* reCAPTCHA v2 — только когда не создан ещё букинг (до payment) */}
+      {!payment && (
+        <div className="mb-4 flex justify-center">
+          <ReCAPTCHA
+            ref={recaptchaRef}
+            sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_V2_SITE_KEY}
+            onChange={onCaptchaChange}
+            onExpired={() => onCaptchaChange(null)}
+          />
+        </div>
+      )}
 
-     
+      {!formValid && (
+        <p className="text-[12px] text-[#e84814] text-center mb-2">
+          {t("form_incomplete_note", "Please fill in all required fields for every participant")}
+        </p>
+      )}
+
+      {!formValid && (
+        <p className="text-[12px] text-[#e84814] text-center mb-2">
+          {t(
+            "form_incomplete_note",
+            "Please fill in all required fields for every participant"
+          )}
+        </p>
+      )}
 
       {submitError && (
         <div className="mb-3 px-3 py-2 rounded-[10px] bg-[#fff0ed] border border-[#e84814] text-[13px] text-[#e84814]">
@@ -1612,12 +1624,10 @@ const OrderSummary = ({
         </div>
       )}
 
-      {!payment && (
+{!payment && (
         <button
           onClick={onSubmit}
-          disabled={
-            isSubmitting || !privacy || !terms || !formValid || !captchaToken
-          }
+          disabled={isSubmitting || !privacy || !terms || !formValid || !captchaToken}
           className={`w-full py-3 rounded-full text-white text-[15px] font-semibold transition-colors flex items-center justify-center gap-2
             ${
               isSubmitting || !privacy || !terms || !formValid || !captchaToken
@@ -1742,18 +1752,7 @@ const buildBookingPayload = (activities, sharedParticipants, comment) => ({
 
 export default function CartPage() {
   const locale = useLocale();
-  const [recaptchaSiteKey, setRecaptchaSiteKey] = useState(null);
 
-  useEffect(() => {
-    fetch(`${API_BASE}/settings/public`, {
-      headers: { Accept: "application/json" },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setRecaptchaSiteKey(data?.google?.google_recaptcha_key || null);
-      })
-      .catch(() => setRecaptchaSiteKey(null));
-  }, []);
   const { terms: apiTerms } = useMenu(locale);
   const { executeRecaptcha } = useGoogleReCaptcha();
   const recaptchaRef = useRef(null);
@@ -1972,27 +1971,27 @@ export default function CartPage() {
       )
     );
 
-  const handleSubmit = async () => {
-    setSubmitError(null);
-    setSubmitSuccess(false);
-
-    if (!captchaToken) {
-      setSubmitError("Please complete the reCAPTCHA.");
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      const payload = buildBookingPayload(
-        activities,
-        sharedParticipants,
-        comment
-      );
-
-      payload.recaptcha_token = captchaToken;
-
-      const res = await submitBooking(payload);
-      const bookingData = res?.data;
+    const handleSubmit = async () => {
+      setSubmitError(null);
+      setSubmitSuccess(false);
+  
+      if (!captchaToken) {
+        setSubmitError("Please complete the reCAPTCHA.");
+        return;
+      }
+  
+      setIsSubmitting(true);
+      try {
+        const payload = buildBookingPayload(
+          activities,
+          sharedParticipants,
+          comment
+        );
+  
+        payload.recaptcha_token = captchaToken;
+  
+        const res = await submitBooking(payload);
+        const bookingData = res?.data;
 
       if (!bookingData?.payment) {
         // Букинг создан, но бэкенд не смог открыть платёжную сессию (например,
@@ -2015,6 +2014,7 @@ export default function CartPage() {
       window.dispatchEvent(new Event("cart-updated"));
     } catch (err) {
       setSubmitError(err.message);
+      
     } finally {
       recaptchaRef.current?.reset(); // v2-токен одноразовый, обязательно сбрасываем
 
@@ -2121,7 +2121,7 @@ export default function CartPage() {
 
             {/* Right: order summary */}
             <div className="w-full lg:w-[360px] flex-shrink-0">
-              <OrderSummary
+            <OrderSummary
                 activities={activities}
                 t={t}
                 sharedParticipants={sharedParticipants}
@@ -2142,8 +2142,6 @@ export default function CartPage() {
                 recaptchaRef={recaptchaRef}
                 captchaToken={captchaToken}
                 onCaptchaChange={setCaptchaToken}
-                recaptchaSiteKey={recaptchaSiteKey}   // NEW
-
               />
             </div>
           </div>
