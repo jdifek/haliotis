@@ -1591,7 +1591,7 @@ const OrderSummary = ({
         <div className="mb-4 flex justify-center">
           <ReCAPTCHA
             ref={recaptchaRef}
-            sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_V2_SITE_KEY}
+            sitekey={'6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'}
             onChange={onCaptchaChange}
             onExpired={() => onCaptchaChange(null)}
           />
