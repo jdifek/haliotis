@@ -1468,7 +1468,6 @@ const OrderSummary = ({
   recaptchaRef,        // NEW
   captchaToken,        // NEW
   onCaptchaChange,      // NEW
-  recaptchaSiteKey
 }) => {
   const grandTotal = activities.reduce((total, act) => {
     const courseTotal = sharedParticipants.length * act.price;
@@ -1590,14 +1589,12 @@ const OrderSummary = ({
       {/* reCAPTCHA v2 — только когда не создан ещё букинг (до payment) */}
       {!payment && (
         <div className="mb-4 flex justify-center">
-         {recaptchaSiteKey && (
-  <ReCAPTCHA
-    ref={recaptchaRef}
-    sitekey={recaptchaSiteKey}
-    onChange={onCaptchaChange}
-    onExpired={() => onCaptchaChange(null)}
-  />
-)}
+          <ReCAPTCHA
+            ref={recaptchaRef}
+            sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_V2_SITE_KEY}
+            onChange={onCaptchaChange}
+            onExpired={() => onCaptchaChange(null)}
+          />
         </div>
       )}
 
@@ -1755,18 +1752,7 @@ const buildBookingPayload = (activities, sharedParticipants, comment) => ({
 
 export default function CartPage() {
   const locale = useLocale();
-  const [recaptchaSiteKey, setRecaptchaSiteKey] = useState(null);
 
-  useEffect(() => {
-    fetch(`${API_BASE}/settings/public`, {
-      headers: { Accept: "application/json" },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setRecaptchaSiteKey(data?.google?.google_recaptcha_key || null);
-      })
-      .catch(() => setRecaptchaSiteKey(null));
-  }, []);
   const { terms: apiTerms } = useMenu(locale);
   const { executeRecaptcha } = useGoogleReCaptcha();
   const recaptchaRef = useRef(null);
@@ -2136,8 +2122,6 @@ export default function CartPage() {
             {/* Right: order summary */}
             <div className="w-full lg:w-[360px] flex-shrink-0">
             <OrderSummary
-              recaptchaSiteKey={recaptchaSiteKey}   // NEW
-
                 activities={activities}
                 t={t}
                 sharedParticipants={sharedParticipants}
