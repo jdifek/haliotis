@@ -1598,20 +1598,6 @@ const OrderSummary = ({
         </div>
       )}
 
-      {!formValid && (
-        <p className="text-[12px] text-[#e84814] text-center mb-2">
-          {t("form_incomplete_note", "Please fill in all required fields for every participant")}
-        </p>
-      )}
-
-      {!formValid && (
-        <p className="text-[12px] text-[#e84814] text-center mb-2">
-          {t(
-            "form_incomplete_note",
-            "Please fill in all required fields for every participant"
-          )}
-        </p>
-      )}
 
       {submitError && (
         <div className="mb-3 px-3 py-2 rounded-[10px] bg-[#fff0ed] border border-[#e84814] text-[13px] text-[#e84814]">
