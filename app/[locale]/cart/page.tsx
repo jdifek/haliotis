@@ -1816,8 +1816,6 @@ export default function CartPage() {
   }, [measurements]);
   // Load cart on mount — real API only, no mocks.
   useEffect(() => {
-    if (!executeRecaptcha) return;
-
     const loadCart = async () => {
       const storageItems = readCartFromStorage();
 
@@ -1826,14 +1824,12 @@ export default function CartPage() {
         return;
       }
 
-      const token = await executeRecaptcha("cart_resolve");
-
       const apiItems = storageItems.map(({ type, id }) => ({
         type,
         id,
       }));
 
-      resolveCart(apiItems, token)
+      resolveCart(apiItems, null)
         .then((data) => {
           setMeasurements(data.participant_measurements || null);
           setAgencies(data.agencies || []);
@@ -1854,8 +1850,7 @@ export default function CartPage() {
     };
 
     loadCart();
-  }, [executeRecaptcha]);
-
+  }, []);
   const removeActivity = (apiType, id) => {
     setActivities((prev) =>
       prev.filter((a) => !(a.id === id && a.apiType === apiType))
