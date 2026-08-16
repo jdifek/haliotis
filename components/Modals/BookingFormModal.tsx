@@ -3,7 +3,10 @@
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import BookingPhoneField from "../booking/BookingPhoneField";
-
+import { loadSibsWidgetScript } from "@/lib/payment";
+import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
+import ReCAPTCHA from "react-google-recaptcha";
+import { useLocale } from "next-intl";
 // ─────────────────────────────────────────────────────────────────────────────
 // LABELS — все строки собраны в одном месте. Язык — EN (как и было), структура
 // готова под замену PT-переводами с бэка: Object.assign(LABELS, ptDict) перед
@@ -1327,7 +1330,6 @@ const ParticipantBlock = ({
 };
 
 // ─── Reservation Summary ──────────────────────────────────────────────────────
-
 const ReservationSummary = ({
   courseTitle,
   currency,
@@ -1338,6 +1340,12 @@ const ReservationSummary = ({
   submitError,
   submitSuccess,
   disabled,
+  recaptchaRef,
+  onCaptchaChange,
+  payment,
+  widgetReady,
+  paymentError,
+  locale,
 }: {
   courseTitle: string;
   currency: string;
@@ -1348,6 +1356,12 @@ const ReservationSummary = ({
   submitError: string | null;
   submitSuccess: boolean;
   disabled: boolean;
+  recaptchaRef: React.RefObject<any>;
+  onCaptchaChange: (token: string | null) => void;
+  payment: any;
+  widgetReady: boolean;
+  paymentError: string | null;
+  locale: string;
 }) => {
   const count = participants.length;
   const courseTotal = count * pricePerPerson;
@@ -1408,34 +1422,81 @@ const ReservationSummary = ({
         </span>
       </div>
 
+     {/* reCAPTCHA v2 — только пока не создан букинг (до payment) */}
+     {!payment && (
+        <div className="flex justify-center my-2">
+          <ReCAPTCHA
+            ref={recaptchaRef}
+            sitekey={'6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'}
+            onChange={onCaptchaChange}
+            onExpired={() => onCaptchaChange(null)}
+          />
+        </div>
+      )}
+
       {submitError && (
         <div className="px-3 py-2 rounded-[10px] bg-[#fff0ed] border border-[#e84814] text-[13px] text-[#e84814]">
           {submitError}
         </div>
       )}
-      {submitSuccess && (
-        <div className="px-3 py-2 rounded-[10px] bg-[#f0fff4] border border-[#4caf50] text-[13px] text-[#2e7d32]">
-          {LABELS.submitSuccess}
+      {paymentError && (
+        <div className="px-3 py-2 rounded-[10px] bg-[#fff0ed] border border-[#e84814] text-[13px] text-[#e84814]">
+          {paymentError}
         </div>
       )}
-      {disabled && !submitError && (
+      {/* {disabled && !submitError && !payment && (
         <p className="text-[12px] text-[#e84814] text-center">
           {LABELS.requiredFieldsNote}
         </p>
+      )} */}
+
+      {!payment && (
+        <button
+          type="button"
+          onClick={onBook}
+          disabled={isSubmitting || disabled}
+          className={`w-full py-2 rounded-full text-white text-[16px] font-semibold transition-colors mt-1 ${
+            isSubmitting || disabled
+              ? "bg-[#ccc] cursor-not-allowed"
+              : "bg-[#e84814] hover:bg-[#d63f0f] cursor-pointer"
+          }`}
+        >
+          {isSubmitting ? LABELS.sending : LABELS.bookNow}
+        </button>
       )}
 
-      <button
-        type="button"
-        onClick={onBook}
-        disabled={isSubmitting || disabled || submitSuccess}
-        className={`w-full py-2 rounded-full text-white text-[16px] font-semibold transition-colors mt-1 ${
-          isSubmitting || disabled || submitSuccess
-            ? "bg-[#ccc] cursor-not-allowed"
-            : "bg-[#e84814] hover:bg-[#d63f0f] cursor-pointer"
-        }`}
-      >
-        {isSubmitting ? LABELS.sending : LABELS.bookNow}
-      </button>
+      {/* После создания букинга — форма оплаты SIBS вместо кнопки */}
+      {payment && (
+        <div className="mt-2">
+          {submitSuccess && (
+            <div className="px-3 py-2 mb-3 rounded-[10px] bg-[#f0fff4] border border-[#4caf50] text-[13px] text-[#2e7d32]">
+              {LABELS.submitSuccess}
+            </div>
+          )}
+          {!widgetReady && (
+            <div className="flex items-center justify-center gap-2 py-2 text-[13px] text-[#666]">
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-black/10 border-t-[#e84814]" />
+              Loading payment methods…
+            </div>
+          )}
+          <form
+            className="paymentSPG"
+            spg-context={payment.form_context}
+            spg-config={JSON.stringify({
+              paymentMethodList: payment.payment_methods,
+              amount: {
+                value: payment.amount.value,
+                currency: payment.amount.currency,
+              },
+              language: locale,
+              redirectUrl: `${window.location.origin}/${locale}/payment/redirect`,
+            })}
+            spg-style={JSON.stringify({
+              transaction: { layout: "default", theme: "default" },
+            })}
+          />
+        </div>
+      )}
 
       <div className="flex items-center justify-center gap-1.5 mt-1">
         <ShieldIcon />
@@ -1542,6 +1603,18 @@ export const BookingFormModal: React.FC<Props> = ({
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
+  // ─── reCAPTCHA v2 ───────────────────────────────────────────────
+  const recaptchaRef = useRef<any>(null);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+
+  // ─── Payment (SIBS) ─────────────────────────────────────────────
+  const [payment, setPayment] = useState<any>(null);
+  const [widgetReady, setWidgetReady] = useState(false);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
+
+  // Локаль для redirectUrl виджета — берите из вашего useLocale(), если он
+  // используется в приложении; здесь fallback на "en".
+  const locale = useLocale();
   // FIX (п.1): пока модалка открыта — скроллится только она, фон полностью заблокирован
   useEffect(() => {
     if (!isOpen) return;
@@ -1566,6 +1639,18 @@ export const BookingFormModal: React.FC<Props> = ({
     };
   }, [isOpen]);
 
+  useEffect(() => {
+    if (!payment) return;
+    setWidgetReady(false);
+    setPaymentError(null);
+    const widgetUrl = `${payment.widget_script_url}?id=${payment.transaction_id}`;
+
+    loadSibsWidgetScript(widgetUrl)
+      .then(() => setWidgetReady(true))
+      .catch((e) =>
+        setPaymentError(e.message || "Failed to load payment widget.")
+      );
+  }, [payment]);
   // Загрузка реального состояния с бэка
   useEffect(() => {
     if (!isOpen || !itemId) return;
@@ -1730,67 +1815,115 @@ export const BookingFormModal: React.FC<Props> = ({
       )
     );
 
-  const formValid =
+    const formValid =
     !!selectedDate &&
     (!centers.length || !!centerSlug) &&
     participants.every(isParticipantValid) &&
     (!requiresCert || participants.every(isCertValid)) &&
     privacy &&
-    terms;
+    terms &&
+    !!captchaToken;
 
-  const handleSubmit = async () => {
-    setSubmitError(null);
-    setSubmitSuccess(false);
-    setIsSubmitting(true);
-    try {
-      const payload = {
-        comment,
-        items: [
-          {
-            type: itemType,
-            id: itemId,
-            date: selectedDate,
-            ...(itemType === "course" && centerSlug
-              ? { center_slug: centerSlug }
-              : {}),
-            participants: participants.map((p) => ({
-              first_name: p.firstName,
-              last_name: p.lastName,
-              date_of_birth: p.dateOfBirth,
-              gender: p.gender,
-              phone: p.phone,
-              email: p.email,
-              measurements: {
-                height: { value: p.height.value, unit_id: p.height.unitId },
-                weight: { value: p.weight.value, unit_id: p.weight.unitId },
-                shoe_size: {
-                  value: p.shoeSize.value,
-                  unit_id: p.shoeSize.unitId,
+  // ВРЕМЕННЫЙ ДЕБАГ — удалить после диагностики
+  if (typeof window !== "undefined") {
+    console.log("formValid debug:", {
+      selectedDate: !!selectedDate,
+      centersOk: !centers.length || !!centerSlug,
+      participantsOk: participants.every(isParticipantValid),
+      requiresCert,
+      certOk: !requiresCert || participants.every(isCertValid),
+      privacy,
+      terms,
+      captchaToken: !!captchaToken,
+      participantsDetail: participants.map(p => ({
+        id: p.id,
+        firstName: !!p.firstName.trim(),
+        lastName: !!p.lastName.trim(),
+        dob: !!p.dateOfBirth,
+        gender: !!p.gender,
+        phone: !!p.phone.trim(),
+        email: !!p.email.trim(),
+        height: !!p.height.value,
+        weight: !!p.weight.value,
+        shoeSize: !!p.shoeSize.value,
+      })),
+    });
+  }
+
+    const handleSubmit = async () => {
+      setSubmitError(null);
+      setSubmitSuccess(false);
+  
+      if (!captchaToken) {
+        setSubmitError("Please complete the reCAPTCHA.");
+        return;
+      }
+  
+      setIsSubmitting(true);
+      try {
+        const payload: any = {
+          comment,
+          recaptcha_token: captchaToken,
+          items: [
+            {
+              type: itemType,
+              id: itemId,
+              date: selectedDate,
+              ...(itemType === "course" && centerSlug
+                ? { center_slug: centerSlug }
+                : {}),
+              participants: participants.map((p) => ({
+                first_name: p.firstName,
+                last_name: p.lastName,
+                date_of_birth: p.dateOfBirth,
+                gender: p.gender,
+                phone: p.phone,
+                email: p.email,
+                measurements: {
+                  height: { value: p.height.value, unit_id: p.height.unitId },
+                  weight: { value: p.weight.value, unit_id: p.weight.unitId },
+                  shoe_size: {
+                    value: p.shoeSize.value,
+                    unit_id: p.shoeSize.unitId,
+                  },
                 },
-              },
-              certification: requiresCert
-                ? {
-                    agency: p.certAgency,
-                    level: p.certLevel,
-                    total_dives: p.totalDives,
-                    last_dive_date: p.lastDiveDate,
-                  }
-                : null,
-              equipment_rent: p.equipment
-                .filter((e) => e.isSelected)
-                .map((e) => ({ id: e.id })),
-            })),
-          },
-        ],
-      };
-      await submitBookingRequest(payload);
-      setSubmitSuccess(true);
-    } catch (err: any) {
-      setSubmitError(err.message || LABELS.submitError);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+                certification: requiresCert
+                  ? {
+                      agency: p.certAgency,
+                      level: p.certLevel,
+                      total_dives: p.totalDives,
+                      last_dive_date: p.lastDiveDate,
+                    }
+                  : null,
+                equipment_rent: p.equipment
+                  .filter((e) => e.isSelected)
+                  .map((e) => ({ id: e.id })),
+              })),
+            },
+          ],
+        };
+  
+        const res = await submitBookingRequest(payload);
+        const bookingData = res?.data;
+  
+        if (!bookingData?.payment) {
+          setSubmitError(
+            bookingData?.payment_error ||
+              "Payment could not be started. Please contact support."
+          );
+          setIsSubmitting(false);
+          return;
+        }
+  
+        setPayment(bookingData.payment);
+        setSubmitSuccess(true);
+      } catch (err: any) {
+        setSubmitError(err.message || LABELS.submitError);
+      } finally {
+        recaptchaRef.current?.reset();
+        setIsSubmitting(false);
+      }
+    };
 
   if (!isOpen) return null;
 
@@ -1991,7 +2124,7 @@ export const BookingFormModal: React.FC<Props> = ({
                       ))}
 
                       <div className="3xl:hidden w-full">
-                        <ReservationSummary
+                      <ReservationSummary
                           courseTitle={courseTitle}
                           currency={currency}
                           participants={participants}
@@ -2001,6 +2134,12 @@ export const BookingFormModal: React.FC<Props> = ({
                           submitError={submitError}
                           submitSuccess={submitSuccess}
                           disabled={!formValid}
+                          recaptchaRef={recaptchaRef}
+                          onCaptchaChange={setCaptchaToken}
+                          payment={payment}
+                          widgetReady={widgetReady}
+                          paymentError={paymentError}
+                          locale={locale}
                         />
                       </div>
                     </div>
@@ -2040,6 +2179,12 @@ export const BookingFormModal: React.FC<Props> = ({
                         submitError={submitError}
                         submitSuccess={submitSuccess}
                         disabled={!formValid}
+                        recaptchaRef={recaptchaRef}
+                        onCaptchaChange={setCaptchaToken}
+                        payment={payment}
+                        widgetReady={widgetReady}
+                        paymentError={paymentError}
+                        locale={locale}
                       />
                     </div>
                   </div>
