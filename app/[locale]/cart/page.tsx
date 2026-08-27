@@ -131,6 +131,7 @@ const createSharedParticipant = (id) => ({
   weight: { value: "", unitId: null },
   shoeSize: { value: "", unitId: null },
   certAgency: "",
+  certAgencyOther: "",
   certLevel: "",
   totalDives: "",
   lastDiveDate: "",
@@ -185,9 +186,12 @@ const isParticipantValid = (sp) =>
   sp.weight.value &&
   sp.shoeSize.value;
 
-const isCertValid = (ad) =>
-  ad.certAgency && ad.certLevel && ad.totalDives && ad.lastDiveDate;
-
+  const isCertValid = (ad) =>
+    ad.certAgency &&
+    (ad.certAgency !== "other" || (ad.certAgencyOther || "").trim()) &&
+    ad.certLevel &&
+    ad.totalDives &&
+    ad.lastDiveDate;
 const isFormValid = (activities, sharedParticipants) => {
   if (!sharedParticipants.every(isParticipantValid)) return false;
 
@@ -423,8 +427,8 @@ const CustomDropdown = ({ label, value, onChange, options, unit, icon }) => {
       <button
         onClick={() => (isOpen ? setIsOpen(false) : open())}
         className={`flex items-center justify-between gap-2 ${
-          icon ? "pl-8" : "pl-3"
-        } pr-3 py-2 rounded-[10px] border border-[#d9d9d9] bg-white text-[15px] w-full outline-none cursor-pointer relative`}
+          icon ? "pl-8" : "pl-2"
+        } pr-2 py-2 rounded-[10px] border border-[#d9d9d9] bg-white text-[15px] w-full outline-none cursor-pointer relative`}
       >
         {icon && (
           <span className="absolute left-3 top-1/2 -translate-y-1/2">
@@ -1026,16 +1030,16 @@ const MeasurementField = ({ label, value, onChange, options, units }) => {
     : units?.[0] || null;
   return (
     <div className="flex gap-1">
-      <div className="flex-1">
-        <CustomDropdown
-          label={label}
-          value={value.value}
-          onChange={(v) => onChange({ ...value, value: v })}
-          options={options}
-        />
-      </div>
-      {units && units.length > 1 && (
-        <div className="w-20">
+     <div className="flex-1">
+  <PlaceholderInput
+    placeholder={label}
+    value={value.value}
+    onChange={(v) => onChange({ ...value, value: v })}
+    type="number"
+  />
+</div>
+{units && units.length > 1 && (
+  <div className="w-[145px] flex-shrink-0">
           <CustomDropdown
             label={t("unit_label", "Unit")}
             value={unitValue || ""}
@@ -1045,7 +1049,7 @@ const MeasurementField = ({ label, value, onChange, options, units }) => {
         </div>
       )}
       {units && units.length === 1 && (
-        <div className="flex items-center px-2 text-[13px] text-[#999] border border-[#d9d9d9] rounded-[10px] bg-white whitespace-nowrap flex-shrink-0">
+        <div className="w-[145px] sm:w-auto flex items-center justify-center sm:justify-start px-2 text-[13px] text-[#999] border border-[#d9d9d9] rounded-[10px] bg-white whitespace-nowrap flex-shrink-0">
           {units[0].title}
         </div>
       )}
@@ -1176,12 +1180,11 @@ const ParticipantBlock = ({
                 { id: "other", title: t("gender_other", "Other") },
               ]}
             />
-            <BookingPhoneField
-              placeholder={t("phone_number", "Phone Number *")}
-              value={shared.phone}
-              onChange={(v) => onChangeShared(shared.id, "phone", v)}
-              defaultCountry="pt"
-            />
+          <BookingPhoneField
+  placeholder={t("phone_number", "Phone Number *")}
+  value={shared.phone}
+  onChange={(v) => onChangeShared(shared.id, "phone", v)}
+/>
             <PlaceholderInput
               placeholder={t("email_label", "E-mail *")}
               value={shared.email}
@@ -1281,22 +1284,28 @@ const ParticipantBlock = ({
                 </span>
               </div>
               <div className="grid md:grid-cols-2 grid-cols-1  gap-2 mb-2">
-                <CustomDropdown
-                  label={t("certification_agency", "Certification Agency *")}
-                  value={agencies.find((a) => a.id === shared.certAgency) || ""}
-                  onChange={(v) =>
-                    onChangeShared(shared.id, "certAgency", v.id)
-                  }
-                  options={agencies}
-                />
-                <PlaceholderInput
-                  placeholder={t(
-                    "certification_level",
-                    "Certification Level *"
-                  )}
-                  value={shared.certLevel || ""}
-                  onChange={(v) => onChangeShared(shared.id, "certLevel", v)}
-                />
+              <CustomDropdown
+  label={t("certification_agency", "Certification Agency *")}
+  value={
+    [...agencies, { id: "other", title: t("agency_other", "Other") }].find(
+      (a) => a.id === shared.certAgency
+    ) || ""
+  }
+  onChange={(v) => onChangeShared(shared.id, "certAgency", v.id)}
+  options={[...agencies, { id: "other", title: t("agency_other", "Other") }]}
+/>
+<PlaceholderInput
+  placeholder={t("certification_level", "Certification Level *")}
+  value={shared.certLevel || ""}
+  onChange={(v) => onChangeShared(shared.id, "certLevel", v)}
+/>
+{shared.certAgency === "other" && (
+  <PlaceholderInput
+    placeholder={t("certification_agency_other", "Agency Name *")}
+    value={shared.certAgencyOther || ""}
+    onChange={(v) => onChangeShared(shared.id, "certAgencyOther", v)}
+  />
+)}
               </div>
               <div className="grid md:grid-cols-2 grid-cols-1 gap-2">
                 <PlaceholderInput
@@ -1716,13 +1725,14 @@ const buildBookingPayload = (activities, sharedParticipants, comment) => ({
           shoe_size: { value: sp.shoeSize.value, unit_id: sp.shoeSize.unitId },
         },
         certification: act.requiresCert
-          ? {
-              agency_id: sp.certAgency,
-              level: sp.certLevel,
-              total_dives: sp.totalDives,
-              last_dive_date: sp.lastDiveDate,
-            }
-          : null,
+        ? {
+            agency_id: sp.certAgency !== "other" ? sp.certAgency : null,
+            agency_other: sp.certAgency === "other" ? sp.certAgencyOther : null,
+            level: sp.certLevel,
+            total_dives: sp.totalDives,
+            last_dive_date: sp.lastDiveDate,
+          }
+        : null,
         equipment_rent: ad.equipment
           .filter((e) => e.isSelected)
           .map((e) => ({
@@ -2031,7 +2041,7 @@ export default function CartPage() {
         className="min-h-screen bg-[#f5f5f5]"
         style={{ fontFamily: "Inter, sans-serif" }}
       >
-        <div className="max-w-[1200px] mx-auto px-4 py-8">
+        <div className="max-w-[1350px] mx-auto px-4 md:px-0 py-8">
           <h1 className="text-[32px] font-bold text-[#111] mb-1">
             {t("your_cart", "Your Cart")}
           </h1>

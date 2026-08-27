@@ -18,15 +18,15 @@ export const Breadcrumbs = ({
 }: BreadcrumbsProps) => {
   return (
     <nav
-      className={`flex items-center text-sm ${className}`}
-      aria-label="Breadcrumb"
-    >
+    className={`flex items-center text-sm flex-nowrap whitespace-nowrap overflow-x-auto ${className}`}
+    aria-label="Breadcrumb"
+    style={{ scrollbarWidth: "none" }}
+  >
       {items.map((item, index) => {
         const isLast = index === items.length - 1;
 
         return (
-          <div key={index} className="flex items-center">
-            {item.href && !isLast ? (
+<div key={index} className="flex items-center flex-shrink-0 whitespace-nowrap">            {item.href && !isLast ? (
             <Link
             href={item.href}
             className={`${

@@ -60,7 +60,7 @@ const LABELS = {
   submitSuccess: "Booking submitted successfully!",
   requiredFieldsNote:
     "Please fill in all required fields for every participant",
-  certAgencies: ["PADI", "SSI", "NAUI", "CMAS", "SDI", "TDI"],
+    certAgencyOtherPlaceholder: "Certification Agency Name *",
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -113,7 +113,7 @@ type MeasurementValue = { value: string; unitId: number | null };
 type MeasurementUnit = { id: number; title: string };
 type GenderOption = { key: string; label: string };
 type CenterOption = { slug: string; name: string };
-
+type AgencyOption = { id: string; title: string };
 type EquipmentItem = {
   id: number;
   name: string;
@@ -136,6 +136,7 @@ type Participant = {
   shoeSize: MeasurementValue;
   equipment: EquipmentItem[];
   certAgency: string;
+  certAgencyOther: string;
   certLevel: string;
   totalDives: string;
   lastDiveDate: string;
@@ -191,6 +192,7 @@ const createParticipant = (id: number): Participant => ({
   shoeSize: { value: "", unitId: null },
   equipment: [],
   certAgency: "",
+  certAgencyOther: "",
   certLevel: "",
   totalDives: "",
   lastDiveDate: "",
@@ -211,9 +213,14 @@ const isParticipantValid = (p: Participant) =>
     p.shoeSize.value
   );
 
-const isCertValid = (p: Participant) =>
-  !!(p.certAgency && p.certLevel && p.totalDives && p.lastDiveDate);
-
+  const isCertValid = (p: Participant) =>
+    !!(
+      p.certAgency &&
+      (p.certAgency !== "other" || p.certAgencyOther.trim()) &&
+      p.certLevel &&
+      p.totalDives &&
+      p.lastDiveDate
+    );
 // ─── Portal ───────────────────────────────────────────────────────────────────
 
 const Portal = ({ children }: { children: React.ReactNode }) => {
@@ -456,8 +463,8 @@ const CustomDropdown = ({
         type="button"
         onClick={() => (isOpen ? setIsOpen(false) : open())}
         className={`flex items-center justify-between gap-2 ${
-          icon ? "pl-8" : "pl-3"
-        } pr-3 py-2 rounded-[10px] border bg-white text-[15px] w-full outline-none transition-colors cursor-pointer relative ${
+          icon ? "pl-8" : "pl-2"
+        } pr-2 py-2 rounded-[10px] border bg-white text-[15px] w-full outline-none transition-colors cursor-pointer relative ${
           isOpen ? "border-[#e84814]" : "border-[#d9d9d9]"
         }`}
       >
@@ -542,15 +549,15 @@ const MeasurementField = ({
   return (
     <div className="flex gap-1 w-full">
       <div className="flex-1 min-w-0">
-        <CustomDropdown
-          label={label}
+        <PlaceholderInput
+          placeholder={label}
           value={value.value}
           onChange={(v) => onChange({ ...value, value: v })}
-          options={options}
+          type="number"
         />
       </div>
       {units.length > 1 ? (
-        <div className="w-[86px] flex-shrink-0">
+        <div className="w-[145px] flex-shrink-0">
           <CustomDropdown
             label="Unit"
             value={unitValue}
@@ -562,7 +569,7 @@ const MeasurementField = ({
           />
         </div>
       ) : units.length === 1 ? (
-        <div className="flex items-center px-2 text-[13px] text-[#999] border border-[#d9d9d9] rounded-[10px] bg-white whitespace-nowrap flex-shrink-0">
+        <div className="w-[145px] sm:w-auto flex items-center justify-center sm:justify-start px-2 text-[13px] text-[#999] border border-[#d9d9d9] rounded-[10px] bg-white whitespace-nowrap flex-shrink-0">
           {units[0].title}
         </div>
       ) : null}
@@ -680,8 +687,12 @@ const MiniCalendar = ({
   const cells: (number | null)[] = [];
   for (let i = 0; i < startDay; i++) cells.push(null);
   for (let d = 1; d <= daysInMonth; d++) cells.push(d);
-  const defaultMinYear = disableFuture ? today.getFullYear() - 100 : today.getFullYear();
-  const defaultMaxYear = disableFuture ? today.getFullYear() : today.getFullYear() + 5;
+  const defaultMinYear = disableFuture
+    ? today.getFullYear() - 100
+    : today.getFullYear();
+  const defaultMaxYear = disableFuture
+    ? today.getFullYear()
+    : today.getFullYear() + 5;
   const years: number[] = [];
   for (let y = defaultMaxYear; y >= defaultMinYear; y--) years.push(y);
   return (
@@ -718,22 +729,34 @@ const MiniCalendar = ({
       </div>
 
       <div className="flex items-center justify-between px-4 py-3 gap-2">
-        <button type="button" onClick={prevMonth} className="w-8 h-8 flex items-center justify-center rounded-full border border-[#e4e4e4] hover:bg-[#f5f5f5] cursor-pointer flex-shrink-0">
+        <button
+          type="button"
+          onClick={prevMonth}
+          className="w-8 h-8 flex items-center justify-center rounded-full border border-[#e4e4e4] hover:bg-[#f5f5f5] cursor-pointer flex-shrink-0"
+        >
           <ChevronDown className="rotate-90 w-3 h-3 text-[#111]" />
         </button>
         <div className="flex items-center gap-1.5">
-          <span className="text-[15px] font-medium text-[#111]">{MONTHS[viewMonth]}</span>
+          <span className="text-[15px] font-medium text-[#111]">
+            {MONTHS[viewMonth]}
+          </span>
           <select
             value={viewYear}
             onChange={(e) => setViewYear(Number(e.target.value))}
             className="text-[15px] font-medium text-[#111] border border-[#e4e4e4] rounded-lg pl-2 pr-1 py-0.5 outline-none cursor-pointer bg-white"
           >
             {years.map((y) => (
-              <option key={y} value={y}>{y}</option>
+              <option key={y} value={y}>
+                {y}
+              </option>
             ))}
           </select>
         </div>
-        <button type="button" onClick={nextMonth} className="w-8 h-8 flex items-center justify-center rounded-full border border-[#e4e4e4] hover:bg-[#f5f5f5] cursor-pointer flex-shrink-0">
+        <button
+          type="button"
+          onClick={nextMonth}
+          className="w-8 h-8 flex items-center justify-center rounded-full border border-[#e4e4e4] hover:bg-[#f5f5f5] cursor-pointer flex-shrink-0"
+        >
           <ChevronDown className="-rotate-90 w-3 h-3 text-[#111]" />
         </button>
       </div>
@@ -928,9 +951,12 @@ const DatePickerField = ({
               zIndex: PORTAL_Z,
             }}
           >
-          <MiniCalendar
+            <MiniCalendar
               selected={value}
-              onSelect={(v) => { onChange(v); setOpen(false); }}
+              onSelect={(v) => {
+                onChange(v);
+                setOpen(false);
+              }}
               onClose={() => setOpen(false)}
               unavailableDates={unavailableDates}
               disablePast={disablePast}
@@ -1043,13 +1069,13 @@ const EquipmentGrid = ({
 };
 
 // ─── Participant block ────────────────────────────────────────────────────────
-
 const ParticipantBlock = ({
   p,
   centerHeights,
   centerWeights,
   centerShoes,
   genderOptions,
+  agencies,
   requiresCert,
   onChange,
   onToggleEquip,
@@ -1062,6 +1088,7 @@ const ParticipantBlock = ({
   centerWeights: MeasurementUnit[];
   centerShoes: MeasurementUnit[];
   genderOptions: GenderOption[];
+  agencies: AgencyOption[];
   requiresCert: boolean;
   onChange: (id: number, field: string, val: any) => void;
   onToggleEquip: (pid: number, eid: number) => void;
@@ -1170,12 +1197,12 @@ const ParticipantBlock = ({
             }}
             options={genderOptions.map((g) => g.label)}
           />
-        <BookingPhoneField
-  placeholder={LABELS.phoneNumber}
-  value={p.phone}
-  onChange={(v) => onChange(p.id, "phone", v)}
-  defaultCountry="pt"
-/>
+          <BookingPhoneField
+            placeholder={LABELS.phoneNumber}
+            value={p.phone}
+            onChange={(v) => onChange(p.id, "phone", v)}
+            
+          />
           <PlaceholderInput
             placeholder={LABELS.email}
             value={p.email}
@@ -1275,9 +1302,20 @@ const ParticipantBlock = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
               <CustomDropdown
                 label={LABELS.certAgency}
-                value={p.certAgency}
-                onChange={(v) => onChangeCert(p.id, "certAgency", v)}
-                options={LABELS.certAgencies}
+                value={
+                  [...agencies, { id: "other", title: "Other" }].find(
+                    (a) => a.id === p.certAgency
+                  )?.title || ""
+                }
+                onChange={(title) => {
+                  const a = [...agencies, { id: "other", title: "Other" }].find(
+                    (x) => x.title === title
+                  );
+                  onChangeCert(p.id, "certAgency", a ? a.id : title);
+                }}
+                options={[...agencies, { id: "other", title: "Other" }].map(
+                  (a) => a.title
+                )}
               />
               <PlaceholderInput
                 placeholder={LABELS.certLevel}
@@ -1285,6 +1323,24 @@ const ParticipantBlock = ({
                 onChange={(v) => onChangeCert(p.id, "certLevel", v)}
               />
             </div>
+            {p.certAgency === "other" && (
+              <div className="mb-2">
+                <PlaceholderInput
+                  placeholder={LABELS.certAgencyOtherPlaceholder}
+                  value={p.certAgencyOther}
+                  onChange={(v) => onChangeCert(p.id, "certAgencyOther", v)}
+                />
+              </div>
+            )}
+            {p.certAgency === "Other" && (
+              <div className="mb-2">
+                <PlaceholderInput
+                  placeholder={LABELS.certAgencyOtherPlaceholder}
+                  value={p.certAgencyOther}
+                  onChange={(v) => onChangeCert(p.id, "certAgencyOther", v)}
+                />
+              </div>
+            )}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <PlaceholderInput
                 placeholder={LABELS.totalDives}
@@ -1422,12 +1478,12 @@ const ReservationSummary = ({
         </span>
       </div>
 
-     {/* reCAPTCHA v2 — только пока не создан букинг (до payment) */}
-     {!payment && (
+      {/* reCAPTCHA v2 — только пока не создан букинг (до payment) */}
+      {!payment && (
         <div className="flex justify-center my-2">
           <ReCAPTCHA
             ref={recaptchaRef}
-            sitekey={'6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'}
+            sitekey={"6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"}
             onChange={onCaptchaChange}
             onExpired={() => onCaptchaChange(null)}
           />
@@ -1580,6 +1636,7 @@ export const BookingFormModal: React.FC<Props> = ({
   }>({ height: [], weight: [], shoe_size: [] });
 
   // FIX (п.4): центры и гендеры — реальные данные с бэка, без мока
+  // FIX (п.4): центры и гендеры — реальные данные с бэка, без мока
   const [centers, setCenters] = useState<CenterOption[]>([]);
   const [centerSlug, setCenterSlug] = useState(initialCenterSlug || "");
   const [genderOptions, setGenderOptions] = useState<GenderOption[]>([
@@ -1587,6 +1644,7 @@ export const BookingFormModal: React.FC<Props> = ({
     { key: "female", label: "Female" },
     { key: "other", label: "Other" },
   ]);
+  const [agencies, setAgencies] = useState<AgencyOption[]>([]);
 
   const [selectedDate, setSelectedDate] = useState("");
   const [participantCount, setParticipantCount] = useState(2);
@@ -1718,16 +1776,21 @@ export const BookingFormModal: React.FC<Props> = ({
         }
 
         // FIX (п.4): реальные гендеры с бэка (ключ→лейбл)
-        if (data.genders && typeof data.genders === "object") {
-          const list: GenderOption[] = Object.entries(data.genders).map(
-            ([key, label]) => ({
-              key,
-              label: String(label),
+              // FIX (п.4): реальные гендеры с бэка (ключ→лейбл)
+              if (data.genders && typeof data.genders === "object") {
+                const list: GenderOption[] = Object.entries(data.genders).map(
+                  ([key, label]) => ({
+                    key,
+                    label: String(label),
+                  })
+                );
+                if (list.length) setGenderOptions(list);
+              }
+      
+              if (Array.isArray(data.agencies) && data.agencies.length) {
+                setAgencies(data.agencies);
+              }
             })
-          );
-          if (list.length) setGenderOptions(list);
-        }
-      })
       .catch((err) => {
         if (!cancelled) setLoadError(err.message || LABELS.loadError);
       })
@@ -1815,7 +1878,7 @@ export const BookingFormModal: React.FC<Props> = ({
       )
     );
 
-    const formValid =
+  const formValid =
     !!selectedDate &&
     (!centers.length || !!centerSlug) &&
     participants.every(isParticipantValid) &&
@@ -1835,7 +1898,7 @@ export const BookingFormModal: React.FC<Props> = ({
       privacy,
       terms,
       captchaToken: !!captchaToken,
-      participantsDetail: participants.map(p => ({
+      participantsDetail: participants.map((p) => ({
         id: p.id,
         firstName: !!p.firstName.trim(),
         lastName: !!p.lastName.trim(),
@@ -1850,80 +1913,82 @@ export const BookingFormModal: React.FC<Props> = ({
     });
   }
 
-    const handleSubmit = async () => {
-      setSubmitError(null);
-      setSubmitSuccess(false);
-  
-      if (!captchaToken) {
-        setSubmitError("Please complete the reCAPTCHA.");
+  const handleSubmit = async () => {
+    setSubmitError(null);
+    setSubmitSuccess(false);
+
+    if (!captchaToken) {
+      setSubmitError("Please complete the reCAPTCHA.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const payload: any = {
+        comment,
+        recaptcha_token: captchaToken,
+        items: [
+          {
+            type: itemType,
+            id: itemId,
+            date: selectedDate,
+            ...(itemType === "course" && centerSlug
+              ? { center_slug: centerSlug }
+              : {}),
+            participants: participants.map((p) => ({
+              first_name: p.firstName,
+              last_name: p.lastName,
+              date_of_birth: p.dateOfBirth,
+              gender: p.gender,
+              phone: p.phone,
+              email: p.email,
+              measurements: {
+                height: { value: p.height.value, unit_id: p.height.unitId },
+                weight: { value: p.weight.value, unit_id: p.weight.unitId },
+                shoe_size: {
+                  value: p.shoeSize.value,
+                  unit_id: p.shoeSize.unitId,
+                },
+              },
+              certification: requiresCert
+              ? {
+                  agency_id: p.certAgency !== "other" ? p.certAgency : null,
+                  agency_other:
+                    p.certAgency === "other" ? p.certAgencyOther : null,
+                  level: p.certLevel,
+                  total_dives: p.totalDives,
+                  last_dive_date: p.lastDiveDate,
+                }
+              : null,
+              equipment_rent: p.equipment
+                .filter((e) => e.isSelected)
+                .map((e) => ({ id: e.id })),
+            })),
+          },
+        ],
+      };
+
+      const res = await submitBookingRequest(payload);
+      const bookingData = res?.data;
+
+      if (!bookingData?.payment) {
+        setSubmitError(
+          bookingData?.payment_error ||
+            "Payment could not be started. Please contact support."
+        );
+        setIsSubmitting(false);
         return;
       }
-  
-      setIsSubmitting(true);
-      try {
-        const payload: any = {
-          comment,
-          recaptcha_token: captchaToken,
-          items: [
-            {
-              type: itemType,
-              id: itemId,
-              date: selectedDate,
-              ...(itemType === "course" && centerSlug
-                ? { center_slug: centerSlug }
-                : {}),
-              participants: participants.map((p) => ({
-                first_name: p.firstName,
-                last_name: p.lastName,
-                date_of_birth: p.dateOfBirth,
-                gender: p.gender,
-                phone: p.phone,
-                email: p.email,
-                measurements: {
-                  height: { value: p.height.value, unit_id: p.height.unitId },
-                  weight: { value: p.weight.value, unit_id: p.weight.unitId },
-                  shoe_size: {
-                    value: p.shoeSize.value,
-                    unit_id: p.shoeSize.unitId,
-                  },
-                },
-                certification: requiresCert
-                  ? {
-                      agency: p.certAgency,
-                      level: p.certLevel,
-                      total_dives: p.totalDives,
-                      last_dive_date: p.lastDiveDate,
-                    }
-                  : null,
-                equipment_rent: p.equipment
-                  .filter((e) => e.isSelected)
-                  .map((e) => ({ id: e.id })),
-              })),
-            },
-          ],
-        };
-  
-        const res = await submitBookingRequest(payload);
-        const bookingData = res?.data;
-  
-        if (!bookingData?.payment) {
-          setSubmitError(
-            bookingData?.payment_error ||
-              "Payment could not be started. Please contact support."
-          );
-          setIsSubmitting(false);
-          return;
-        }
-  
-        setPayment(bookingData.payment);
-        setSubmitSuccess(true);
-      } catch (err: any) {
-        setSubmitError(err.message || LABELS.submitError);
-      } finally {
-        recaptchaRef.current?.reset();
-        setIsSubmitting(false);
-      }
-    };
+
+      setPayment(bookingData.payment);
+      setSubmitSuccess(true);
+    } catch (err: any) {
+      setSubmitError(err.message || LABELS.submitError);
+    } finally {
+      recaptchaRef.current?.reset();
+      setIsSubmitting(false);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -1961,10 +2026,19 @@ export const BookingFormModal: React.FC<Props> = ({
 
               <div className="relative z-0 flex items-center gap-3 px-6 pb-6 pt-4">
                 <div className="w-9 h-9 bg-white rounded-full flex items-center justify-center flex-shrink-0">
-                <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="44" height="44" rx="22" fill="white" />
-  <path d="M27.9624 23.293C28.8861 22.3501 30.3835 22.3501 31.3072 23.293C32.2309 24.2358 32.2309 25.7642 31.3072 26.707L27.2341 30.8645C27.1332 30.9675 27.0021 31.1066 26.8434 31.2195L26.843 31.2191C26.7172 31.3088 26.5813 31.383 26.4381 31.4402C26.2583 31.5122 26.0727 31.5468 25.9326 31.5754L23.9487 31.9805C23.6275 32.046 23.2955 31.9435 23.0639 31.707C22.8322 31.4706 22.7317 31.1318 22.796 30.8039L23.1928 28.7789C23.2209 28.6358 23.2543 28.4461 23.3249 28.2625C23.3809 28.1164 23.4537 27.9777 23.5415 27.8492L23.6283 27.7332C23.718 27.6223 23.8136 27.5277 23.8893 27.4504L27.9624 23.293ZM29.9219 24.707C29.7634 24.5453 29.5063 24.5453 29.3478 24.707L25.2747 28.8645C25.2078 28.9328 25.175 28.9665 25.1519 28.9918C25.1513 28.9924 25.1505 28.9928 25.15 28.9934C25.1497 28.9943 25.1498 28.9955 25.1496 28.9965C25.1418 29.0301 25.1325 29.0767 25.114 29.1711L25.0053 29.725L25.5484 29.6145C25.6408 29.5956 25.6865 29.5861 25.7194 29.5781C25.7203 29.5779 25.7213 29.5775 25.7221 29.5773C25.7227 29.5768 25.7234 29.5764 25.724 29.5758C25.7488 29.5522 25.7818 29.5187 25.8488 29.4504L29.9219 25.293C30.0803 25.1312 30.0803 24.8688 29.9219 24.707ZM19.8377 26C20.3787 26 20.8174 26.4478 20.8174 27C20.8174 27.5523 20.3788 28 19.8377 28H16.8986C16.3575 28 15.9189 27.5523 15.9189 27C15.9189 26.4477 16.3575 26 16.8986 26H19.8377ZM23.2667 22C23.8077 22 24.2464 22.4478 24.2464 23C24.2464 23.5523 23.8078 24 23.2667 24H16.8986C16.3575 24 15.9189 23.5523 15.9189 23C15.9189 22.4477 16.3575 22 16.8986 22H23.2667ZM29.6348 20H13.9594V27.8C13.9594 28.3764 13.9601 28.7487 13.9828 29.032C14.0045 29.3036 14.0415 29.4045 14.0662 29.4539L14.1041 29.523C14.1848 29.6572 14.2953 29.7701 14.4267 29.8523L14.4944 29.891L14.5419 29.9117C14.6025 29.934 14.7081 29.9595 14.9078 29.9762C15.1853 29.9993 15.55 30 16.1148 30H19.8377C20.3788 30 20.8174 30.4477 20.8174 31C20.8174 31.5523 20.3788 32 19.8377 32H16.1148C15.5823 32 15.124 32.0009 14.7482 31.9695C14.3608 31.9372 13.9754 31.8659 13.6047 31.673V31.6727C13.0517 31.385 12.602 30.9264 12.3203 30.3621C12.1314 29.9837 12.0615 29.5903 12.0299 29.1949C11.9992 28.8113 12 28.3435 12 27.8V18.2C12 17.6565 11.9992 17.1887 12.0299 16.8051C12.0615 16.4097 12.1314 16.0163 12.3203 15.6379C12.6021 15.0735 13.0517 14.6146 13.6047 14.327C13.9754 14.1342 14.3608 14.0628 14.7482 14.0305C15.0771 14.003 15.4692 14.0011 15.9189 14.0008V13C15.9189 12.4477 16.3575 12 16.8986 12C17.4396 12 17.8783 12.4477 17.8783 13V14H25.716V13C25.716 12.4477 26.1546 12 26.6957 12C27.2368 12 27.6754 12.4477 27.6754 13V14.0008C28.1251 14.0011 28.5171 14.003 28.8461 14.0305C29.2334 14.0628 29.6189 14.1341 29.9896 14.327C30.5424 14.6145 30.9918 15.0735 31.2736 15.6379C31.4624 16.0163 31.5328 16.4097 31.5644 16.8051C31.5951 17.1887 31.5943 17.6565 31.5943 18.2V20C31.5943 20.5523 31.1556 21 30.6145 21C30.0735 21 29.6348 20.5523 29.6348 20ZM16.1148 16C15.55 16 15.1853 16.0007 14.9078 16.0238C14.6417 16.046 14.5429 16.0838 14.4944 16.109C14.3101 16.2048 14.1601 16.3579 14.0662 16.5461C14.0415 16.5956 14.0045 16.6964 13.9828 16.968C13.9628 17.2171 13.9606 17.535 13.9602 18H29.6341C29.6336 17.535 29.6314 17.2171 29.6115 16.968C29.5897 16.6964 29.5527 16.5955 29.5281 16.5461C29.446 16.3816 29.321 16.2437 29.1676 16.1477L29.0998 16.109C29.0514 16.0838 28.9526 16.046 28.6865 16.0238C28.4089 16.0007 28.0442 16 27.4795 16H16.1148Z" fill="black" />
-</svg>
+                  <svg
+                    width="44"
+                    height="44"
+                    viewBox="0 0 44 44"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <rect width="44" height="44" rx="22" fill="white" />
+                    <path
+                      d="M27.9624 23.293C28.8861 22.3501 30.3835 22.3501 31.3072 23.293C32.2309 24.2358 32.2309 25.7642 31.3072 26.707L27.2341 30.8645C27.1332 30.9675 27.0021 31.1066 26.8434 31.2195L26.843 31.2191C26.7172 31.3088 26.5813 31.383 26.4381 31.4402C26.2583 31.5122 26.0727 31.5468 25.9326 31.5754L23.9487 31.9805C23.6275 32.046 23.2955 31.9435 23.0639 31.707C22.8322 31.4706 22.7317 31.1318 22.796 30.8039L23.1928 28.7789C23.2209 28.6358 23.2543 28.4461 23.3249 28.2625C23.3809 28.1164 23.4537 27.9777 23.5415 27.8492L23.6283 27.7332C23.718 27.6223 23.8136 27.5277 23.8893 27.4504L27.9624 23.293ZM29.9219 24.707C29.7634 24.5453 29.5063 24.5453 29.3478 24.707L25.2747 28.8645C25.2078 28.9328 25.175 28.9665 25.1519 28.9918C25.1513 28.9924 25.1505 28.9928 25.15 28.9934C25.1497 28.9943 25.1498 28.9955 25.1496 28.9965C25.1418 29.0301 25.1325 29.0767 25.114 29.1711L25.0053 29.725L25.5484 29.6145C25.6408 29.5956 25.6865 29.5861 25.7194 29.5781C25.7203 29.5779 25.7213 29.5775 25.7221 29.5773C25.7227 29.5768 25.7234 29.5764 25.724 29.5758C25.7488 29.5522 25.7818 29.5187 25.8488 29.4504L29.9219 25.293C30.0803 25.1312 30.0803 24.8688 29.9219 24.707ZM19.8377 26C20.3787 26 20.8174 26.4478 20.8174 27C20.8174 27.5523 20.3788 28 19.8377 28H16.8986C16.3575 28 15.9189 27.5523 15.9189 27C15.9189 26.4477 16.3575 26 16.8986 26H19.8377ZM23.2667 22C23.8077 22 24.2464 22.4478 24.2464 23C24.2464 23.5523 23.8078 24 23.2667 24H16.8986C16.3575 24 15.9189 23.5523 15.9189 23C15.9189 22.4477 16.3575 22 16.8986 22H23.2667ZM29.6348 20H13.9594V27.8C13.9594 28.3764 13.9601 28.7487 13.9828 29.032C14.0045 29.3036 14.0415 29.4045 14.0662 29.4539L14.1041 29.523C14.1848 29.6572 14.2953 29.7701 14.4267 29.8523L14.4944 29.891L14.5419 29.9117C14.6025 29.934 14.7081 29.9595 14.9078 29.9762C15.1853 29.9993 15.55 30 16.1148 30H19.8377C20.3788 30 20.8174 30.4477 20.8174 31C20.8174 31.5523 20.3788 32 19.8377 32H16.1148C15.5823 32 15.124 32.0009 14.7482 31.9695C14.3608 31.9372 13.9754 31.8659 13.6047 31.673V31.6727C13.0517 31.385 12.602 30.9264 12.3203 30.3621C12.1314 29.9837 12.0615 29.5903 12.0299 29.1949C11.9992 28.8113 12 28.3435 12 27.8V18.2C12 17.6565 11.9992 17.1887 12.0299 16.8051C12.0615 16.4097 12.1314 16.0163 12.3203 15.6379C12.6021 15.0735 13.0517 14.6146 13.6047 14.327C13.9754 14.1342 14.3608 14.0628 14.7482 14.0305C15.0771 14.003 15.4692 14.0011 15.9189 14.0008V13C15.9189 12.4477 16.3575 12 16.8986 12C17.4396 12 17.8783 12.4477 17.8783 13V14H25.716V13C25.716 12.4477 26.1546 12 26.6957 12C27.2368 12 27.6754 12.4477 27.6754 13V14.0008C28.1251 14.0011 28.5171 14.003 28.8461 14.0305C29.2334 14.0628 29.6189 14.1341 29.9896 14.327C30.5424 14.6145 30.9918 15.0735 31.2736 15.6379C31.4624 16.0163 31.5328 16.4097 31.5644 16.8051C31.5951 17.1887 31.5943 17.6565 31.5943 18.2V20C31.5943 20.5523 31.1556 21 30.6145 21C30.0735 21 29.6348 20.5523 29.6348 20ZM16.1148 16C15.55 16 15.1853 16.0007 14.9078 16.0238C14.6417 16.046 14.5429 16.0838 14.4944 16.109C14.3101 16.2048 14.1601 16.3579 14.0662 16.5461C14.0415 16.5956 14.0045 16.6964 13.9828 16.968C13.9628 17.2171 13.9606 17.535 13.9602 18H29.6341C29.6336 17.535 29.6314 17.2171 29.6115 16.968C29.5897 16.6964 29.5527 16.5955 29.5281 16.5461C29.446 16.3816 29.321 16.2437 29.1676 16.1477L29.0998 16.109C29.0514 16.0838 28.9526 16.046 28.6865 16.0238C28.4089 16.0007 28.0442 16 27.4795 16H16.1148Z"
+                      fill="black"
+                    />
+                  </svg>
                 </div>
                 <span
                   className="text-white leading-[130%]"
@@ -2114,6 +2188,7 @@ export const BookingFormModal: React.FC<Props> = ({
                           centerWeights={measurements.weight}
                           centerShoes={measurements.shoe_size}
                           genderOptions={genderOptions}
+                          agencies={agencies}
                           requiresCert={requiresCert}
                           onChange={updateParticipant}
                           onToggleEquip={toggleEquip}
@@ -2122,9 +2197,8 @@ export const BookingFormModal: React.FC<Props> = ({
                           onChangeCert={updateCert}
                         />
                       ))}
-
                       <div className="3xl:hidden w-full">
-                      <ReservationSummary
+                        <ReservationSummary
                           courseTitle={courseTitle}
                           currency={currency}
                           participants={participants}

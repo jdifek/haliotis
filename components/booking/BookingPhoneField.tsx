@@ -24,17 +24,18 @@ const ChevronDown = ({ className = "" }) => (
 );
 
 const EXCLUDED_COUNTRIES = ["ru", "by"];
-
-// value / onChange — полная строка вида "+351912345678"
 export default function BookingPhoneField({
   value = "",
   onChange,
   placeholder = "Phone Number *",
-  defaultCountry = "pt", // ← дефолт Португалия
+  defaultCountry = "pt", // используется только для парсинга номера, визуально скрыт до выбора
   extraBorder = false,
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [pos, setPos] = useState({ top: 0, left: 0, width: 0 });
+  // Пока пользователь не открыл список стран и не начал вводить номер —
+  // не показываем флаг/код по умолчанию (см. фикс "не должна быть выбрана страна")
+  const [countryTouched, setCountryTouched] = useState(false);
   const triggerRef = useRef(null);
   const dropdownRef = useRef(null);
 
@@ -62,9 +63,12 @@ export default function BookingPhoneField({
   const open = () => {
     if (triggerRef.current) {
       const r = triggerRef.current.getBoundingClientRect();
+      // position: fixed — координаты берём как есть от вьюпорта, БЕЗ scrollY/scrollX,
+      // иначе при заблокированном скролле body (position:fixed на body в модалке)
+      // дропдаун улетает за экран (см. аналогичный фикс в BookingFormModal)
       setPos({
-        top: r.bottom + window.scrollY + 4,
-        left: r.left + window.scrollX,
+        top: r.bottom + 4,
+        left: r.left,
         width: r.width,
       });
     }
@@ -102,12 +106,25 @@ export default function BookingPhoneField({
           onClick={() => (isOpen ? setIsOpen(false) : open())}
           className="flex items-center gap-1 pl-1 pr-1  border-r border-[#d9d9d9] shrink-0 cursor-pointer"
         >
-          <ReactCountryFlag
-            countryCode={country.iso2.toUpperCase()}
-            svg
-            style={{ width: 20, height: 20 }}
-          />
-          <span className="text-[#111]">+{country.dialCode}</span>
+          {countryTouched ? (
+            <>
+              <ReactCountryFlag
+                countryCode={country.iso2.toUpperCase()}
+                svg
+                style={{ width: 20, height: 20 }}
+              />
+              <span className="text-[#111]">+{country.dialCode}</span>
+            </>
+          ) : (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="9" stroke="#999" strokeWidth="1.5" />
+              <path
+                d="M3 12h18M12 3c2.4 2.4 3.8 5.6 3.8 9s-1.4 6.6-3.8 9c-2.4-2.4-3.8-5.6-3.8-9s1.4-6.6 3.8-9z"
+                stroke="#999"
+                strokeWidth="1.5"
+              />
+            </svg>
+          )}
           <ChevronDown
             className={`text-[#d9d9d9] transition-transform ${
               isOpen ? "rotate-180" : ""
@@ -120,7 +137,10 @@ export default function BookingPhoneField({
           inputMode="numeric"
           autoComplete="off"
           value={inputValue}
-          onChange={handlePhoneValueChange}
+          onChange={(e) => {
+            if (!countryTouched) setCountryTouched(true);
+            handlePhoneValueChange(e);
+          }}
           placeholder={hasAsterisk ? parts[0].trim() : placeholder}
           className="flex-1 min-w-0 pl-2 bg-transparent outline-none text-[#111] placeholder:text-[#111]"
         />
@@ -131,16 +151,16 @@ export default function BookingPhoneField({
 
       {isOpen && (
         <Portal>
-          <div
+                  <div
             ref={dropdownRef}
             style={{
-              position: "absolute",
+              position: "fixed",
               top: pos.top,
               left: pos.left,
               minWidth: pos.width,
               width: "max-content",
               maxWidth: 280,
-              zIndex: 99999,
+              zIndex: 100000002,
             }}
             className="bg-white border border-[#d9d9d9] rounded-[10px] shadow-xl max-h-56 overflow-y-auto"
           >
@@ -150,6 +170,7 @@ export default function BookingPhoneField({
                 key={c.iso2}
                 onClick={() => {
                   setCountry(c.iso2);
+                  setCountryTouched(true);
                   setIsOpen(false);
                 }}
                 className={`w-full flex items-center gap-2 px-3 py-2 text-left text-[14px] hover:bg-[#f5f5f5] cursor-pointer ${
