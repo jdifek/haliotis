@@ -88,6 +88,7 @@ async function resolveItem(type: string, id: number) {
   return res.json();
 }
 
+
 async function submitBookingRequest(payload: any) {
   const res = await fetch(`${API_BASE}/bookings`, {
     method: "POST",
