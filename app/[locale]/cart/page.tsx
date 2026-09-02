@@ -1267,7 +1267,7 @@ const ParticipantBlock = ({
               label={t("select_gender", "Select Gender *")}
               value={genderValue}
               onChange={(v) => onChangeShared(shared.id, "gender", v.id)}
-              opCascadingMeasurementSelecttions={[
+              options={[
                 { id: "male", title: t("gender_male", "Male") },
                 { id: "female", title: t("gender_female", "Female") },
                 { id: "other", title: t("gender_other", "Other") },
