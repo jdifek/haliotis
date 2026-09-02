@@ -34,17 +34,14 @@ const readCartFromStorage = () => {
   }
 };
 
-const resolveCart = async (items, recaptchaToken) => {
+const resolveCart = async (items, recaptchaToken, lang) => {
   const res = await fetch(`${API_BASE}/cart/resolve`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
     },
-    body: JSON.stringify({
-      items,
-      recaptcha_token: recaptchaToken,
-    }),
+    body: JSON.stringify({ items, recaptcha_token: recaptchaToken, lang }),
   });
 
   if (!res.ok) {
@@ -1889,8 +1886,7 @@ export default function CartPage() {
         id,
       }));
 
-      resolveCart(apiItems, null)
-        .then((data) => {
+      resolveCart(apiItems, null, locale)        .then((data) => {
           setMeasurements(data.participant_measurements || null);
           setAgencies(data.agencies || []);
           const initialIds = [1];

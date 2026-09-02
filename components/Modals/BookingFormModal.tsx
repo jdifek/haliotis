@@ -78,12 +78,11 @@ const LABELS = {
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
-async function resolveItem(type: string, id: number) {
+async function resolveItem(type: string, id: number, lang: string) {
   const res = await fetch(`${API_BASE}/cart/resolve`, {
     method: "POST",
     headers: { "Content-Type": "application/json", Accept: "application/json" },
-    body: JSON.stringify({ items: [{ type, id }] }),
-  });
+    body: JSON.stringify({ items: [{ type, id }], lang }),  });
   if (!res.ok) throw new Error(`resolve failed: ${res.status}`);
   return res.json();
 }
@@ -1871,8 +1870,7 @@ export const BookingFormModal: React.FC<Props> = ({
     setIsLoading(true);
     setLoadError(null);
 
-    resolveItem(itemType, itemId)
-      .then((data) => {
+    resolveItem(itemType, itemId, locale)      .then((data) => {
         if (cancelled) return;
         const apiItem = data.items?.[0] || null;
 console.log(data,"data");
