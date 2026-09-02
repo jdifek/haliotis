@@ -119,7 +119,7 @@ const mapEquipItem = (e) => ({
 
 // ─── Shared participants (one record per participant, used across ALL activities) ──
 
-const createSharedParticipant = (id) => ({
+const createSharedParticipant = (id, measurementsConfig = {}) => ({
   id,
   firstName: "",
   lastName: "",
@@ -127,15 +127,69 @@ const createSharedParticipant = (id) => ({
   gender: "",
   phone: "",
   email: "",
-  height: { value: "", unitId: null },
-  weight: { value: "", unitId: null },
-  shoeSize: { value: "", unitId: null },
+  measurements: Object.fromEntries(
+    Object.entries(measurementsConfig).map(([key, cfg]) => [key, defaultMeasurementValue(cfg)])
+  ),
   certAgency: "",
   certAgencyOther: "",
   certLevel: "",
   totalDives: "",
   lastDiveDate: "",
 });
+const CascadingMeasurementSelect = ({ config, value, onChange }) => {
+  const path = value.path || [];
+
+  const levels = [];
+  let currentOptions = config.options;
+  let depth = 0;
+  while (currentOptions && currentOptions.length) {
+    const selectedId = path[depth] ?? null;
+    levels.push({ options: currentOptions, selectedId });
+    const selectedOpt = currentOptions.find((o) => o.id === selectedId);
+    if (!selectedOpt || isLeaf(selectedOpt)) break;
+    currentOptions = selectedOpt.options;
+    depth++;
+  }
+
+  const handleSelect = (levelIndex, optId) => {
+    const newPath = path.slice(0, levelIndex);
+    newPath[levelIndex] = optId;
+    onChange({ ...value, path: newPath });
+  };
+
+  const lastIdx = levels.length - 1;
+  const leafLevel = levels[lastIdx];
+  const typeLevels = levels.slice(0, lastIdx);
+
+  const renderLevel = (lvl, idx, label) => {
+    const selectedOpt = lvl.options.find((o) => o.id === lvl.selectedId);
+    return (
+      <CustomDropdown
+        key={idx}
+        label={label}
+        value={selectedOpt?.title || ""}
+        onChange={(title) => {
+          const opt = lvl.options.find((o) => o.title === title);
+          if (opt) handleSelect(idx, opt.id);
+        }}
+        options={lvl.options.map((o) => o.title)}
+      />
+    );
+  };
+
+  return (
+    <div className="flex gap-1 w-full">
+      <div className="flex-1 min-w-0">
+        {leafLevel && renderLevel(leafLevel, lastIdx, `${config.label} *`)}
+      </div>
+      {typeLevels.map((lvl, idx) => (
+        <div key={idx} className="w-[110px] flex-shrink-0">
+          {renderLevel(lvl, idx, "Type")}
+        </div>
+      ))}
+    </div>
+  );
+};
 // ─── Per-activity, per-participant data (equipment selection + certification) ──
 
 const createActivityParticipantData = (equipmentTemplate = []) => ({
@@ -175,30 +229,83 @@ const mapResolvedItem = (apiItem, storageItem, participantIds) => {
 };
 
 // ─── Portal ───────────────────────────────────────────────────────────────────
-const isParticipantValid = (sp) =>
+const isParticipantValid = (sp, measurementsConfig = {}) =>
   sp.firstName.trim() &&
   sp.lastName.trim() &&
   sp.dateOfBirth &&
   sp.gender &&
   sp.phone.trim() &&
   sp.email.trim() &&
-  sp.height.value &&
-  sp.weight.value &&
-  sp.shoeSize.value;
+  Object.keys(measurementsConfig).every((key) =>
+    isMeasurementValid(measurementsConfig[key], sp.measurements?.[key] || emptyMeasurementValue())
+  );
 
+const isFormValid = (activities, sharedParticipants, measurementsConfig) => {
+  if (!sharedParticipants.every((sp) => isParticipantValid(sp, measurementsConfig))) return false;
+  const anyRequiresCert = activities.some((act) => act.requiresCert);
+  if (anyRequiresCert && !sharedParticipants.every(isCertValid)) return false;
+  return true;
+};
   const isCertValid = (ad) =>
     ad.certAgency &&
     (ad.certAgency !== "other" || (ad.certAgencyOther || "").trim()) &&
     ad.certLevel &&
     ad.totalDives &&
     ad.lastDiveDate;
-const isFormValid = (activities, sharedParticipants) => {
-  if (!sharedParticipants.every(isParticipantValid)) return false;
 
-  const anyRequiresCert = activities.some((act) => act.requiresCert);
-  if (anyRequiresCert && !sharedParticipants.every(isCertValid)) return false;
+const isLeaf = (opt) => !(opt.type === "select" && opt.options?.length);
 
-  return true;
+const isCascadingConfig = (config) =>
+  !!config?.options?.some((o) => o.type === "select" && o.options?.length);
+
+const emptyMeasurementValue = () => ({ value: "", unitId: null, path: [] });
+
+const defaultMeasurementValue = (config) => {
+  if (!config || config.type === "text") return emptyMeasurementValue();
+
+  if (isCascadingConfig(config)) {
+    const path = [];
+    let opts = config.options;
+    while (opts && opts.length) {
+      const isLastLevel = opts.every(isLeaf);
+      if (isLastLevel) break;
+      const first = opts[0];
+      path.push(first.id);
+      opts = first.options;
+    }
+    return { value: "", unitId: null, path };
+  }
+
+  const firstUnit = config.options?.[0];
+  return { value: "", unitId: firstUnit ? firstUnit.id : null, path: [] };
+};
+
+const isMeasurementValid = (config, mv) => {
+  if (!config) return true;
+  if (config.type === "text") return !!mv.value;
+
+  if (isCascadingConfig(config)) {
+    let opts = config.options;
+    let depth = 0;
+    while (opts && opts.length) {
+      const id = mv.path?.[depth];
+      if (id == null) return false;
+      const opt = opts.find((o) => o.id === id);
+      if (!opt) return false;
+      opts = opt.options;
+      depth++;
+    }
+    return true;
+  }
+  return !!mv.value;
+};
+
+const serializeMeasurement = (config, mv) => {
+  if (isCascadingConfig(config)) {
+    const path = mv.path || [];
+    return { unit_id: path.length ? path[path.length - 1] : null };
+  }
+  return { value: mv.value, unit_id: mv.unitId };
 };
 const Portal = ({ children }) => {
   const [mounted, setMounted] = useState(false);
@@ -1023,36 +1130,63 @@ const EquipmentGrid = ({ equipment, onToggle, onSelectVariation }) => (
 
 // ─── Measurement Field (value + optional unit) ────────────────────────────────
 
-const MeasurementField = ({ label, value, onChange, options, units }) => {
-  const t = useT();
-  const unitValue = value.unitId
-    ? units?.find((u) => u.id === value.unitId)
-    : units?.[0] || null;
+const MeasurementField = ({ config, value, onChange }) => {
+  if (!config) {
+    return (
+      <PlaceholderInput
+        placeholder="Value *"
+        value={value.value}
+        onChange={(v) => onChange({ ...value, value: v })}
+        type="number"
+      />
+    );
+  }
+
+  if (config.type === "text") {
+    return (
+      <PlaceholderInput
+        placeholder={`${config.label} *`}
+        value={value.value}
+        onChange={(v) => onChange({ ...value, value: v })}
+        type="number"
+      />
+    );
+  }
+
+  const units = config.options || [];
+  const isCascading = units.some((o) => o.type === "select" && o.options?.length);
+
+  if (isCascading) {
+    return <CascadingMeasurementSelect config={config} value={value} onChange={onChange} />;
+  }
+
   return (
-    <div className="flex gap-1">
-     <div className="flex-1">
-  <PlaceholderInput
-    placeholder={label}
-    value={value.value}
-    onChange={(v) => onChange({ ...value, value: v })}
-    type="number"
-  />
-</div>
-{units && units.length > 1 && (
-  <div className="w-[145px] flex-shrink-0">
+    <div className="flex gap-1 w-full">
+      <div className="flex-1 min-w-0">
+        <PlaceholderInput
+          placeholder={`${config.label} *`}
+          value={value.value}
+          onChange={(v) => onChange({ ...value, value: v })}
+          type="number"
+        />
+      </div>
+      {units.length > 1 ? (
+        <div className="w-[145px] flex-shrink-0">
           <CustomDropdown
-            label={t("unit_label", "Unit")}
-            value={unitValue || ""}
-            onChange={(v) => onChange({ ...value, unitId: v.id })}
-            options={units}
+            label="Unit"
+            value={units.find((u) => u.id === value.unitId)?.title || units[0].title}
+            onChange={(title) => {
+              const u = units.find((x) => x.title === title);
+              onChange({ ...value, unitId: u ? u.id : value.unitId });
+            }}
+            options={units.map((u) => u.title)}
           />
         </div>
-      )}
-      {units && units.length === 1 && (
+      ) : units.length === 1 ? (
         <div className="w-[145px] sm:w-auto flex items-center justify-center sm:justify-start px-2 text-[13px] text-[#999] border border-[#d9d9d9] rounded-[10px] bg-white whitespace-nowrap flex-shrink-0">
           {units[0].title}
         </div>
-      )}
+      ) : null}
     </div>
   );
 };
@@ -1061,64 +1195,23 @@ const MeasurementField = ({ label, value, onChange, options, units }) => {
 // `shared` = the participant's common data (name, dob, height, weight…), same object
 //            reused across all activities.
 // `activityData` = this activity's own equipment + certification for this participant.
-
 const ParticipantBlock = ({
   shared,
   t,
   pNum,
   activityId,
   onChangeShared,
+  onChangeMeasurement,   // NEW
   activityData,
   onToggleEquip,
   onSelectVariation,
   requiresCert,
-  measurements,
+  measurementsConfig,    // переименовано из measurements — это конфиг с бэка
   agencies,
 }) => {
   const [isExpanded, setIsExpanded] = useState(pNum === 1);
   const [equipExpanded, setEquipExpanded] = useState(true);
-
-  const heightUnits = measurements?.height || [];
-  const weightUnits = measurements?.weight || [];
-  const shoeSizeUnits = measurements?.shoe_size || [];
-
-  const heightOptions = [
-    "150",
-    "155",
-    "160",
-    "165",
-    "170",
-    "175",
-    "180",
-    "185",
-    "190",
-    "195",
-    "200",
-  ];
-  const weightOptions = [
-    "40",
-    "50",
-    "60",
-    "70",
-    "80",
-    "90",
-    "100",
-    "110",
-    "120",
-  ];
-  const shoeOptions = [
-    "36",
-    "37",
-    "38",
-    "39",
-    "40",
-    "41",
-    "42",
-    "43",
-    "44",
-    "45",
-    "46",
-  ];
+ 
 
   const genderValue = shared.gender
     ? { id: shared.gender, title: t(`gender_${shared.gender}`, shared.gender) }
@@ -1174,7 +1267,7 @@ const ParticipantBlock = ({
               label={t("select_gender", "Select Gender *")}
               value={genderValue}
               onChange={(v) => onChangeShared(shared.id, "gender", v.id)}
-              options={[
+              opCascadingMeasurementSelecttions={[
                 { id: "male", title: t("gender_male", "Male") },
                 { id: "female", title: t("gender_female", "Female") },
                 { id: "other", title: t("gender_other", "Other") },
@@ -1194,28 +1287,15 @@ const ParticipantBlock = ({
           </div>
           {/* Row 3 — measurements with API units (shared) */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-            <MeasurementField
-              label={t("height_label", "Height *")}
-              value={shared.height}
-              onChange={(v) => onChangeShared(shared.id, "height", v)}
-              options={heightOptions}
-              units={heightUnits}
-            />
-            <MeasurementField
-              label={t("weight_label", "Weight *")}
-              value={shared.weight}
-              onChange={(v) => onChangeShared(shared.id, "weight", v)}
-              options={weightOptions}
-              units={weightUnits}
-            />
-            <MeasurementField
-              label={t("shoe_size_label", "Shoe Size *")}
-              value={shared.shoeSize}
-              onChange={(v) => onChangeShared(shared.id, "shoeSize", v)}
-              options={shoeOptions}
-              units={shoeSizeUnits}
-            />
-          </div>
+  {Object.entries(measurementsConfig || {}).map(([key, config]) => (
+    <MeasurementField
+      key={key}
+      config={config}
+      value={shared.measurements?.[key] || { value: "", unitId: null, path: [] }}
+      onChange={(v) => onChangeMeasurement(shared.id, key, v)}
+    />
+  ))}
+</div>
 
           <p className="text-[12px] text-[#111] opacity-70 leading-[160%] mt-1">
             {t(
@@ -1355,15 +1435,9 @@ const ParticipantBlock = ({
 
 // ─── Activity Card ────────────────────────────────────────────────────────────
 const ActivityCard = ({
-  activity,
-  t,
-  sharedParticipants,
-  onRemove,
-  onChangeShared,
-  onToggleEquip,
-  onSelectVariation,
-  measurements,
-  agencies,
+  activity, t, sharedParticipants, onRemove, onChangeShared,
+  onChangeMeasurement,     // NEW
+  onToggleEquip, onSelectVariation, measurements, agencies,
 }) => (
   <div className="bg-white rounded-2xl border border-[#e4e4e4] overflow-hidden mb-4">
     <div className="p-4">
@@ -1433,23 +1507,23 @@ const ActivityCard = ({
     {/* Participants forms — shared identity, activity-specific equipment/cert */}
     <div className="px-4 pb-4 flex flex-col gap-3">
       {sharedParticipants.map((sp, idx) => (
-        <ParticipantBlock
-          key={sp.id}
-          shared={sp}
-          t={t}
-          pNum={idx + 1}
-          activityId={activity.id}
-          onChangeShared={onChangeShared}
-          activityData={
-            activity.byParticipant[sp.id] ||
-            createActivityParticipantData(activity.equipmentTemplate)
-          }
-          onToggleEquip={onToggleEquip}
-          onSelectVariation={onSelectVariation}
-          requiresCert={activity.requiresCert}
-          measurements={measurements}
-          agencies={agencies}
-        />
+       <ParticipantBlock
+       key={sp.id}
+       shared={sp}
+       t={t}
+       pNum={idx + 1}
+       activityId={activity.id}
+       onChangeShared={onChangeShared}
+       onChangeMeasurement={onChangeMeasurement}
+       activityData={
+        activity.byParticipant[sp.id] ||
+        createActivityParticipantData(activity.equipmentTemplate)
+      }       onToggleEquip={onToggleEquip}
+       onSelectVariation={onSelectVariation}
+       requiresCert={activity.requiresCert}
+       measurementsConfig={measurements}
+       agencies={agencies}
+     />
       ))}
     </div>
   </div>
@@ -1459,6 +1533,7 @@ const ActivityCard = ({
 const OrderSummary = ({
   activities,
   t,
+  measurements,
   sharedParticipants,
   privacy,
   setPrivacy,
@@ -1485,8 +1560,7 @@ const OrderSummary = ({
       .reduce((s, e) => s + e.price, 0);
     return total + courseTotal + equipTotal;
   }, 0);
-  const formValid = isFormValid(activities, sharedParticipants);
-
+  const formValid = isFormValid(activities, sharedParticipants, measurements);
   return (
     <div className="bg-white rounded-2xl border border-[#e4e4e4] p-4 sticky top-4">
       <h2 className="text-[20px] font-semibold text-[#111] mb-3">
@@ -1698,47 +1772,38 @@ const OrderSummary = ({
 
 // ─── Build booking payload ────────────────────────────────────────────────────
 
-const buildBookingPayload = (activities, sharedParticipants, comment) => ({
+const buildBookingPayload = (activities, sharedParticipants, comment, measurementsConfig) => ({
   comment,
   items: activities.map((act) => ({
     type: act.apiType,
     id: act.id,
     slug: act.slug,
-    ...(act.apiType === "course" && act.centerSlug
-      ? { center_slug: act.centerSlug }
-      : {}),
-
+    ...(act.apiType === "course" && act.centerSlug ? { center_slug: act.centerSlug } : {}),
     participants: sharedParticipants.map((sp) => {
       const ad = act.byParticipant[sp.id] || createActivityParticipantData();
       return {
         first_name: sp.firstName,
         last_name: sp.lastName,
         date_of_birth: sp.dateOfBirth,
-        // gender хранится внутри как "male"/"female"/"other" (см. ParticipantBlock),
-        // капитализируем на выходе, чтобы не менять контракт с бэком.
         gender: sp.gender,
         phone: sp.phone,
         email: sp.email,
-        measurements: {
-          height: { value: sp.height.value, unit_id: sp.height.unitId },
-          weight: { value: sp.weight.value, unit_id: sp.weight.unitId },
-          shoe_size: { value: sp.shoeSize.value, unit_id: sp.shoeSize.unitId },
-        },
+        measurements: Object.fromEntries(
+          Object.keys(measurementsConfig || {}).map((key) => [
+            key,
+            serializeMeasurement(measurementsConfig[key], sp.measurements?.[key] || emptyMeasurementValue()),
+          ])
+        ),
         certification: act.requiresCert
-        ? {
-            agency_id: sp.certAgency !== "other" ? sp.certAgency : null,
-            agency_other: sp.certAgency === "other" ? sp.certAgencyOther : null,
-            level: sp.certLevel,
-            total_dives: sp.totalDives,
-            last_dive_date: sp.lastDiveDate,
-          }
-        : null,
-        equipment_rent: ad.equipment
-          .filter((e) => e.isSelected)
-          .map((e) => ({
-            id: e.id,
-            // variation_id: e.selectedVariationId,
-          })),
+          ? {
+              agency_id: sp.certAgency !== "other" ? sp.certAgency : null,
+              agency_other: sp.certAgency === "other" ? sp.certAgencyOther : null,
+              level: sp.certLevel,
+              total_dives: sp.totalDives,
+              last_dive_date: sp.lastDiveDate,
+            }
+          : null,
+        equipment_rent: ad.equipment.filter((e) => e.isSelected).map((e) => ({ id: e.id })),
       };
     }),
   })),
@@ -1795,18 +1860,17 @@ export default function CartPage() {
   // як тільки прийшли measurements — тільки якщо unitId ще не вибраний
   useEffect(() => {
     if (!measurements) return;
-
     setSharedParticipants((prev) =>
       prev.map((sp) => {
-        const next = { ...sp };
-        ["height", "weight", "shoeSize"].forEach((field) => {
-          const apiKey = field === "shoeSize" ? "shoe_size" : field;
-          const units = measurements[apiKey];
-          if (units?.length && !next[field].unitId) {
-            next[field] = { ...next[field], unitId: units[0].id };
+        const nextMeasurements = { ...sp.measurements };
+        Object.entries(measurements).forEach(([key, config]) => {
+          const existing = nextMeasurements[key];
+          const hasValue = existing && (existing.unitId != null || existing.path?.length);
+          if (!hasValue) {
+            nextMeasurements[key] = defaultMeasurementValue(config);
           }
         });
-        return next;
+        return { ...sp, measurements: nextMeasurements };
       })
     );
   }, [measurements]);
@@ -1839,6 +1903,9 @@ export default function CartPage() {
             return mapResolvedItem(apiItem, storageItem, initialIds);
           });
 
+          console.log(data, 'data');
+          
+
           setActivities(mapped);
         })
         .catch((err) => setLoadError(err.message))
@@ -1861,18 +1928,8 @@ export default function CartPage() {
       window.dispatchEvent(new Event("cart-updated")); // синхронизирует Header
     } catch {}
   };
-  const createSharedParticipantWithDefaults = (id, measurements) => {
-    const sp = createSharedParticipant(id);
-    if (measurements) {
-      if (measurements.height?.length)
-        sp.height.unitId = measurements.height[0].id;
-      if (measurements.weight?.length)
-        sp.weight.unitId = measurements.weight[0].id;
-      if (measurements.shoe_size?.length)
-        sp.shoeSize.unitId = measurements.shoe_size[0].id;
-    }
-    return sp;
-  };
+  const createSharedParticipantWithDefaults = (id, measurementsConfig) =>
+    createSharedParticipant(id, measurementsConfig || {});
   // Changing participant count adds/removes shared participants AND
   // extends/trims each activity's per-participant equipment+cert map.
   const handleCountChange = (n) => {
@@ -1919,6 +1976,12 @@ export default function CartPage() {
     setSharedParticipants((prev) =>
       prev.map((p) => (p.id === pid ? { ...p, [field]: val } : p))
     );
+    const updateMeasurement = (pid, key, val) =>
+      setSharedParticipants((prev) =>
+        prev.map((p) =>
+          p.id === pid ? { ...p, measurements: { ...p.measurements, [key]: val } } : p
+        )
+      );
 
   // Equipment toggle — scoped to one activity + one participant only.
   const toggleEquip = (actId, pid, eid) =>
@@ -1973,11 +2036,7 @@ export default function CartPage() {
   
       setIsSubmitting(true);
       try {
-        const payload = buildBookingPayload(
-          activities,
-          sharedParticipants,
-          comment
-        );
+        const payload = buildBookingPayload(activities, sharedParticipants, comment, measurements);
   
         payload.recaptcha_token = captchaToken;
   
@@ -2095,17 +2154,18 @@ export default function CartPage() {
               ) : (
                 activities.map((act) => (
                   <ActivityCard
-                    key={act.id}
-                    activity={act}
-                    t={t}
-                    sharedParticipants={sharedParticipants}
-                    onRemove={removeActivity}
-                    onChangeShared={updateShared}
-                    onToggleEquip={toggleEquip}
-                    onSelectVariation={selectVariation}
-                    measurements={measurements}
-                    agencies={agencies}
-                  />
+                  key={act.id}
+                  activity={act}
+                  t={t}
+                  sharedParticipants={sharedParticipants}
+                  onRemove={removeActivity}
+                  onChangeShared={updateShared}
+                  onChangeMeasurement={updateMeasurement}
+                  onToggleEquip={toggleEquip}
+                  onSelectVariation={selectVariation}
+                  measurements={measurements}
+                  agencies={agencies}
+                />
                 ))
               )}
             </div>
@@ -2130,6 +2190,7 @@ export default function CartPage() {
                 widgetReady={widgetReady}
                 paymentError={paymentError}
                 locale={locale}
+                measurements={measurements}
                 recaptchaRef={recaptchaRef}
                 captchaToken={captchaToken}
                 onCaptchaChange={setCaptchaToken}

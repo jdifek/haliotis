@@ -109,9 +109,27 @@ async function submitBookingRequest(payload: any) {
 }
 
 // ─── Types ────────────────────────────────────────────────────────────────────
+type MeasurementOption = {
+  id: number;
+  title: string;
+  type: "select" | "text" | null;
+  options?: MeasurementOption[];
+};
 
-type MeasurementValue = { value: string; unitId: number | null };
-type MeasurementUnit = { id: number; title: string };
+type MeasurementConfig = {
+  label: string;
+  type: "select" | "text";
+  options: MeasurementOption[];
+};
+
+type MeasurementsMap = Record<string, MeasurementConfig>;
+
+type MeasurementValue = {
+  value: string;                // для текстовых/юнитовых полей
+  unitId: number | null;        // выбранный юнит (не-каскадные select)
+  path: (number | null)[];      // выбранная цепочка (каскадные select)
+};
+
 type GenderOption = { key: string; label: string };
 type CenterOption = { slug: string; name: string };
 type AgencyOption = { id: string; title: string };
@@ -129,12 +147,10 @@ type Participant = {
   firstName: string;
   lastName: string;
   dateOfBirth: string;
-  gender: string; // хранится КЛЮЧ (male/female/other), не лейбл
+  gender: string;
   phone: string;
   email: string;
-  height: MeasurementValue;
-  weight: MeasurementValue;
-  shoeSize: MeasurementValue;
+  measurements: Record<string, MeasurementValue>;
   equipment: EquipmentItem[];
   certAgency: string;
   certAgencyOther: string;
@@ -180,7 +196,7 @@ type Props = {
   unavailableDates?: string[];
 };
 
-const createParticipant = (id: number): Participant => ({
+const createParticipant = (id: number, measurementsConfig: MeasurementsMap = {}): Participant => ({
   id,
   firstName: "",
   lastName: "",
@@ -188,9 +204,9 @@ const createParticipant = (id: number): Participant => ({
   gender: "",
   phone: "",
   email: "",
-  height: { value: "", unitId: null },
-  weight: { value: "", unitId: null },
-  shoeSize: { value: "", unitId: null },
+  measurements: Object.fromEntries(
+    Object.entries(measurementsConfig).map(([key, cfg]) => [key, defaultMeasurementValue(cfg)])
+  ),
   equipment: [],
   certAgency: "",
   certAgencyOther: "",
@@ -201,27 +217,88 @@ const createParticipant = (id: number): Participant => ({
   isEquipmentExpanded: id === 1,
 });
 
-const isParticipantValid = (p: Participant) =>
-  !!(
-    p.firstName.trim() &&
-    p.lastName.trim() &&
-    p.dateOfBirth &&
-    p.gender &&
-    p.phone.trim() &&
-    p.email.trim() &&
-    p.height.value &&
-    p.weight.value &&
-    p.shoeSize.value
-  );
 
-  const isCertValid = (p: Participant) =>
-    !!(
-      p.certAgency &&
-      (p.certAgency !== "other" || p.certAgencyOther.trim()) &&
-      p.certLevel &&
-      p.totalDives &&
-      p.lastDiveDate
-    );
+
+    const emptyMeasurementValue = (): MeasurementValue => ({
+      value: "",
+      unitId: null,
+      path: [],
+    });
+    
+    const isLeaf = (opt: MeasurementOption) =>
+      !(opt.type === "select" && opt.options?.length);
+    
+    const isCascadingConfig = (config?: MeasurementConfig) =>
+      !!config?.options?.some((o) => o.type === "select" && o.options?.length);
+    const defaultMeasurementValue = (config?: MeasurementConfig): MeasurementValue => {
+      if (!config || config.type === "text") return emptyMeasurementValue();
+    
+      if (isCascadingConfig(config)) {
+        const path: (number | null)[] = [];
+        let opts: MeasurementOption[] | undefined = config.options;
+        while (opts && opts.length) {
+          const isLastLevel = opts.every(isLeaf);
+          if (isLastLevel) break;
+          const first = opts[0];
+          path.push(first.id);
+          opts = first.options;
+        }
+        return { value: "", unitId: null, path };
+      }
+    
+      const firstUnit = config.options?.[0];
+      return { value: "", unitId: firstUnit ? firstUnit.id : null, path: [] };
+    };
+    
+    const isMeasurementValid = (config: MeasurementConfig | undefined, mv: MeasurementValue) => {
+      if (!config) return true; // конфиг ещё не пришёл — не блокируем форму
+      if (config.type === "text") return !!mv.value;
+    
+      if (isCascadingConfig(config)) {
+        let opts: MeasurementOption[] | undefined = config.options;
+        let depth = 0;
+        while (opts && opts.length) {
+          const id = mv.path?.[depth];
+          if (id == null) return false;
+          const opt = opts.find((o) => o.id === id);
+          if (!opt) return false;
+          opts = opt.options;
+          depth++;
+        }
+        return true;
+      }
+      return !!mv.value;
+    };
+    
+    const serializeMeasurement = (config: MeasurementConfig | undefined, mv: MeasurementValue) => {
+      if (isCascadingConfig(config)) {
+        const path = mv.path || [];
+        return { unit_id: path.length ? path[path.length - 1] : null };
+      }
+      return { value: mv.value, unit_id: mv.unitId };
+    };
+    
+    const isParticipantValid = (p: Participant, measurementsConfig: MeasurementsMap) =>
+      !!(
+        p.firstName.trim() &&
+        p.lastName.trim() &&
+        p.dateOfBirth &&
+        p.gender &&
+        p.phone.trim() &&
+        p.email.trim() &&
+        Object.keys(measurementsConfig).every((key) =>
+          isMeasurementValid(measurementsConfig[key], p.measurements[key] || emptyMeasurementValue())
+        )
+      );
+    
+    const isCertValid = (p: Participant) =>
+      !!(
+        p.certAgency &&
+        (p.certAgency !== "other" || p.certAgencyOther.trim()) &&
+        p.certLevel &&
+        p.totalDives &&
+        p.lastDiveDate
+      );
 // ─── Portal ───────────────────────────────────────────────────────────────────
 
 const Portal = ({ children }: { children: React.ReactNode }) => {
@@ -530,28 +607,125 @@ const CustomDropdown = ({
 
 // ─── Measurement field: значение + отдельный дропдаун единицы измерения ──
 
-const MeasurementField = ({
-  label,
+
+const CascadingMeasurementSelect = ({
+  config,
   value,
   onChange,
-  options,
-  units,
 }: {
-  label: string;
+  config: MeasurementConfig;
   value: MeasurementValue;
   onChange: (v: MeasurementValue) => void;
-  options: string[];
-  units: MeasurementUnit[];
 }) => {
-  const unitValue = units.length
-    ? units.find((u) => u.id === value.unitId)?.title || units[0].title
-    : "";
+  const path = value.path || [];
+
+  const levels: { options: MeasurementOption[]; selectedId: number | null }[] = [];
+  let currentOptions: MeasurementOption[] | undefined = config.options;
+  let depth = 0;
+  while (currentOptions && currentOptions.length) {
+    const selectedId = path[depth] ?? null;
+    levels.push({ options: currentOptions, selectedId });
+    const selectedOpt = currentOptions.find((o) => o.id === selectedId);
+    if (!selectedOpt || isLeaf(selectedOpt)) break;
+    currentOptions = selectedOpt.options;
+    depth++;
+  }
+
+  const handleSelect = (levelIndex: number, optId: number) => {
+    const newPath = path.slice(0, levelIndex);
+    newPath[levelIndex] = optId;
+    onChange({ ...value, path: newPath });
+  };
+
+  // Последний уровень (лист, напр. "UK 5") — реальный выбор пользователя,
+  // ставим его СЛЕВА как основное поле с понятным лейблом.
+  // Уровни до него (тип/система, напр. "UK"/"EU") — узкие чипы СПРАВА,
+  // как обычный юнит-дропдаун.
+  const lastIdx = levels.length - 1;
+  const leafLevel = levels[lastIdx];
+  const typeLevels = levels.slice(0, lastIdx);
+
+  const renderLevel = (
+    lvl: { options: MeasurementOption[]; selectedId: number | null },
+    idx: number,
+    label: string
+  ) => {
+    const selectedOpt = lvl.options.find((o) => o.id === lvl.selectedId);
+    return (
+      <CustomDropdown
+        key={idx}
+        label={label}
+        value={selectedOpt?.title || ""}
+        onChange={(title) => {
+          const opt = lvl.options.find((o) => o.title === title);
+          if (opt) handleSelect(idx, opt.id);
+        }}
+        options={lvl.options.map((o) => o.title)}
+      />
+    );
+  };
 
   return (
     <div className="flex gap-1 w-full">
       <div className="flex-1 min-w-0">
+        {leafLevel && renderLevel(leafLevel, lastIdx, `${config.label} *`)}
+      </div>
+      {typeLevels.map((lvl, idx) => (
+        <div key={idx} className="w-[110px] flex-shrink-0">
+          {renderLevel(lvl, idx, "Type")}
+        </div>
+      ))}
+    </div>
+  );
+};
+const MeasurementField = ({
+  config,
+  value,
+  onChange,
+}: {
+  config?: MeasurementConfig;
+  value: MeasurementValue;
+  onChange: (v: MeasurementValue) => void;
+}) => {
+  // конфиг с бэка ещё не пришёл — просто число
+  if (!config) {
+    return (
+      <PlaceholderInput
+        placeholder="Value *"
+        value={value.value}
+        onChange={(v) => onChange({ ...value, value: v })}
+        type="number"
+      />
+    );
+  }
+
+  // Поле явно текстовое — как и раньше: только число, без дропдауна
+  if (config.type === "text") {
+    return (
+      <PlaceholderInput
+        placeholder={`${config.label} *`}
+        value={value.value}
+        onChange={(v) => onChange({ ...value, value: v })}
+        type="number"
+      />
+    );
+  }
+
+  const units = config.options || [];
+  const isCascading = units.some((o) => o.type === "select" && o.options?.length);
+
+  // Каскадный select (напр. shoe_size: UK/EU -> конкретный размер) — без числового
+  // поля, сам выбор в дропдаунах и есть значение
+  if (isCascading) {
+    return <CascadingMeasurementSelect config={config} value={value} onChange={onChange} />;
+  }
+
+  // Обычный случай: число + (опционально) юнит — как было раньше
+  return (
+    <div className="flex gap-1 w-full">
+      <div className="flex-1 min-w-0">
         <PlaceholderInput
-          placeholder={label}
+          placeholder={`${config.label} *`}
           value={value.value}
           onChange={(v) => onChange({ ...value, value: v })}
           type="number"
@@ -561,7 +735,7 @@ const MeasurementField = ({
         <div className="w-[145px] flex-shrink-0">
           <CustomDropdown
             label="Unit"
-            value={unitValue}
+            value={units.find((u) => u.id === value.unitId)?.title || units[0].title}
             onChange={(title) => {
               const u = units.find((x) => x.title === title);
               onChange({ ...value, unitId: u ? u.id : value.unitId });
@@ -1072,9 +1246,8 @@ const EquipmentGrid = ({
 // ─── Participant block ────────────────────────────────────────────────────────
 const ParticipantBlock = ({
   p,
-  centerHeights,
-  centerWeights,
-  centerShoes,
+  measurementsConfig,
+  onChangeMeasurement,
   genderOptions,
   agencies,
   requiresCert,
@@ -1085,9 +1258,8 @@ const ParticipantBlock = ({
   onChangeCert,
 }: {
   p: Participant;
-  centerHeights: MeasurementUnit[];
-  centerWeights: MeasurementUnit[];
-  centerShoes: MeasurementUnit[];
+  measurementsConfig: MeasurementsMap;
+  onChangeMeasurement: (pid: number, key: string, val: MeasurementValue) => void;
   genderOptions: GenderOption[];
   agencies: AgencyOption[];
   requiresCert: boolean;
@@ -1213,28 +1385,15 @@ const ParticipantBlock = ({
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-2">
-          <MeasurementField
-            label={LABELS.height}
-            value={p.height}
-            onChange={(v) => onChange(p.id, "height", v)}
-            options={heightOptions}
-            units={centerHeights}
-          />
-          <MeasurementField
-            label={LABELS.weight}
-            value={p.weight}
-            onChange={(v) => onChange(p.id, "weight", v)}
-            options={weightOptions}
-            units={centerWeights}
-          />
-          <MeasurementField
-            label={LABELS.shoeSize}
-            value={p.shoeSize}
-            onChange={(v) => onChange(p.id, "shoeSize", v)}
-            options={shoeOptions}
-            units={centerShoes}
-          />
-        </div>
+  {Object.entries(measurementsConfig).map(([key, config]) => (
+    <MeasurementField
+      key={key}
+      config={config}
+      value={p.measurements[key] || emptyMeasurementValue()}
+      onChange={(v) => onChangeMeasurement(p.id, key, v)}
+    />
+  ))}
+</div>
 
         <p className="text-[13px] text-[#111] leading-[160%] mt-3 mb-1">
           {LABELS.equipmentNote}
@@ -1622,7 +1781,7 @@ export const BookingFormModal: React.FC<Props> = ({
 }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
-
+  const [measurements, setMeasurements] = useState<MeasurementsMap>({});
   const [courseTitle, setCourseTitle] = useState(fallbackTitle);
   const [currency, setCurrency] = useState("€");
   const [pricePerPerson, setPricePerPerson] = useState(fallbackPrice);
@@ -1630,11 +1789,6 @@ export const BookingFormModal: React.FC<Props> = ({
     []
   );
   const [requiresCert, setRequiresCert] = useState(false);
-  const [measurements, setMeasurements] = useState<{
-    height: MeasurementUnit[];
-    weight: MeasurementUnit[];
-    shoe_size: MeasurementUnit[];
-  }>({ height: [], weight: [], shoe_size: [] });
 
   // FIX (п.4): центры и гендеры — реальные данные с бэка, без мока
   // FIX (п.4): центры и гендеры — реальные данные с бэка, без мока
@@ -1721,6 +1875,7 @@ export const BookingFormModal: React.FC<Props> = ({
       .then((data) => {
         if (cancelled) return;
         const apiItem = data.items?.[0] || null;
+console.log(data,"data");
 
         if (apiItem) {
           setCourseTitle(apiItem.name || fallbackTitle);
@@ -1767,15 +1922,9 @@ export const BookingFormModal: React.FC<Props> = ({
             setCenters([]);
           }
         }
-
         if (data.participant_measurements) {
-          setMeasurements({
-            height: data.participant_measurements.height || [],
-            weight: data.participant_measurements.weight || [],
-            shoe_size: data.participant_measurements.shoe_size || [],
-          });
+          setMeasurements(data.participant_measurements);
         }
-
         // FIX (п.4): реальные гендеры с бэка (ключ→лейбл)
               // FIX (п.4): реальные гендеры с бэка (ключ→лейбл)
               if (data.genders && typeof data.genders === "object") {
@@ -1805,36 +1954,46 @@ export const BookingFormModal: React.FC<Props> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, itemType, itemId]);
 
+  const defaultUnitId = (config?: MeasurementConfig) => {
+    if (!config || config.type === "text") return null;
+    const isCascading = config.options?.some((o) => o.type === "select" && o.options?.length);
+    if (isCascading) return null;
+    return config.options?.[0]?.id ?? null;
+  };
+  
   useEffect(() => {
     setParticipants((prev) =>
-      prev.map((p) => ({
-        ...p,
-        equipment: equipmentTemplate.map((e) => ({ ...e })),
-        height: p.height.unitId
-          ? p.height
-          : { ...p.height, unitId: measurements.height[0]?.id ?? null },
-        weight: p.weight.unitId
-          ? p.weight
-          : { ...p.weight, unitId: measurements.weight[0]?.id ?? null },
-        shoeSize: p.shoeSize.unitId
-          ? p.shoeSize
-          : { ...p.shoeSize, unitId: measurements.shoe_size[0]?.id ?? null },
-      }))
+      prev.map((p) => {
+        const nextMeasurements = { ...p.measurements };
+        Object.entries(measurements).forEach(([key, config]) => {
+          const existing = nextMeasurements[key];
+          const hasValue = existing && (existing.unitId != null || existing.path?.length);
+          if (!hasValue) {
+            nextMeasurements[key] = defaultMeasurementValue(config);
+          }
+        });
+        return {
+          ...p,
+          equipment: equipmentTemplate.map((e) => ({ ...e })),
+          measurements: nextMeasurements,
+        };
+      })
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [equipmentTemplate, measurements]);
-
+  const updateMeasurement = (id: number, key: string, val: MeasurementValue) =>
+  setParticipants((prev) =>
+    prev.map((p) =>
+      p.id === id ? { ...p, measurements: { ...p.measurements, [key]: val } } : p
+    )
+  );
   const setCount = (n: number) => {
     const c = Math.max(1, Math.min(10, n));
     setParticipantCount(c);
     setParticipants((prev) => {
       if (c > prev.length) {
         const additions = Array.from({ length: c - prev.length }, (_, i) => {
-          const np = createParticipant(prev.length + i + 1);
+          const np = createParticipant(prev.length + i + 1, measurements);
           np.equipment = equipmentTemplate.map((e) => ({ ...e }));
-          np.height.unitId = measurements.height[0]?.id ?? null;
-          np.weight.unitId = measurements.weight[0]?.id ?? null;
-          np.shoeSize.unitId = measurements.shoe_size[0]?.id ?? null;
           return np;
         });
         return [...prev, ...additions];
@@ -1882,37 +2041,14 @@ export const BookingFormModal: React.FC<Props> = ({
   const formValid =
     !!selectedDate &&
     (!centers.length || !!centerSlug) &&
-    participants.every(isParticipantValid) &&
+    participants.every((p) => isParticipantValid(p, measurements)) &&
     (!requiresCert || participants.every(isCertValid)) &&
     privacy &&
     terms &&
     !!captchaToken;
 
   // ВРЕМЕННЫЙ ДЕБАГ — удалить после диагностики
-  if (typeof window !== "undefined") {
-    console.log("formValid debug:", {
-      selectedDate: !!selectedDate,
-      centersOk: !centers.length || !!centerSlug,
-      participantsOk: participants.every(isParticipantValid),
-      requiresCert,
-      certOk: !requiresCert || participants.every(isCertValid),
-      privacy,
-      terms,
-      captchaToken: !!captchaToken,
-      participantsDetail: participants.map((p) => ({
-        id: p.id,
-        firstName: !!p.firstName.trim(),
-        lastName: !!p.lastName.trim(),
-        dob: !!p.dateOfBirth,
-        gender: !!p.gender,
-        phone: !!p.phone.trim(),
-        email: !!p.email.trim(),
-        height: !!p.height.value,
-        weight: !!p.weight.value,
-        shoeSize: !!p.shoeSize.value,
-      })),
-    });
-  }
+ 
 
   const handleSubmit = async () => {
     setSubmitError(null);
@@ -1922,7 +2058,14 @@ export const BookingFormModal: React.FC<Props> = ({
       setSubmitError("Please complete the reCAPTCHA.");
       return;
     }
-
+    const serializeMeasurement = (config: MeasurementConfig | undefined, mv: MeasurementValue) => {
+      const isCascading = config?.options?.some((o) => o.type === "select" && o.options?.length);
+      if (isCascading) {
+        const path = mv.path || [];
+        return { unit_id: path.length ? path[path.length - 1] : null };
+      }
+      return { value: mv.value, unit_id: mv.unitId };
+    };
     setIsSubmitting(true);
     try {
       const payload: any = {
@@ -1943,14 +2086,12 @@ export const BookingFormModal: React.FC<Props> = ({
               gender: p.gender,
               phone: p.phone,
               email: p.email,
-              measurements: {
-                height: { value: p.height.value, unit_id: p.height.unitId },
-                weight: { value: p.weight.value, unit_id: p.weight.unitId },
-                shoe_size: {
-                  value: p.shoeSize.value,
-                  unit_id: p.shoeSize.unitId,
-                },
-              },
+              measurements: Object.fromEntries(
+                Object.keys(measurements).map((key) => [
+                  key,
+                  serializeMeasurement(measurements[key], p.measurements[key] || emptyMeasurementValue()),
+                ])
+              ),
               certification: requiresCert
               ? {
                   agency_id: p.certAgency !== "other" ? p.certAgency : null,
@@ -2185,9 +2326,8 @@ export const BookingFormModal: React.FC<Props> = ({
                         <ParticipantBlock
                           key={p.id}
                           p={p}
-                          centerHeights={measurements.height}
-                          centerWeights={measurements.weight}
-                          centerShoes={measurements.shoe_size}
+                          measurementsConfig={measurements}
+                          onChangeMeasurement={updateMeasurement}
                           genderOptions={genderOptions}
                           agencies={agencies}
                           requiresCert={requiresCert}
