@@ -79,37 +79,38 @@ export type Terms = {
 
 export type MenuData = {
   terms: Terms;
-  data: {
-    main: MenuItem[];
-    footer: MenuItem[];
-    bottom: MenuItem[];
-  };
+  data: { main: MenuItem[]; footer: MenuItem[]; bottom: MenuItem[] };
   diving_centers: DivingCenter[];
+  settings?: {                          // ← новое
+    google?: {
+      google_recaptcha_key?: string;
+    };
+  };
 };
-
 // ---------------------------------------------------------------------------
 // Module-level cache
 // ---------------------------------------------------------------------------
 
 const _cache: Record<string, MenuData> = {};
 const _promises: Record<string, Promise<MenuData>> = {};
-
 async function fetchMenuData(locale: string): Promise<MenuData> {
-  if (_cache[locale]) return Promise.resolve(_cache[locale]);
-  if (await _promises[locale]) return _promises[locale];
+  if (_cache[locale]) return _cache[locale];
 
-  _promises[locale] = fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/configs/menus?lang=${locale}`,
-    { headers: { Accept: "application/json" } }
-  )
-    .then((res) => {
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      return res.json() as Promise<MenuData>;
-    })
-    .then((data) => {
-      _cache[locale] = data;
-      return data;
-    });
+  _promises[locale] = Promise.all([
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/configs/menus?lang=${locale}`, {
+      headers: { Accept: "application/json" },
+    }).then((r) => r.json()),
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/settings/public`, {
+      headers: { Accept: "application/json" },
+    }).then((r) => r.json()),
+  ]).then(([menuJson, settingsJson]) => {
+    const merged = {
+      ...menuJson,
+      settings: settingsJson.data,     // ← мёржим в один объект
+    };
+    _cache[locale] = merged;
+    return merged;
+  });
 
   return _promises[locale];
 }
@@ -127,6 +128,7 @@ interface UseMenuResult {
   terms: Terms;
   loading: boolean;
   error: string | null;
+  recaptchaKey: string;
 }
 
 export function useMenu(locale: string): UseMenuResult {
@@ -165,6 +167,7 @@ export function useMenu(locale: string): UseMenuResult {
   const divingCenters = (menuData?.diving_centers ?? []).sort(
     (a, b) => a.position - b.position
   );
+ 
 
   const colorBySlug = Object.fromEntries(
     divingCenters.map((c) => [c.slug, c.color])
@@ -172,6 +175,8 @@ export function useMenu(locale: string): UseMenuResult {
 
   const terms = menuData?.terms ?? {};
 
+  const recaptchaKey =
+  menuData?.settings?.google?.google_recaptcha_key ?? "";
 
-  return { menuData, divingCenters, colorBySlug, terms, loading, error };
+  return { menuData, divingCenters, colorBySlug, terms, loading, error,recaptchaKey };
 }

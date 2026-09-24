@@ -1530,6 +1530,7 @@ const ActivityCard = ({
 const OrderSummary = ({
   activities,
   t,
+  recaptchaKey,
   measurements,
   sharedParticipants,
   privacy,
@@ -1671,7 +1672,7 @@ const OrderSummary = ({
         <div className="mb-4 flex justify-center">
           <ReCAPTCHA
             ref={recaptchaRef}
-            sitekey={'6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'}
+            sitekey={recaptchaKey} 
             onChange={onCaptchaChange}
             onExpired={() => onCaptchaChange(null)}
           />
@@ -1811,7 +1812,7 @@ const buildBookingPayload = (activities, sharedParticipants, comment, measuremen
 export default function CartPage() {
   const locale = useLocale();
 
-  const { terms: apiTerms } = useMenu(locale);
+  const { terms: apiTerms, recaptchaKey } = useMenu(locale);
   const { executeRecaptcha } = useGoogleReCaptcha();
   const recaptchaRef = useRef(null);
   const [captchaToken, setCaptchaToken] = useState(null);
@@ -2175,6 +2176,7 @@ export default function CartPage() {
                 privacy={privacy}
                 setPrivacy={setPrivacy}
                 terms={terms}
+                recaptchaKey={recaptchaKey}
                 setTerms={setTerms}
                 comment={comment}
                 setComment={setComment}

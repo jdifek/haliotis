@@ -7,6 +7,7 @@ import { loadSibsWidgetScript } from "@/lib/payment";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import ReCAPTCHA from "react-google-recaptcha";
 import { useLocale } from "next-intl";
+import { useMenu } from "@/app/hooks/useMenu";
 // ─────────────────────────────────────────────────────────────────────────────
 // LABELS — все строки собраны в одном месте. Язык — EN (как и было), структура
 // готова под замену PT-переводами с бэка: Object.assign(LABELS, ptDict) перед
@@ -192,6 +193,7 @@ type Props = {
   courseTitle?: string;
   pricePerPerson?: number;
   initialCenterSlug?: string;
+
   unavailableDates?: string[];
 };
 
@@ -1561,9 +1563,11 @@ const ReservationSummary = ({
   widgetReady,
   paymentError,
   locale,
+  recaptchaKey, 
 }: {
   courseTitle: string;
   currency: string;
+  recaptchaKey: string;
   participants: Participant[];
   pricePerPerson: number;
   onBook: () => void;
@@ -1640,12 +1644,12 @@ const ReservationSummary = ({
       {/* reCAPTCHA v2 — только пока не создан букинг (до payment) */}
       {!payment && (
         <div className="flex justify-center my-2">
-          <ReCAPTCHA
-            ref={recaptchaRef}
-            sitekey={"6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"}
-            onChange={onCaptchaChange}
-            onExpired={() => onCaptchaChange(null)}
-          />
+         <ReCAPTCHA
+    ref={recaptchaRef}
+    sitekey={recaptchaKey}   // ← вместо хардкода
+    onChange={onCaptchaChange}
+    onExpired={() => onCaptchaChange(null)}
+  />
         </div>
       )}
 
@@ -1771,6 +1775,7 @@ const CheckboxRow = ({
 export const BookingFormModal: React.FC<Props> = ({
   isOpen,
   onClose,
+
   itemType = "course",
   itemId,
   courseTitle: fallbackTitle = "",
@@ -1778,6 +1783,7 @@ export const BookingFormModal: React.FC<Props> = ({
   initialCenterSlug,
   unavailableDates = [],
 }) => {
+
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [measurements, setMeasurements] = useState<MeasurementsMap>({});
@@ -1827,6 +1833,8 @@ export const BookingFormModal: React.FC<Props> = ({
   // Локаль для redirectUrl виджета — берите из вашего useLocale(), если он
   // используется в приложении; здесь fallback на "en".
   const locale = useLocale();
+  const { recaptchaKey } = useMenu(locale);   // ← берём отсюда
+
   // FIX (п.1): пока модалка открыта — скроллится только она, фон полностью заблокирован
   useEffect(() => {
     if (!isOpen) return;
@@ -2338,6 +2346,7 @@ console.log(data,"data");
                       ))}
                       <div className="3xl:hidden w-full">
                         <ReservationSummary
+                        recaptchaKey={recaptchaKey} 
                           courseTitle={courseTitle}
                           currency={currency}
                           participants={participants}
@@ -2383,6 +2392,7 @@ console.log(data,"data");
                       </div>
 
                       <ReservationSummary
+                      recaptchaKey={recaptchaKey} 
                         courseTitle={courseTitle}
                         currency={currency}
                         participants={participants}
